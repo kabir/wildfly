@@ -35,7 +35,7 @@ import org.jboss.as.controller.registry.ManagementResourceRegistration;
  */
 public interface ConstrainedResourceDefinition extends ResourceDefinition {
 
-    void registerContraints(final ManagementResourceRegistration resourceRegistration);
+    void registerConstraints(final ManagementResourceRegistration resourceRegistration);
 
     List<AccessConstraintDefinition> getAccessConstraints();
 }
