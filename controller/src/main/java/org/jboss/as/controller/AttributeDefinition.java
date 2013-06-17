@@ -22,6 +22,7 @@
 
 package org.jboss.as.controller;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -71,7 +72,7 @@ public abstract class AttributeDefinition {
     protected final AttributeMarshaller attributeMarshaller;
     private final boolean resourceOnly;
     private final DeprecationData deprecationData;
-    private final List<AccessConstraintDefinition> accessConstraints = Collections.emptyList(); // TODO provide these!
+    private final List<AccessConstraintDefinition> accessConstraints;
 
 
     protected AttributeDefinition(String name, String xmlName, final ModelNode defaultValue, final ModelType type,
@@ -79,14 +80,25 @@ public abstract class AttributeDefinition {
                                final ParameterValidator validator, final String[] alternatives, final String[] requires,
                                final AttributeAccess.Flag... flags) {
         this(name, xmlName, defaultValue, type, allowNull, allowExpression, measurementUnit,
-                null, validator, true, alternatives, requires, null, false, null, flags);
+                null, validator, true, alternatives, requires, null, false, null, null, flags);
+    }
+
+    protected AttributeDefinition(String name, String xmlName, final ModelNode defaultValue, final ModelType type,
+            final boolean allowNull, final boolean allowExpression, final MeasurementUnit measurementUnit,
+            final ParameterCorrector valueCorrector, final ParameterValidator validator,
+            boolean validateNull, final String[] alternatives, final String[] requires, AttributeMarshaller attributeMarshaller,
+            boolean resourceOnly, DeprecationData deprecationData, final AttributeAccess.Flag... flags) {
+        this(name, xmlName, defaultValue, type, allowNull, allowExpression, measurementUnit, valueCorrector, validator,
+                validateNull, alternatives, requires, attributeMarshaller, resourceOnly, deprecationData,
+                null, flags);
     }
 
     protected AttributeDefinition(String name, String xmlName, final ModelNode defaultValue, final ModelType type,
                                   final boolean allowNull, final boolean allowExpression, final MeasurementUnit measurementUnit,
                                   final ParameterCorrector valueCorrector, final ParameterValidator validator,
                                   boolean validateNull, final String[] alternatives, final String[] requires, AttributeMarshaller attributeMarshaller,
-                                  boolean resourceOnly, DeprecationData deprecationData, final AttributeAccess.Flag... flags) {
+                                  boolean resourceOnly, DeprecationData deprecationData, final AccessConstraintDefinition[] accessConstraints,
+                                  final AttributeAccess.Flag... flags) {
 
         this.name = name;
         this.xmlName = xmlName;
@@ -121,6 +133,11 @@ public abstract class AttributeDefinition {
             this.attributeMarshaller = new DefaultAttributeMarshaller();
         }
         this.resourceOnly = resourceOnly;
+        if (accessConstraints == null) {
+            this.accessConstraints = Collections.<AccessConstraintDefinition>emptyList();
+        } else {
+            this.accessConstraints = Collections.unmodifiableList(Arrays.asList(accessConstraints));
+        }
         this.deprecationData = deprecationData;
     }
 
