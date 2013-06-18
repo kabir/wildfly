@@ -263,8 +263,8 @@ public abstract class AbstractAttributeDefinitionBuilder<BUILDER extends Abstrac
             accessConstraints = new AccessConstraintDefinition[1];
         } else {
             accessConstraints = Arrays.copyOf(accessConstraints, accessConstraints.length + 1);
-            accessConstraints[accessConstraints.length - 1] = accessConstraint;
         }
+        accessConstraints[accessConstraints.length - 1] = accessConstraint;
         return (BUILDER) this;
     }
 }
