@@ -85,7 +85,7 @@ public abstract class AbstractResourceDefinition extends SimpleResourceDefinitio
         return Collections.unmodifiableMap(childResourceDefinitions);
     }
 
-    private void addAttributeDefinition(ModelElement resourceDefinitionKey, SimpleAttributeDefinition attribute) {
+    protected void addAttributeDefinition(ModelElement resourceDefinitionKey, SimpleAttributeDefinition attribute) {
         List<SimpleAttributeDefinition> resourceAttributes = attributeDefinitions.get(resourceDefinitionKey);
 
         if (resourceAttributes == null) {

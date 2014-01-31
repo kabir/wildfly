@@ -39,7 +39,7 @@ public class IDMConfigAddStepHandler extends RestartParentResourceAddHandler {
     private final AttributeDefinition[] attributes;
 
     IDMConfigAddStepHandler(final AttributeDefinition... attributes) {
-        super(ModelElement.IDENTITY_MANAGEMENT.getName());
+        super(ModelElement.PARTITION_MANAGER.getName());
         this.attributes = attributes != null ? attributes : new AttributeDefinition[0];
     }
 

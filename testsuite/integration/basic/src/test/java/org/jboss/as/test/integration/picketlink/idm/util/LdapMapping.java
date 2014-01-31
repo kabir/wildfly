@@ -32,7 +32,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.COM
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.STEPS;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_CLASS;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_CLASS_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE_BASE_DN_SUFFIX;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE_MAPPING;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE_MAPPING_OBJECT_CLASSES;
@@ -75,7 +75,7 @@ public class LdapMapping {
         ModelNode mappingAddOperation = Util.createAddOperation(PathAddress.pathAddress(parentNode.get(OP_ADDR)).append(LDAP_STORE_MAPPING
                                                                                                                         .getName(), this.type));
 
-        mappingAddOperation.get(COMMON_CLASS.getName()).set(this.type);
+        mappingAddOperation.get(COMMON_CLASS_NAME.getName()).set(this.type);
 
         if (this.baseDn != null) {
             mappingAddOperation.get(LDAP_STORE_BASE_DN_SUFFIX.getName()).set(this.baseDn);

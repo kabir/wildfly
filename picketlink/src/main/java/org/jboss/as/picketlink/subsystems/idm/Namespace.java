@@ -23,7 +23,7 @@ package org.jboss.as.picketlink.subsystems.idm;
 
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.as.picketlink.subsystems.idm.model.parser.IDMSubsystemReader_1_0;
-import org.jboss.as.picketlink.subsystems.idm.model.parser.IDMSubsystemWriter_1_0;
+import org.jboss.as.picketlink.subsystems.idm.model.parser.IDMSubsystemWriter;
 import org.jboss.dmr.ModelNode;
 import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public enum Namespace {
 
-    PICKETLINK_IDENTITY_MANAGEMENT_1_0(1, 0, new IDMSubsystemReader_1_0(), new IDMSubsystemWriter_1_0());
+    PICKETLINK_IDENTITY_MANAGEMENT_1_0(1, 0, new IDMSubsystemReader_1_0(), new IDMSubsystemWriter());
 
     public static final Namespace CURRENT = PICKETLINK_IDENTITY_MANAGEMENT_1_0;
     private static final String BASE_URN = "urn:jboss:domain:picketlink-identity-management:";

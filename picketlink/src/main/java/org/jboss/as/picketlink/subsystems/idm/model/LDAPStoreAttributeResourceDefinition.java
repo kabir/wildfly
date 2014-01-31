@@ -34,10 +34,18 @@ import org.jboss.dmr.ModelType;
  */
 public class LDAPStoreAttributeResourceDefinition extends AbstractResourceDefinition {
 
-    public static final SimpleAttributeDefinition NAME = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_NAME.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition LDAP_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_LDAP_NAME.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition IS_IDENTIFIER = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_IS_IDENTIFIER.getName(), ModelType.BOOLEAN, true).setDefaultValue(new ModelNode(false)).build();
-    public static final SimpleAttributeDefinition READ_ONLY = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_READ_ONLY.getName(), ModelType.BOOLEAN, true).setDefaultValue(new ModelNode(false)).build();
+    public static final SimpleAttributeDefinition NAME = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_NAME.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition LDAP_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_LDAP_NAME.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition IS_IDENTIFIER = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_IS_IDENTIFIER.getName(), ModelType.BOOLEAN, true)
+        .setDefaultValue(new ModelNode(false))
+        .build();
+    public static final SimpleAttributeDefinition READ_ONLY = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_ATTRIBUTE_READ_ONLY.getName(), ModelType.BOOLEAN, true)
+        .setDefaultValue(new ModelNode(false))
+        .build();
     public static final LDAPStoreAttributeResourceDefinition INSTANCE = new LDAPStoreAttributeResourceDefinition(NAME, LDAP_NAME, IS_IDENTIFIER, READ_ONLY);
 
     private LDAPStoreAttributeResourceDefinition(SimpleAttributeDefinition... attributes) {

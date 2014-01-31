@@ -22,6 +22,7 @@
 
 package org.jboss.as.picketlink;
 
+import org.jboss.as.controller.OperationFailedException;
 import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
@@ -59,7 +60,7 @@ public interface PicketLinkMessages {
 
     // IDM Messages
     @Message(id = 12504, value = "No IdentityConfiguration provided. Maybe you forgot to provide a @Producer method for the IdentityConfiguration.")
-    IllegalStateException idmNoConfigurationProvided();
+    OperationFailedException idmNoConfigurationProvided();
 
     @Message(id = 12505, value = "Entities module not found [%s].")
     SecurityConfigurationException idmJpaEntityModuleNotFound(String entityModuleName);

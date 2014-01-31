@@ -34,7 +34,10 @@ import org.jboss.dmr.ModelType;
  */
 public class SupportedTypesResourceDefinition extends AbstractResourceDefinition {
 
-    public static final SimpleAttributeDefinition SUPPORTS_ALL = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_SUPPORTS_ALL.getName(), ModelType.BOOLEAN, true).setDefaultValue(new ModelNode().set("false")).setAllowExpression(true).build();
+    public static final SimpleAttributeDefinition SUPPORTS_ALL = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_SUPPORTS_ALL.getName(), ModelType.BOOLEAN, true)
+        .setDefaultValue(new ModelNode(false))
+        .setAllowExpression(true)
+        .build();
     public static final SupportedTypesResourceDefinition INSTANCE = new SupportedTypesResourceDefinition(SUPPORTS_ALL);
 
     private SupportedTypesResourceDefinition(SimpleAttributeDefinition... attributes) {

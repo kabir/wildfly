@@ -29,6 +29,8 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.picketlink.subsystems.idm.service.PartitionManagerService;
 import org.jboss.dmr.ModelNode;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  */
@@ -42,8 +44,9 @@ public class IdentityManagementRemoveHandler extends AbstractRemoveStepHandler {
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model)
             throws OperationFailedException {
-        String alias = PathAddress.pathAddress(model).getLastElement().getValue();
-        context.removeService(PartitionManagerService.createServiceName(alias));
+        PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
+        final String federationName = address.getLastElement().getValue();
+        context.removeService(PartitionManagerService.createServiceName(federationName));
         context.completeStep(OperationContext.ResultHandler.NOOP_RESULT_HANDLER);
     }
 }

@@ -33,11 +33,19 @@ import org.jboss.dmr.ModelType;
  */
 public class LDAPStoreResourceDefinition extends AbstractIdentityStoreResourceDefinition {
 
-    public static final SimpleAttributeDefinition URL = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_URL.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition BIND_DN = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_BIND_DN.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition BIND_CREDENTIAL = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_BIND_CREDENTIAL.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition BASE_DN_SUFFIX = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_BASE_DN_SUFFIX.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final LDAPStoreResourceDefinition INSTANCE = new LDAPStoreResourceDefinition(URL, BIND_DN, BIND_CREDENTIAL, BASE_DN_SUFFIX, MODULE, SUPPORT_ATTRIBUTE, SUPPORT_CREDENTIAL);
+    public static final SimpleAttributeDefinition URL = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_URL.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition BIND_DN = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_BIND_DN.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition BIND_CREDENTIAL = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_BIND_CREDENTIAL.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition BASE_DN_SUFFIX = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_BASE_DN_SUFFIX.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final LDAPStoreResourceDefinition INSTANCE = new LDAPStoreResourceDefinition(URL, BIND_DN, BIND_CREDENTIAL, BASE_DN_SUFFIX);
 
     private LDAPStoreResourceDefinition(SimpleAttributeDefinition... attributes) {
         super(ModelElement.LDAP_STORE, new IDMConfigAddStepHandler(attributes), attributes);

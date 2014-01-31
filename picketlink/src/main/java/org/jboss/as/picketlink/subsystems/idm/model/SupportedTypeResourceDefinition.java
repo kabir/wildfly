@@ -32,10 +32,15 @@ import org.jboss.dmr.ModelType;
  */
 public class SupportedTypeResourceDefinition extends AbstractResourceDefinition {
 
-    public static final SimpleAttributeDefinition COMMON_CLASS = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SupportedTypeResourceDefinition INSTANCE = new SupportedTypeResourceDefinition();
+    public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SupportedTypeResourceDefinition INSTANCE = new SupportedTypeResourceDefinition(CLASS_NAME, MODULE);
 
-    private SupportedTypeResourceDefinition() {
-        super(ModelElement.SUPPORTED_TYPE, new IDMConfigAddStepHandler(COMMON_CLASS), COMMON_CLASS);
+    private SupportedTypeResourceDefinition(SimpleAttributeDefinition... attributes) {
+        super(ModelElement.SUPPORTED_TYPE, new IDMConfigAddStepHandler(attributes), attributes);
     }
 }

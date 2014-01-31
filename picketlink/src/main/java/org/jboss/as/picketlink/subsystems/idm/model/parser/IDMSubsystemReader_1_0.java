@@ -54,7 +54,7 @@ import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.FILE_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_CONFIGURATION;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_MANAGEMENT;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.PARTITION_MANAGER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_STORE_CREDENTIAL_HANDLER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.JPA_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE;
@@ -112,7 +112,7 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
             }
 
             switch (modelKey) {
-                case IDENTITY_MANAGEMENT:
+                case PARTITION_MANAGER:
                     parseIdentityManagementConfig(reader, subsystemNode, addOperations);
                     break;
                 default:
@@ -123,7 +123,7 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
 
     private void parseIdentityManagementConfig(final XMLExtendedStreamReader reader, final ModelNode parentNode,
                                                       final List<ModelNode> addOperations) throws XMLStreamException {
-        ModelNode identityManagementNode = parseConfig(reader, IDENTITY_MANAGEMENT, COMMON_NAME.getName(), parentNode,
+        ModelNode identityManagementNode = parseConfig(reader, PARTITION_MANAGER, COMMON_NAME.getName(), parentNode,
                                                               IdentityManagementResourceDefinition.INSTANCE.getAttributes(), addOperations);
 
         parseElement(new ElementParser() {
@@ -136,7 +136,7 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
                         break;
                 }
             }
-        }, IDENTITY_MANAGEMENT, identityManagementNode, reader, addOperations);
+        }, PARTITION_MANAGER, identityManagementNode, reader, addOperations);
     }
 
     private void parseIdentityConfigurationConfig(final XMLExtendedStreamReader reader, final ModelNode parentNode,
@@ -232,7 +232,7 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
     private void parseLDAPMappingConfig(final XMLExtendedStreamReader reader, final ModelNode identityProviderNode,
                                                final List<ModelNode> addOperations) throws XMLStreamException {
         ModelNode ldapMappingConfig = parseConfig(reader, LDAP_STORE_MAPPING,
-                                                         LDAPStoreMappingResourceDefinition.CLASS.getName(), identityProviderNode,
+                                                         LDAPStoreMappingResourceDefinition.CLASS_NAME.getName(), identityProviderNode,
                                                          LDAPStoreMappingResourceDefinition.INSTANCE.getAttributes(), addOperations);
 
         parseElement(new ElementParser() {
@@ -251,7 +251,7 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
 
     private ModelNode parseCredentialHandlerConfig(XMLExtendedStreamReader reader, ModelNode identityProviderNode,
                                                           List<ModelNode> addOperations) throws XMLStreamException {
-        return parseConfig(reader, IDENTITY_STORE_CREDENTIAL_HANDLER, CredentialHandlerResourceDefinition.CLASS.getName(),
+        return parseConfig(reader, IDENTITY_STORE_CREDENTIAL_HANDLER, CredentialHandlerResourceDefinition.CLASS_NAME.getName(),
                                   identityProviderNode, CredentialHandlerResourceDefinition.INSTANCE.getAttributes(), addOperations);
     }
 
@@ -266,7 +266,7 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
                                      List<ModelNode> addOperations) throws XMLStreamException {
                 switch (element) {
                     case SUPPORTED_TYPE:
-                        parseConfig(reader, SUPPORTED_TYPE, SupportedTypeResourceDefinition.COMMON_CLASS.getName(), parentNode,
+                        parseConfig(reader, SUPPORTED_TYPE, SupportedTypeResourceDefinition.CLASS_NAME.getName(), parentNode,
                                            SupportedTypeResourceDefinition.INSTANCE.getAttributes(), addOperations);
                         break;
                 }

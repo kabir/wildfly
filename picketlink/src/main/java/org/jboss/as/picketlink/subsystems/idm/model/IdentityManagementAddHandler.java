@@ -37,6 +37,7 @@ import org.jboss.as.picketlink.subsystems.idm.service.JPAIdentityStoreInitialize
 import org.jboss.as.picketlink.subsystems.idm.service.PartitionManagerService;
 import org.jboss.as.txn.service.TxnServices;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoadException;
@@ -99,11 +100,11 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         ServiceBuilder<PartitionManager> serviceBuilder = context.getServiceTarget().addService(PartitionManagerService.createServiceName(federationName), partitionManagerService);
         ModelNode identityManagement = Resource.Tools.readModel(context.readResource(EMPTY_ADDRESS));
 
-        for (ModelNode identityConfiguration : identityManagement.get(IDENTITY_CONFIGURATION.getName()).asList()) {
-            String configurationName = identityConfiguration.asProperty().getName();
+        for (Property identityConfiguration : identityManagement.get(IDENTITY_CONFIGURATION.getName()).asPropertyList()) {
+            String configurationName = identityConfiguration.getName();
             NamedIdentityConfigurationBuilder namedIdentityConfigurationBuilder = builder.named(configurationName);
 
-            for (ModelNode store : identityConfiguration.asProperty().getValue().asList()) {
+            for (ModelNode store : identityConfiguration.getValue().asList()) {
                 configureIdentityStore(context, serviceBuilder, partitionManagerService, namedIdentityConfigurationBuilder, store);
             }
         }
@@ -116,56 +117,32 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
     }
 
     private void configureIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, PartitionManagerService partitionManagerService, NamedIdentityConfigurationBuilder namedIdentityConfigurationBuilder, ModelNode modelNode) throws OperationFailedException {
-        String storeType = modelNode.keys().iterator().next();
-        ModelNode identityStore = modelNode.asProperty().getValue().asProperty().getValue();
-
-        ModelNode alternativeModuleNode = JPAStoreResourceDefinition.MODULE.resolveModelAttribute(context, identityStore);
-        Module alternativeModule;
-
-        if (alternativeModuleNode.isDefined()) {
-            ModuleLoader moduleLoader = Module.getBootModuleLoader();
-            try {
-                alternativeModule = moduleLoader.loadModule(ModuleIdentifier.create(alternativeModuleNode.asString()));
-            } catch (ModuleLoadException e) {
-                throw MESSAGES.moduleCouldNotLoad(alternativeModuleNode.asString(), e);
-            }
-        } else {
-            alternativeModule = Module.getCallerModule();
-        }
-
-        IdentityStoreConfigurationBuilder storeConfig;
+        Property prop = modelNode.asProperty();
+        String storeType = prop.getName();
+        ModelNode identityStore = prop.getValue().asProperty().getValue();
+        IdentityStoreConfigurationBuilder storeConfig = null;
 
         if (storeType.equals(JPA_STORE.getName())) {
             storeConfig = configureJPAIdentityStore(context, serviceBuilder, partitionManagerService, identityStore, namedIdentityConfigurationBuilder);
         } else if (storeType.equals(FILE_STORE.getName())) {
             storeConfig = configureFileIdentityStore(context, identityStore, namedIdentityConfigurationBuilder);
         } else if (storeType.equals(LDAP_STORE.getName())) {
-            storeConfig = configureLDAPIdentityStore(context, alternativeModule, identityStore, namedIdentityConfigurationBuilder);
-        } else {
-            throw MESSAGES.idmNoConfigurationProvided();
+            storeConfig = configureLDAPIdentityStore(context, identityStore, namedIdentityConfigurationBuilder);
         }
 
         ModelNode supportAttributeNode = JPAStoreResourceDefinition.SUPPORT_ATTRIBUTE.resolveModelAttribute(context, identityStore);
 
-        storeConfig.supportAttributes(true);
-
-        if (supportAttributeNode.isDefined()) {
-            storeConfig.supportAttributes(supportAttributeNode.asBoolean());
-        }
+        storeConfig.supportAttributes(supportAttributeNode.asBoolean());
 
         ModelNode supportCredentialNode = JPAStoreResourceDefinition.SUPPORT_CREDENTIAL.resolveModelAttribute(context, identityStore);
 
-        storeConfig.supportCredentials(true);
+        storeConfig.supportCredentials(supportCredentialNode.asBoolean());
 
-        if (supportCredentialNode.isDefined()) {
-            storeConfig.supportCredentials(supportCredentialNode.asBoolean());
-        }
-
-        configureSupportedTypes(context, identityStore, alternativeModule, storeConfig);
-        configureCredentialHandlers(context, identityStore, alternativeModule, storeConfig);
+        configureSupportedTypes(context, identityStore, storeConfig);
+        configureCredentialHandlers(context, identityStore, storeConfig);
     }
 
-    private LDAPStoreConfigurationBuilder configureLDAPIdentityStore(OperationContext context, Module alternativeModule, ModelNode ldapIdentityStore, NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
+    private LDAPStoreConfigurationBuilder configureLDAPIdentityStore(OperationContext context, ModelNode ldapIdentityStore, NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
         LDAPStoreConfigurationBuilder storeConfig = builder.stores().ldap();
         ModelNode url = LDAPStoreResourceDefinition.URL.resolveModelAttribute(context, ldapIdentityStore);
         ModelNode bindDn = LDAPStoreResourceDefinition.BIND_DN.resolveModelAttribute(context, ldapIdentityStore);
@@ -191,23 +168,14 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         if (ldapIdentityStore.hasDefined(LDAP_STORE_MAPPING.getName())) {
             for (ModelNode mappingNode : ldapIdentityStore.get(LDAP_STORE_MAPPING.getName()).asList()) {
                 ModelNode ldapMapping = mappingNode.asProperty().getValue();
-                String mappingClass = LDAPStoreMappingResourceDefinition.CLASS.resolveModelAttribute(context, ldapMapping).asString();
-                LDAPMappingConfigurationBuilder storeMapping;
-
-                try {
-                    storeMapping = storeConfig.mapping(this.<AttributedType>loadClass(alternativeModule, mappingClass));
-                } catch (ClassNotFoundException e) {
-                    throw MESSAGES.couldNotLoadClass(mappingClass, e);
-                }
+                String mappingClass = LDAPStoreMappingResourceDefinition.CLASS_NAME.resolveModelAttribute(context, ldapMapping).asString();
+                ModelNode moduleNode = LDAPStoreMappingResourceDefinition.MODULE.resolveModelAttribute(context, ldapMapping);
+                LDAPMappingConfigurationBuilder storeMapping = storeConfig.mapping(this.<AttributedType>loadClass(moduleNode, mappingClass));
 
                 ModelNode relatesTo = LDAPStoreMappingResourceDefinition.RELATES_TO.resolveModelAttribute(context, ldapMapping);
 
                 if (relatesTo.isDefined()) {
-                    try {
-                        storeMapping.forMapping(this.<AttributedType>loadClass(alternativeModule, relatesTo.asString()));
-                    } catch (ClassNotFoundException e) {
-                        throw MESSAGES.couldNotLoadClass(relatesTo.asString(), e);
-                    }
+                    storeMapping.forMapping(this.<AttributedType>loadClass(moduleNode, relatesTo.asString()));
                 } else {
                     String baseDN = LDAPStoreMappingResourceDefinition.BASE_DN.resolveModelAttribute(context, ldapMapping).asString();
 
@@ -249,15 +217,6 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         return storeConfig;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> Class<T> loadClass(final Module module, final String typeName) throws ClassNotFoundException {
-        if (module != null) {
-            return (Class<T>) module.getClassLoader().loadClass(typeName);
-        }
-
-        return (Class<T>) Class.forName(typeName);
-    }
-
     private IdentityStoreConfigurationBuilder configureFileIdentityStore(OperationContext context, ModelNode resource, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
         FileStoreConfigurationBuilder fileStoreBuilder = builder.stores().file();
 
@@ -270,17 +229,9 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
             fileStoreBuilder.workingDirectory(workingDir.asString());
         }
 
-        if (alwaysCreateFiles.isDefined()) {
-            fileStoreBuilder.preserveState(!alwaysCreateFiles.asBoolean());
-        }
-
-        if (asyncWrite.isDefined()) {
-            fileStoreBuilder.asyncWrite(asyncWrite.asBoolean());
-        }
-
-        if (asyncWriteThreadPool.isDefined()) {
-            fileStoreBuilder.asyncWriteThreadPool(asyncWriteThreadPool.asInt());
-        }
+        fileStoreBuilder.preserveState(!alwaysCreateFiles.asBoolean());
+        fileStoreBuilder.asyncWrite(asyncWrite.asBoolean());
+        fileStoreBuilder.asyncWriteThreadPool(asyncWriteThreadPool.asInt());
 
         return fileStoreBuilder;
     }
@@ -297,9 +248,7 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
             storeConfig.entityModule(jpaEntityModule.asString());
         }
 
-        if (jpaEntityModuleUnitName.isDefined()) {
-            storeConfig.entityModuleUnitName(jpaEntityModuleUnitName.asString());
-        }
+        storeConfig.entityModuleUnitName(jpaEntityModuleUnitName.asString());
 
         if (jpaDataSourceNode.isDefined()) {
             storeConfig.dataSourceJndiUrl(toJndiName(jpaDataSourceNode.asString()));
@@ -320,46 +269,39 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private void configureSupportedTypes(OperationContext context, ModelNode identityStore, Module alternativeModule, IdentityStoreConfigurationBuilder storeConfig) throws OperationFailedException {
+    private void configureSupportedTypes(OperationContext context, ModelNode identityStore, IdentityStoreConfigurationBuilder storeConfig) throws OperationFailedException {
         if (identityStore.hasDefined(SUPPORTED_TYPES.getName())) {
             ModelNode featuresSet = identityStore.get(SUPPORTED_TYPES.getName()).asProperty().getValue();
             ModelNode supportsAll = SupportedTypesResourceDefinition.SUPPORTS_ALL.resolveModelAttribute(context, featuresSet);
 
-            if (supportsAll.isDefined() && supportsAll.asBoolean()) {
+            if (supportsAll.asBoolean()) {
                 storeConfig.supportAllFeatures();
             }
 
             if (featuresSet.hasDefined(SUPPORTED_TYPE.getName())) {
-                for (ModelNode featureNode : featuresSet.get(SUPPORTED_TYPE.getName()).asList()) {
-                    ModelNode feature = featureNode.asProperty().getValue();
-                    String typeName = SupportedTypeResourceDefinition.COMMON_CLASS.resolveModelAttribute(context, feature).asString();
+                for (Property featureNode : featuresSet.get(SUPPORTED_TYPE.getName()).asPropertyList()) {
+                    ModelNode feature = featureNode.getValue();
+                    String typeName = SupportedTypeResourceDefinition.CLASS_NAME.resolveModelAttribute(context, feature).asString();
+                    ModelNode moduleNode = SupportedTypeResourceDefinition.MODULE.resolveModelAttribute(context, feature);
+                    Class<? extends AttributedType> attributedTypeClass = loadClass(moduleNode, typeName);
 
-                    try {
-                        Class<? extends AttributedType> attributedTypeClass = loadClass(alternativeModule, typeName);
-
-                        if (Relationship.class.isAssignableFrom(attributedTypeClass)) {
-                            storeConfig.supportGlobalRelationship((Class<? extends Relationship>) attributedTypeClass);
-                        } else {
-                            storeConfig.supportType(attributedTypeClass);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        throw MESSAGES.couldNotLoadClass(typeName, e);
+                    if (Relationship.class.isAssignableFrom(attributedTypeClass)) {
+                        storeConfig.supportGlobalRelationship((Class<? extends Relationship>) attributedTypeClass);
+                    } else {
+                        storeConfig.supportType(attributedTypeClass);
                     }
                 }
             }
         }
     }
 
-    private void configureCredentialHandlers(OperationContext context, ModelNode identityStore, Module alternativeModule, IdentityStoreConfigurationBuilder storeConfig) throws OperationFailedException {
+    private void configureCredentialHandlers(OperationContext context, ModelNode identityStore, IdentityStoreConfigurationBuilder storeConfig) throws OperationFailedException {
         if (identityStore.hasDefined(IDENTITY_STORE_CREDENTIAL_HANDLER.getName())) {
             for (ModelNode credentialHandler : identityStore.get(IDENTITY_STORE_CREDENTIAL_HANDLER.getName()).asList()) {
-                String typeName = CredentialHandlerResourceDefinition.CLASS.resolveModelAttribute(context, credentialHandler.asProperty().getValue()).asString();
+                String typeName = CredentialHandlerResourceDefinition.CLASS_NAME.resolveModelAttribute(context, credentialHandler.asProperty().getValue()).asString();
+                ModelNode moduleNode = CredentialHandlerResourceDefinition.MODULE.resolveModelAttribute(context, credentialHandler.asProperty().getValue());
 
-                try {
-                    storeConfig.addCredentialHandler(loadClass(alternativeModule, typeName));
-                } catch (ClassNotFoundException e) {
-                    throw MESSAGES.couldNotLoadClass(typeName, e);
-                }
+                storeConfig.addCredentialHandler(loadClass(moduleNode, typeName));
             }
         }
     }
@@ -373,4 +315,32 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
 
         return jndiName;
     }
+
+    private Module getModule(ModelNode moduleNode) {
+        Module module;
+
+        if (moduleNode.isDefined()) {
+            ModuleLoader moduleLoader = Module.getBootModuleLoader();
+            try {
+                module = moduleLoader.loadModule(ModuleIdentifier.create(moduleNode.asString()));
+            } catch (ModuleLoadException e) {
+                throw MESSAGES.moduleCouldNotLoad(moduleNode.asString(), e);
+            }
+        } else {
+            // fallback to caller module.
+            module = Module.getCallerModule();
+        }
+
+        return module;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Class<T> loadClass(ModelNode moduleNode, String typeName) {
+        try {
+            return (Class<T>) getModule(moduleNode).getClassLoader().loadClass(typeName);
+        } catch (ClassNotFoundException cnfe) {
+            throw MESSAGES.couldNotLoadClass(typeName, cnfe);
+        }
+    }
+
 }

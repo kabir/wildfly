@@ -4,8 +4,6 @@
              version="2.0">
 
   <persistence-unit name="identity" transaction-type="JTA">
-    <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
-
     <class>org.picketlink.idm.jpa.model.sample.simple.AttributedTypeEntity</class>
     <class>org.picketlink.idm.jpa.model.sample.simple.AccountTypeEntity</class>
     <class>org.picketlink.idm.jpa.model.sample.simple.RoleTypeEntity</class>

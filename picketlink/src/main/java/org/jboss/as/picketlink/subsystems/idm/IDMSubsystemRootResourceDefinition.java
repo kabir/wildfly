@@ -39,4 +39,5 @@ public class IDMSubsystemRootResourceDefinition extends SimpleResourceDefinition
                  IDMExtension.getResourceDescriptionResolver(IDMExtension.SUBSYSTEM_NAME),
                  IDMSubsystemAdd.INSTANCE, ReloadRequiredRemoveStepHandler.INSTANCE);
     }
+
 }

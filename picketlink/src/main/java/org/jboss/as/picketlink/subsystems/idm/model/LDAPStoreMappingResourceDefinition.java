@@ -33,12 +33,25 @@ import org.jboss.dmr.ModelType;
  */
 public class LDAPStoreMappingResourceDefinition extends AbstractResourceDefinition {
 
-    public static final SimpleAttributeDefinition CLASS = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_CLASS.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition BASE_DN = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_BASE_DN.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition OBJECT_CLASSES = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_OBJECT_CLASSES.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition PARENT_ATTRIBUTE = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_PARENT_ATTRIBUTE_NAME.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition RELATES_TO = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_RELATES_TO.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final LDAPStoreMappingResourceDefinition INSTANCE = new LDAPStoreMappingResourceDefinition(CLASS, BASE_DN, OBJECT_CLASSES, PARENT_ATTRIBUTE, RELATES_TO);
+    public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, false)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition BASE_DN = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_BASE_DN.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition OBJECT_CLASSES = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_OBJECT_CLASSES.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition PARENT_ATTRIBUTE = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_PARENT_ATTRIBUTE_NAME.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition RELATES_TO = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_RELATES_TO.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final LDAPStoreMappingResourceDefinition INSTANCE = new LDAPStoreMappingResourceDefinition(CLASS_NAME, MODULE, BASE_DN, OBJECT_CLASSES, PARENT_ATTRIBUTE, RELATES_TO);
 
     private LDAPStoreMappingResourceDefinition(SimpleAttributeDefinition... attributes) {
         super(ModelElement.LDAP_STORE_MAPPING, new IDMConfigAddStepHandler(attributes), attributes);

@@ -37,7 +37,7 @@ public class IdentityManagementResourceDefinition extends AbstractResourceDefini
     public static final IdentityManagementResourceDefinition INSTANCE = new IdentityManagementResourceDefinition();
 
     private IdentityManagementResourceDefinition() {
-        super(ModelElement.IDENTITY_MANAGEMENT, IdentityManagementAddHandler.INSTANCE,
+        super(ModelElement.PARTITION_MANAGER, IdentityManagementAddHandler.INSTANCE,
                  IdentityManagementRemoveHandler.INSTANCE, IDENTITY_MANAGEMENT_JNDI_URL);
     }
 

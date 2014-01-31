@@ -29,11 +29,19 @@ import org.jboss.dmr.ModelType;
 
 public abstract class AbstractIdentityStoreResourceDefinition extends AbstractResourceDefinition {
 
-    public static final SimpleAttributeDefinition SUPPORT_ATTRIBUTE = new SimpleAttributeDefinitionBuilder(ModelElement.IDENTITY_STORE_SUPPORT_ATTRIBUTE.getName(), ModelType.BOOLEAN, true).setDefaultValue(new ModelNode(true)).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition SUPPORT_CREDENTIAL = new SimpleAttributeDefinitionBuilder(ModelElement.IDENTITY_STORE_SUPPORT_CREDENTIAL.getName(), ModelType.BOOLEAN, true).setDefaultValue(new ModelNode(true)).setAllowExpression(true).build();
+    public static final SimpleAttributeDefinition SUPPORT_ATTRIBUTE = new SimpleAttributeDefinitionBuilder(ModelElement.IDENTITY_STORE_SUPPORT_ATTRIBUTE.getName(), ModelType.BOOLEAN, true)
+        .setDefaultValue(new ModelNode(true))
+        .setAllowExpression(true)
+        .build();
+
+    public static final SimpleAttributeDefinition SUPPORT_CREDENTIAL = new SimpleAttributeDefinitionBuilder(ModelElement.IDENTITY_STORE_SUPPORT_CREDENTIAL.getName(), ModelType.BOOLEAN, true)
+        .setDefaultValue(new ModelNode(true))
+        .setAllowExpression(true)
+        .build();
 
     protected AbstractIdentityStoreResourceDefinition(ModelElement modelElement, OperationStepHandler addHandler, SimpleAttributeDefinition... attributes) {
         super(modelElement, addHandler, attributes);
+        addAttributeDefinition(modelElement, SUPPORT_ATTRIBUTE);
+        addAttributeDefinition(modelElement, SUPPORT_CREDENTIAL);
     }
 }

@@ -32,10 +32,15 @@ import org.jboss.dmr.ModelType;
  */
 public class CredentialHandlerResourceDefinition extends AbstractResourceDefinition {
 
-    public static final SimpleAttributeDefinition CLASS = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final CredentialHandlerResourceDefinition INSTANCE = new CredentialHandlerResourceDefinition();
+    public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, false)
+       .setAllowExpression(true)
+       .build();
+    public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final CredentialHandlerResourceDefinition INSTANCE = new CredentialHandlerResourceDefinition(CLASS_NAME, MODULE);
 
-    private CredentialHandlerResourceDefinition() {
-        super(ModelElement.IDENTITY_STORE_CREDENTIAL_HANDLER, new IDMConfigAddStepHandler(CLASS), CLASS);
+    private CredentialHandlerResourceDefinition(SimpleAttributeDefinition... attributes) {
+        super(ModelElement.IDENTITY_STORE_CREDENTIAL_HANDLER, new IDMConfigAddStepHandler(attributes), attributes);
     }
 }

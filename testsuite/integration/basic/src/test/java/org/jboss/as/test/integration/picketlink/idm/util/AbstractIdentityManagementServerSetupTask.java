@@ -41,10 +41,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RES
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.STEPS;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 import static org.jboss.as.picketlink.subsystems.idm.IDMExtension.SUBSYSTEM_NAME;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_ALIAS;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_SUPPORTS_ALL;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_CONFIGURATION;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_MANAGEMENT;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.PARTITION_MANAGER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_MANAGEMENT_JNDI_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.SUPPORTED_TYPES;
 import static org.jboss.as.test.integration.security.common.Utils.applyUpdate;
@@ -98,14 +98,14 @@ public abstract class AbstractIdentityManagementServerSetupTask implements Serve
     private ModelNode createIdentityManagementAddOperation() {
         ModelNode operationAddIdentityManagement = Util.createAddOperation(getIdentityManagementPathAddress());
 
-        operationAddIdentityManagement.get(COMMON_ALIAS.getName()).set(this.alias);
+        operationAddIdentityManagement.get(COMMON_NAME.getName()).set(this.alias);
         operationAddIdentityManagement.get(IDENTITY_MANAGEMENT_JNDI_NAME.getName()).set(this.jndiName);
 
         return operationAddIdentityManagement;
     }
 
     private PathAddress getIdentityManagementPathAddress() {
-        return PathAddress.pathAddress().append(SUBSYSTEM, SUBSYSTEM_NAME).append(IDENTITY_MANAGEMENT.getName(), this.alias);
+        return PathAddress.pathAddress().append(SUBSYSTEM, SUBSYSTEM_NAME).append(PARTITION_MANAGER.getName(), this.alias);
     }
 
     private void createIdentityManagementConfiguration(ManagementClient managementClient) throws Exception {

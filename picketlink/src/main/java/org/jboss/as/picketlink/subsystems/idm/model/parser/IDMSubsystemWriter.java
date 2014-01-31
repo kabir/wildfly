@@ -40,7 +40,7 @@ import static org.jboss.as.picketlink.PicketLinkMessages.MESSAGES;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.FILE_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_CONFIGURATION;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_MANAGEMENT;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.PARTITION_MANAGER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_STORE_CREDENTIAL_HANDLER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.JPA_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE;
@@ -54,13 +54,13 @@ import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.SUPPORTE
  *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  */
-public class IDMSubsystemWriter_1_0 implements XMLStreamConstants, XMLElementWriter<SubsystemMarshallingContext> {
+public class IDMSubsystemWriter implements XMLStreamConstants, XMLElementWriter<SubsystemMarshallingContext> {
 
     private static final Map<String, ModelXMLElementWriter> writers = new HashMap<String, ModelXMLElementWriter>();
 
     static {
         // identity management elements writers
-        registerWriter(IDENTITY_MANAGEMENT, COMMON_NAME);
+        registerWriter(PARTITION_MANAGER, COMMON_NAME);
         registerWriter(IDENTITY_CONFIGURATION, COMMON_NAME);
         registerWriter(JPA_STORE);
         registerWriter(FILE_STORE);
@@ -85,8 +85,8 @@ public class IDMSubsystemWriter_1_0 implements XMLStreamConstants, XMLElementWri
         for (ModelNode modelNode : identityManagement) {
             String modelName = modelNode.asProperty().getName();
 
-            if (modelName.equals(IDENTITY_MANAGEMENT.getName())) {
-                writers.get(IDENTITY_MANAGEMENT.getName()).write(writer, modelNode);
+            if (modelName.equals(PARTITION_MANAGER.getName())) {
+                writers.get(PARTITION_MANAGER.getName()).write(writer, modelNode);
             } else {
                 MESSAGES.parserUnexpectedElement(modelName);
             }

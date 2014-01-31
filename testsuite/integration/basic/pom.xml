@@ -154,6 +154,7 @@
                                     <!-- Tests to execute. Overriden in webProfileExclusion.profile . -->
                                     <includes>
                                         <include>org/jboss/as/test/integration/ee/remotelookup/*TestCase*.java</include>
+                                        <include>org/jboss/as/test/integration/ee/injection/resource/substitution/*TestCase*.java</include>
                                         <include>org/jboss/as/test/integration/ejb/iiop/**/*TestCase*.java</include>
                                         <include>org/jboss/as/test/integration/*/security/**/*TestCase.java</include>
                                         <include>org/jboss/as/test/integration/ejb/mdb/**/*TestCase*.java</include>

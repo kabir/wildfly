@@ -25,6 +25,7 @@ package org.jboss.as.picketlink.subsystems.idm.model;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
 /**
@@ -33,11 +34,20 @@ import org.jboss.dmr.ModelType;
  */
 public class JPAStoreResourceDefinition extends AbstractIdentityStoreResourceDefinition {
 
-    public static final SimpleAttributeDefinition DATA_SOURCE = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_DATASOURCE.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition ENTITY_MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_ENTITY_MODULE.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition ENTITY_MODULE_UNIT_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_ENTITY_MODULE_UNIT_NAME.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition ENTITY_MANAGER_FACTORY = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_ENTITY_MANAGER_FACTORY.getName(), ModelType.STRING, true).setAllowExpression(true).build();
-    public static final JPAStoreResourceDefinition INSTANCE = new JPAStoreResourceDefinition(DATA_SOURCE, ENTITY_MODULE, ENTITY_MODULE_UNIT_NAME, ENTITY_MANAGER_FACTORY, MODULE, SUPPORT_ATTRIBUTE, SUPPORT_CREDENTIAL);
+    public static final SimpleAttributeDefinition DATA_SOURCE = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_DATASOURCE.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition ENTITY_MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_ENTITY_MODULE.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition ENTITY_MODULE_UNIT_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_ENTITY_MODULE_UNIT_NAME.getName(), ModelType.STRING, true)
+        .setDefaultValue(new ModelNode("identity"))
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition ENTITY_MANAGER_FACTORY = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_ENTITY_MANAGER_FACTORY.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final JPAStoreResourceDefinition INSTANCE = new JPAStoreResourceDefinition(DATA_SOURCE, ENTITY_MODULE, ENTITY_MODULE_UNIT_NAME, ENTITY_MANAGER_FACTORY);
 
     private JPAStoreResourceDefinition(SimpleAttributeDefinition... attributes) {
         super(ModelElement.JPA_STORE, new IDMConfigAddStepHandler(attributes), attributes);

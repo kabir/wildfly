@@ -47,10 +47,10 @@ public class IDMExtension implements Extension {
     public void initialize(ExtensionContext context) {
         SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, Namespace.CURRENT.getMajor(), Namespace.CURRENT.getMinor());
 
-        ManagementResourceRegistration picketlink = subsystem.registerSubsystemModel(IDMSubsystemRootResourceDefinition.INSTANCE);
+        ManagementResourceRegistration managementResourceRegistration = subsystem.registerSubsystemModel(IDMSubsystemRootResourceDefinition.INSTANCE);
 
-        picketlink.registerSubModel(IdentityManagementResourceDefinition.INSTANCE);
-        picketlink.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
+        managementResourceRegistration.registerSubModel(IdentityManagementResourceDefinition.INSTANCE);
+        managementResourceRegistration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
 
         subsystem.registerXMLElementWriter(Namespace.CURRENT.getXMLWriter());
     }

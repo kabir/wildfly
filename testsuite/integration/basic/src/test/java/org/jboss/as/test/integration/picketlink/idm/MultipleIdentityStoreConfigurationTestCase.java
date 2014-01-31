@@ -33,7 +33,7 @@ import org.picketlink.idm.model.basic.User;
 import javax.annotation.Resource;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_CLASS;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_CLASS_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_SUPPORTS_ALL;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_STORE_SUPPORT_ATTRIBUTE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_STORE_SUPPORT_CREDENTIAL;
@@ -192,7 +192,7 @@ public class MultipleIdentityStoreConfigurationTestCase {
             ModelNode identityTypeAddOperation = Util.createAddOperation(PathAddress.pathAddress(operationAddSupportedTypes.get(OP_ADDR))
                                                                          .append(SUPPORTED_TYPE.getName(), IdentityType.class.getName()));
 
-            identityTypeAddOperation.get(COMMON_CLASS.getName()).set(IdentityType.class.getName());
+            identityTypeAddOperation.get(COMMON_CLASS_NAME.getName()).set(IdentityType.class.getName());
 
             operationSteps.add(identityTypeAddOperation);
         }
@@ -207,7 +207,7 @@ public class MultipleIdentityStoreConfigurationTestCase {
             ModelNode relationshipAddOperation = Util.createAddOperation(PathAddress.pathAddress(operationAddSupportedTypes.get(OP_ADDR))
                                                                          .append(SUPPORTED_TYPE.getName(), Relationship.class.getName()));
 
-            relationshipAddOperation.get(COMMON_CLASS.getName()).set(Relationship.class.getName());
+            relationshipAddOperation.get(COMMON_CLASS_NAME.getName()).set(Relationship.class.getName());
 
             operationSteps.add(relationshipAddOperation);
         }

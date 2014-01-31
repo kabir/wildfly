@@ -25,22 +25,22 @@
 
   <xsd:complexType name="subsystemType">
     <xsd:sequence>
-      <xsd:element name="identity-management" type="identityManagementType" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="partition-manager" type="partitionManagerType" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:complexType>
 
   <!-- Identity Management Domain Model -->
-  <xsd:complexType name="identityManagementType">
+  <xsd:complexType name="partitionManagerType">
     <xsd:annotation>
-      <xsd:documentation>Defines the Identity Management type.</xsd:documentation>
+      <xsd:documentation>Defines the Partition Manager type.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
       <xsd:element name="identity-configuration" type="identityConfigurationType" minOccurs="1" maxOccurs="unbounded"
                    nillable="false"/>
     </xsd:sequence>
-    <xsd:attribute name="alias" type="xsd:string" use="required">
+    <xsd:attribute name="name" type="xsd:string" use="required">
       <xsd:annotation>
-        <xsd:documentation>Alias for this instance.</xsd:documentation>
+        <xsd:documentation>Name for this instance.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="jndi-name" type="xsd:string" use="required">
@@ -52,7 +52,7 @@
 
   <xsd:complexType name="identityConfigurationType">
     <xsd:annotation>
-      <xsd:documentation>Defines the Identity Management type.</xsd:documentation>
+      <xsd:documentation>Defines the configuration for a Partition Manager type.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence minOccurs="1" maxOccurs="unbounded">
       <xsd:element name="jpa-store" type="jpaIdentityStoreType" minOccurs="0" maxOccurs="1" nillable="true"/>
@@ -71,15 +71,10 @@
       <xsd:documentation>Base schema for identity store elements.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
-      <xsd:element name="supportedTypes" type="supportedTypesType" minOccurs="1" maxOccurs="1" nillable="false"/>
+      <xsd:element name="supported-types" type="supportedTypesType" minOccurs="1" maxOccurs="1" nillable="false"/>
       <xsd:element name="credential-handlers" type="credentialHandlersType" minOccurs="0" maxOccurs="1"
                    nillable="true"/>
     </xsd:sequence>
-    <xsd:attribute name="module" type="xsd:string" use="optional">
-      <xsd:annotation>
-        <xsd:documentation>The name of the module from where the types should be loaded from.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
     <xsd:attribute name="support-credential" type="xsd:boolean" use="optional" default="true">
       <xsd:annotation>
         <xsd:documentation>Indicates if the store should support credentials management.</xsd:documentation>
@@ -94,27 +89,32 @@
 
   <xsd:complexType name="supportedTypesType">
     <xsd:annotation>
-      <xsd:documentation>The supportedTypes element schema.</xsd:documentation>
+      <xsd:documentation>The supported-types element schema.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
-      <xsd:element name="supportedType" type="supportedTypeType" minOccurs="0" maxOccurs="unbounded" nillable="false"/>
+      <xsd:element name="supported-type" type="supportedType" minOccurs="0" maxOccurs="unbounded" nillable="false"/>
     </xsd:sequence>
-    <xsd:attribute name="supportsAll" type="xsd:boolean" use="optional" default="true">
+    <xsd:attribute name="supports-all" type="xsd:boolean" use="optional" default="true">
       <xsd:annotation>
         <xsd:documentation>Defines if all types and configurations are supported.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
 
-  <xsd:complexType name="supportedTypeType">
+  <xsd:complexType name="supportedType">
     <xsd:annotation>
-      <xsd:documentation>The supportedType element schema.</xsd:documentation>
+      <xsd:documentation>The supported-type element schema.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
     </xsd:sequence>
-    <xsd:attribute name="class" type="xsd:string" use="required">
+    <xsd:attribute name="class-name" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:documentation>Defines a type that should be supported by a identity store.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="module" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>Defines the module to be used when loading class-name.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
@@ -135,10 +135,15 @@
     </xsd:annotation>
     <xsd:sequence>
     </xsd:sequence>
-    <xsd:attribute name="class" type="xsd:string" use="required">
+    <xsd:attribute name="class-name" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:documentation>Defines a credential handler type that should be supported by a identity store.
         </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="module" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>Defines the module to be used when loading class-name.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
@@ -201,7 +206,7 @@
             <xsd:documentation>Defines if asynchronous write is enabled.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="async-write-thread-pool" type="xsd:int" use="optional">
+        <xsd:attribute name="async-write-thread-pool" type="xsd:int" use="optional" default="5">
           <xsd:annotation>
             <xsd:documentation>The size of the thread pool if asynchronous writing is enabled.</xsd:documentation>
           </xsd:annotation>
@@ -259,9 +264,14 @@
     <xsd:sequence>
       <xsd:element name="attribute" type="attributeType" minOccurs="1" maxOccurs="unbounded" nillable="false"/>
     </xsd:sequence>
-    <xsd:attribute name="class" type="xsd:string" use="required">
+    <xsd:attribute name="class-name" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:documentation>Defines a type that should be supported by a identity store.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="module" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>Defines the module to be used when loading class-name.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="base-dn-suffix" type="xsd:string" use="optional">

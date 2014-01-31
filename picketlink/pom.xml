@@ -30,11 +30,6 @@
 
         <dependency>
             <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.wildfly</groupId>
             <artifactId>wildfly-jpa</artifactId>
         </dependency>
 
