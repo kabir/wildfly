@@ -26,6 +26,9 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
+import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.as.picketlink.subsystems.idm.model.IdentityManagementResourceDefinition;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -40,4 +43,9 @@ public class IDMSubsystemRootResourceDefinition extends SimpleResourceDefinition
                  IDMSubsystemAdd.INSTANCE, ReloadRequiredRemoveStepHandler.INSTANCE);
     }
 
+    @Override
+    public void registerChildren(ManagementResourceRegistration resourceRegistration) {
+        resourceRegistration.registerSubModel(IdentityManagementResourceDefinition.INSTANCE);
+        resourceRegistration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
+    }
 }

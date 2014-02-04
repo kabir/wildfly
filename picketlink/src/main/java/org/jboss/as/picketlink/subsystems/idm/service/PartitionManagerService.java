@@ -115,9 +115,7 @@ public class PartitionManagerService implements Service<PartitionManager> {
     }
 
     public void register(IdentityStoreInitializer initializer) {
-        synchronized (this.identityStoreInitializer) {
-            this.identityStoreInitializer.add(initializer);
-        }
+        this.identityStoreInitializer.add(initializer);
     }
 
     public InjectedValue<TransactionManager> getTransactionManager() {
@@ -136,7 +134,7 @@ public class PartitionManagerService implements Service<PartitionManager> {
                                                                 .addService(serviceName, binderService)
                                                                 .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(this.jndiName));
 
-        builder.addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class,binderService.getNamingStoreInjector());
+        builder.addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class, binderService.getNamingStoreInjector());
         builder.addDependency(createServiceName(this.alias), PartitionManager.class, new Injector<PartitionManager>() {
             @Override
             public void inject(final PartitionManager value) throws InjectionException {
@@ -165,5 +163,4 @@ public class PartitionManagerService implements Service<PartitionManager> {
     private BindInfo createPartitionManagerBindInfo() {
         return ContextNames.bindInfoFor(this.jndiName);
     }
-
 }

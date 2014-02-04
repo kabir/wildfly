@@ -26,10 +26,7 @@ import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.descriptions.ResourceDescriptionResolver;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
-import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
-import org.jboss.as.controller.registry.ManagementResourceRegistration;
-import org.jboss.as.picketlink.subsystems.idm.model.IdentityManagementResourceDefinition;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -47,11 +44,7 @@ public class IDMExtension implements Extension {
     public void initialize(ExtensionContext context) {
         SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, Namespace.CURRENT.getMajor(), Namespace.CURRENT.getMinor());
 
-        ManagementResourceRegistration managementResourceRegistration = subsystem.registerSubsystemModel(IDMSubsystemRootResourceDefinition.INSTANCE);
-
-        managementResourceRegistration.registerSubModel(IdentityManagementResourceDefinition.INSTANCE);
-        managementResourceRegistration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
-
+        subsystem.registerSubsystemModel(IDMSubsystemRootResourceDefinition.INSTANCE);
         subsystem.registerXMLElementWriter(Namespace.CURRENT.getXMLWriter());
     }
 
