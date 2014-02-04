@@ -25,8 +25,11 @@ package org.jboss.as.picketlink.subsystems.idm.model;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.as.server.ServerEnvironment;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -35,6 +38,11 @@ import org.jboss.dmr.ModelType;
 public class FileStoreResourceDefinition extends AbstractIdentityStoreResourceDefinition {
 
     public static final SimpleAttributeDefinition WORKING_DIR = new SimpleAttributeDefinitionBuilder(ModelElement.FILE_STORE_WORKING_DIR.getName(), ModelType.STRING, true)
+        .setDefaultValue(new ModelNode().set("picketlink" + File.separatorChar + "idm"))
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition RELATIVE_TO = new SimpleAttributeDefinitionBuilder(ModelElement.FILE_STORE_RELATIVE_TO.getName(), ModelType.STRING, true)
+        .setDefaultValue(new ModelNode().set(ServerEnvironment.SERVER_DATA_DIR))
         .setAllowExpression(true)
         .build();
     public static final SimpleAttributeDefinition ALWAYS_CREATE_FILE = new SimpleAttributeDefinitionBuilder(ModelElement.FILE_STORE_ALWAYS_CREATE_FILE.getName(), ModelType.BOOLEAN, true)
@@ -50,7 +58,7 @@ public class FileStoreResourceDefinition extends AbstractIdentityStoreResourceDe
         .setAllowExpression(true)
         .build();
 
-    public static final FileStoreResourceDefinition INSTANCE = new FileStoreResourceDefinition(WORKING_DIR, ALWAYS_CREATE_FILE, ASYNC_WRITE, ASYNC_WRITE_THREAD_POOL);
+    public static final FileStoreResourceDefinition INSTANCE = new FileStoreResourceDefinition(WORKING_DIR, RELATIVE_TO, ALWAYS_CREATE_FILE, ASYNC_WRITE, ASYNC_WRITE_THREAD_POOL, SUPPORT_ATTRIBUTE, SUPPORT_CREDENTIAL);
 
     private FileStoreResourceDefinition(SimpleAttributeDefinition... attributes) {
         super(ModelElement.FILE_STORE, new IDMConfigAddStepHandler(attributes), attributes);

@@ -22,13 +22,10 @@
 package org.jboss.as.picketlink.subsystem;
 
 import org.jboss.as.picketlink.subsystems.idm.IDMExtension;
-import org.jboss.as.server.Services;
-import org.jboss.as.server.moduleservice.ServiceModuleLoader;
 import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
 import org.jboss.as.subsystem.test.AdditionalInitialization;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.as.subsystem.test.KernelServicesBuilder;
-import org.jboss.msc.service.ServiceTarget;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,14 +51,7 @@ public class IDMSubsystemUnitTestCase extends AbstractSubsystemBaseTest {
         System.setProperty("jboss.home.dir", System.getProperty("java.io.tmpdir"));
         System.setProperty("jboss.home.dir", System.getProperty("java.io.tmpdir"));
         System.setProperty("jboss.server.server.dir", System.getProperty("java.io.tmpdir"));
-        KernelServicesBuilder builder = createKernelServicesBuilder(new AdditionalInitialization() {
-            @Override
-            protected void addExtraServices(ServiceTarget target) {
-                super.addExtraServices(target);
-                target.addService(Services.JBOSS_SERVICE_MODULE_LOADER, new ServiceModuleLoader(null)).install();
-            }
-        })
-                                        .setSubsystemXml(getSubsystemXml());
+        KernelServicesBuilder builder = createKernelServicesBuilder(AdditionalInitialization.MANAGEMENT).setSubsystemXml(getSubsystemXml());
         KernelServices mainServices = builder.build();
         if (!mainServices.isSuccessfulBoot()) {
             Assert.fail(mainServices.getBootError().toString());

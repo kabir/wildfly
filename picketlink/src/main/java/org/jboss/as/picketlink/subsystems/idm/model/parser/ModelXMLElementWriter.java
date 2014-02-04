@@ -24,12 +24,11 @@ package org.jboss.as.picketlink.subsystems.idm.model.parser;
 
 import org.jboss.as.controller.ResourceDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
-import org.jboss.dmr.ModelNode;
-import org.jboss.staxmapper.XMLExtendedStreamWriter;
-import org.jboss.as.picketlink.PicketLinkMessages;
 import org.jboss.as.picketlink.subsystems.idm.model.AbstractResourceDefinition;
 import org.jboss.as.picketlink.subsystems.idm.model.ModelElement;
 import org.jboss.as.picketlink.subsystems.idm.model.XMLElement;
+import org.jboss.dmr.ModelNode;
+import org.jboss.staxmapper.XMLExtendedStreamWriter;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -107,13 +106,7 @@ public class ModelXMLElementWriter {
     }
 
     private ModelXMLElementWriter get(String writerKey) {
-        ModelXMLElementWriter writer = this.register.get(writerKey);
-
-        if (writer == null) {
-            throw PicketLinkMessages.MESSAGES.noModelElementWriterProvided(writerKey);
-        }
-
-        return writer;
+        return this.register.get(writerKey);
     }
 
     private void writeAttributes(XMLStreamWriter writer, ModelNode modelNode) throws XMLStreamException {

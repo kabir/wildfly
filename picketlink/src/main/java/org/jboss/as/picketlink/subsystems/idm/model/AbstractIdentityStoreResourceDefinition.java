@@ -41,7 +41,5 @@ public abstract class AbstractIdentityStoreResourceDefinition extends AbstractRe
 
     protected AbstractIdentityStoreResourceDefinition(ModelElement modelElement, OperationStepHandler addHandler, SimpleAttributeDefinition... attributes) {
         super(modelElement, addHandler, attributes);
-        addAttributeDefinition(modelElement, SUPPORT_ATTRIBUTE);
-        addAttributeDefinition(modelElement, SUPPORT_CREDENTIAL);
     }
 }

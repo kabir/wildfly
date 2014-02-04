@@ -44,13 +44,14 @@
             <groupId>org.syslog4j</groupId>
             <artifactId>syslog4j</artifactId>
         </dependency>
+
         <dependency>
-          <groupId>org.picketlink</groupId>
-          <artifactId>picketlink-idm-api</artifactId>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
         </dependency>
         <dependency>
-          <groupId>io.undertow</groupId>
-          <artifactId>undertow-core</artifactId>
+            <groupId>org.picketlink</groupId>
+            <artifactId>picketlink-idm-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -208,6 +209,7 @@
                                         <exclude>org/jboss/as/test/integration/**/*SecondTestCase.java</exclude>
                                         <!-- Tests which need FULL config. -->
                                         <exclude>org/jboss/as/test/integration/ee/remotelookup/*TestCase*.java</exclude>
+                                        <exclude>org/jboss/as/test/integration/ee/injection/resource/substitution/*TestCase*.java</exclude>
                                         <exclude>org/jboss/as/test/integration/ejb/iiop/**/*TestCase*.java</exclude>
                                         <exclude>org/jboss/as/test/integration/*/security/**/*TestCase.java</exclude>
                                         <exclude>org/jboss/as/test/integration/ejb/mdb/**/*TestCase*.java</exclude>

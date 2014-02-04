@@ -21,6 +21,7 @@
  */
 package org.jboss.as.picketlink.subsystems.idm.service;
 
+import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.ValueManagedReferenceFactory;
@@ -63,10 +64,11 @@ public class PartitionManagerService implements Service<PartitionManager> {
     private final String jndiName;
     private final String alias;
     private final IdentityConfigurationBuilder configurationBuilder;
-    private PartitionManager partitionManager;
+    private volatile PartitionManager partitionManager;
     private final List<IdentityStoreInitializer> identityStoreInitializer = Collections
                                                                             .synchronizedList(new ArrayList<IdentityStoreInitializer>());
     private final InjectedValue<TransactionManager> transactionManager = new InjectedValue<TransactionManager>();
+    private InjectedValue<PathManager> pathManager = new InjectedValue<PathManager>();
 
     public PartitionManagerService(String alias, String jndiName, IdentityConfigurationBuilder configurationBuilder) {
         this.alias = alias;
@@ -103,19 +105,27 @@ public class PartitionManagerService implements Service<PartitionManager> {
         ROOT_LOGGER.debugf("Stopping PartitionManagerService for [%s]", this.alias);
         unpublishPartitionManager(context);
 
-        for (IdentityStoreInitializer initializer : this.identityStoreInitializer) {
-            initializer.onStop(this);
-        }
+        synchronized (this.identityStoreInitializer) {
+            for (IdentityStoreInitializer initializer : this.identityStoreInitializer) {
+                initializer.onStop(this);
+            }
 
-        this.identityStoreInitializer.clear();
+            this.identityStoreInitializer.clear();
+        }
     }
 
     public void register(IdentityStoreInitializer initializer) {
-        this.identityStoreInitializer.add(initializer);
+        synchronized (this.identityStoreInitializer) {
+            this.identityStoreInitializer.add(initializer);
+        }
     }
 
     public InjectedValue<TransactionManager> getTransactionManager() {
         return this.transactionManager;
+    }
+
+    public InjectedValue<PathManager> getPathManager() {
+        return this.pathManager;
     }
 
     private void publishPartitionManager(StartContext context) {
@@ -126,9 +136,7 @@ public class PartitionManagerService implements Service<PartitionManager> {
                                                                 .addService(serviceName, binderService)
                                                                 .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(this.jndiName));
 
-        builder.addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class,
-                             binderService.getNamingStoreInjector());
-
+        builder.addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class,binderService.getNamingStoreInjector());
         builder.addDependency(createServiceName(this.alias), PartitionManager.class, new Injector<PartitionManager>() {
             @Override
             public void inject(final PartitionManager value) throws InjectionException {
@@ -147,8 +155,8 @@ public class PartitionManagerService implements Service<PartitionManager> {
     }
 
     private void unpublishPartitionManager(StopContext context) {
-        ServiceController<?> service = context.getController().getServiceContainer()
-                                       .getService(createPartitionManagerBindInfo().getBinderServiceName());
+        ServiceController<?> service = context.getController().getServiceContainer().getService(createPartitionManagerBindInfo()
+                                                                                                .getBinderServiceName());
         if (service != null) {
             service.setMode(Mode.REMOVE);
         }
@@ -157,4 +165,5 @@ public class PartitionManagerService implements Service<PartitionManager> {
     private BindInfo createPartitionManagerBindInfo() {
         return ContextNames.bindInfoFor(this.jndiName);
     }
+
 }

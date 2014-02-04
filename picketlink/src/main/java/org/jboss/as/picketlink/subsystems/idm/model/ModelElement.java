@@ -56,6 +56,7 @@ public enum ModelElement {
     JPA_STORE_ENTITY_MANAGER_FACTORY("entity-manager-factory"),
     FILE_STORE("file-store"),
     FILE_STORE_WORKING_DIR("working-dir"),
+    FILE_STORE_RELATIVE_TO("relative-to"),
     FILE_STORE_ALWAYS_CREATE_FILE("always-create-files"),
     FILE_STORE_ASYNC_WRITE("async-write"),
     FILE_STORE_ASYNC_THREAD_POOL("async-write-thread-pool"),

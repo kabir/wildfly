@@ -45,7 +45,7 @@ public class LDAPStoreResourceDefinition extends AbstractIdentityStoreResourceDe
     public static final SimpleAttributeDefinition BASE_DN_SUFFIX = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_BASE_DN_SUFFIX.getName(), ModelType.STRING, false)
         .setAllowExpression(true)
         .build();
-    public static final LDAPStoreResourceDefinition INSTANCE = new LDAPStoreResourceDefinition(URL, BIND_DN, BIND_CREDENTIAL, BASE_DN_SUFFIX);
+    public static final LDAPStoreResourceDefinition INSTANCE = new LDAPStoreResourceDefinition(URL, BIND_DN, BIND_CREDENTIAL, BASE_DN_SUFFIX, SUPPORT_ATTRIBUTE, SUPPORT_CREDENTIAL);
 
     private LDAPStoreResourceDefinition(SimpleAttributeDefinition... attributes) {
         super(ModelElement.LDAP_STORE, new IDMConfigAddStepHandler(attributes), attributes);

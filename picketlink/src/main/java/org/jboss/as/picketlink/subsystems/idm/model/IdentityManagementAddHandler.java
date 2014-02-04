@@ -29,10 +29,13 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.registry.Resource;
+import org.jboss.as.controller.services.path.PathManager;
+import org.jboss.as.controller.services.path.PathManagerService;
 import org.jboss.as.naming.ValueManagedReferenceFactory;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.picketlink.subsystems.idm.config.JPAStoreSubsystemConfiguration;
 import org.jboss.as.picketlink.subsystems.idm.config.JPAStoreSubsystemConfigurationBuilder;
+import org.jboss.as.picketlink.subsystems.idm.service.FileIdentityStoreInitializer;
 import org.jboss.as.picketlink.subsystems.idm.service.JPAIdentityStoreInitializer;
 import org.jboss.as.picketlink.subsystems.idm.service.PartitionManagerService;
 import org.jboss.as.txn.service.TxnServices;
@@ -125,7 +128,7 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         if (storeType.equals(JPA_STORE.getName())) {
             storeConfig = configureJPAIdentityStore(context, serviceBuilder, partitionManagerService, identityStore, namedIdentityConfigurationBuilder);
         } else if (storeType.equals(FILE_STORE.getName())) {
-            storeConfig = configureFileIdentityStore(context, identityStore, namedIdentityConfigurationBuilder);
+            storeConfig = configureFileIdentityStore(context, serviceBuilder, partitionManagerService, identityStore, namedIdentityConfigurationBuilder);
         } else if (storeType.equals(LDAP_STORE.getName())) {
             storeConfig = configureLDAPIdentityStore(context, identityStore, namedIdentityConfigurationBuilder);
         }
@@ -217,21 +220,21 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         return storeConfig;
     }
 
-    private IdentityStoreConfigurationBuilder configureFileIdentityStore(OperationContext context, ModelNode resource, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
+    private IdentityStoreConfigurationBuilder configureFileIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, PartitionManagerService partitionManagerService, ModelNode resource, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
         FileStoreConfigurationBuilder fileStoreBuilder = builder.stores().file();
-
-        ModelNode workingDir = FileStoreResourceDefinition.WORKING_DIR.resolveModelAttribute(context, resource);
+        String workingDir = FileStoreResourceDefinition.WORKING_DIR.resolveModelAttribute(context, resource).asString();
+        String relativeTo = FileStoreResourceDefinition.RELATIVE_TO.resolveModelAttribute(context, resource).asString();
         ModelNode alwaysCreateFiles = FileStoreResourceDefinition.ALWAYS_CREATE_FILE.resolveModelAttribute(context, resource);
         ModelNode asyncWrite = FileStoreResourceDefinition.ASYNC_WRITE.resolveModelAttribute(context, resource);
         ModelNode asyncWriteThreadPool = FileStoreResourceDefinition.ASYNC_WRITE_THREAD_POOL.resolveModelAttribute(context, resource);
 
-        if (workingDir.isDefined()) {
-            fileStoreBuilder.workingDirectory(workingDir.asString());
-        }
-
         fileStoreBuilder.preserveState(!alwaysCreateFiles.asBoolean());
         fileStoreBuilder.asyncWrite(asyncWrite.asBoolean());
         fileStoreBuilder.asyncWriteThreadPool(asyncWriteThreadPool.asInt());
+
+        serviceBuilder.addDependency(PathManagerService.SERVICE_NAME, PathManager.class, partitionManagerService.getPathManager());
+
+        partitionManagerService.register(new FileIdentityStoreInitializer(fileStoreBuilder, workingDir, relativeTo));
 
         return fileStoreBuilder;
     }

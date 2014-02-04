@@ -191,11 +191,12 @@
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="identityStoreType">
-        <xsd:attribute name="working-dir" type="xsd:string" use="optional">
+        <xsd:attribute name="working-dir" type="xsd:string" use="optional" default="picketlink/idm">
           <xsd:annotation>
             <xsd:documentation>The working directory where data is located.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="relative-to" type="xsd:string" use="optional" default="jboss.server.data.dir"/>
         <xsd:attribute name="always-create-files" type="xsd:boolean" use="optional" default="true">
           <xsd:annotation>
             <xsd:documentation>Defines if data should be always re-created between initializations.</xsd:documentation>

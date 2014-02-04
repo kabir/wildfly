@@ -47,7 +47,7 @@ public class JPAStoreResourceDefinition extends AbstractIdentityStoreResourceDef
     public static final SimpleAttributeDefinition ENTITY_MANAGER_FACTORY = new SimpleAttributeDefinitionBuilder(ModelElement.JPA_STORE_ENTITY_MANAGER_FACTORY.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
         .build();
-    public static final JPAStoreResourceDefinition INSTANCE = new JPAStoreResourceDefinition(DATA_SOURCE, ENTITY_MODULE, ENTITY_MODULE_UNIT_NAME, ENTITY_MANAGER_FACTORY);
+    public static final JPAStoreResourceDefinition INSTANCE = new JPAStoreResourceDefinition(DATA_SOURCE, ENTITY_MODULE, ENTITY_MODULE_UNIT_NAME, ENTITY_MANAGER_FACTORY, SUPPORT_CREDENTIAL, SUPPORT_ATTRIBUTE);
 
     private JPAStoreResourceDefinition(SimpleAttributeDefinition... attributes) {
         super(ModelElement.JPA_STORE, new IDMConfigAddStepHandler(attributes), attributes);
