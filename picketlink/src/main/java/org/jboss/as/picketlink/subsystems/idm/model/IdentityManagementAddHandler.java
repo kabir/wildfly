@@ -100,7 +100,8 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         String jndiName = IdentityManagementResourceDefinition.IDENTITY_MANAGEMENT_JNDI_URL.resolveModelAttribute(context, model).asString();
         IdentityConfigurationBuilder builder = new IdentityConfigurationBuilder();
         PartitionManagerService partitionManagerService = new PartitionManagerService(federationName, jndiName, builder);
-        ServiceBuilder<PartitionManager> serviceBuilder = context.getServiceTarget().addService(PartitionManagerService.createServiceName(federationName), partitionManagerService);
+        ServiceBuilder<PartitionManager> serviceBuilder = context.getServiceTarget()
+            .addService(PartitionManagerService.createServiceName(federationName), partitionManagerService);
         ModelNode identityManagement = Resource.Tools.readModel(context.readResource(EMPTY_ADDRESS));
 
         for (Property identityConfiguration : identityManagement.get(IDENTITY_CONFIGURATION.getName()).asPropertyList()) {
@@ -112,7 +113,9 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
             }
         }
 
-        ServiceController<PartitionManager> controller = serviceBuilder.addListener(verificationHandler).setInitialMode(Mode.PASSIVE).install();
+        ServiceController<PartitionManager> controller = serviceBuilder.addListener(verificationHandler)
+            .setInitialMode(Mode.PASSIVE)
+            .install();
 
         if (newControllers != null) {
             newControllers.add(controller);
@@ -137,7 +140,8 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
 
         storeConfig.supportAttributes(supportAttributeNode.asBoolean());
 
-        ModelNode supportCredentialNode = JPAStoreResourceDefinition.SUPPORT_CREDENTIAL.resolveModelAttribute(context, identityStore);
+        ModelNode supportCredentialNode = JPAStoreResourceDefinition.SUPPORT_CREDENTIAL
+            .resolveModelAttribute(context, identityStore);
 
         storeConfig.supportCredentials(supportCredentialNode.asBoolean());
 
@@ -169,18 +173,36 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         }
 
         if (ldapIdentityStore.hasDefined(LDAP_STORE_MAPPING.getName())) {
-            for (ModelNode mappingNode : ldapIdentityStore.get(LDAP_STORE_MAPPING.getName()).asList()) {
-                ModelNode ldapMapping = mappingNode.asProperty().getValue();
-                String mappingClass = LDAPStoreMappingResourceDefinition.CLASS_NAME.resolveModelAttribute(context, ldapMapping).asString();
+            for (Property mappingNode : ldapIdentityStore.get(LDAP_STORE_MAPPING.getName()).asPropertyList()) {
+                ModelNode ldapMapping = mappingNode.getValue();
+                ModelNode classNameNode = LDAPStoreMappingResourceDefinition.CLASS_NAME.resolveModelAttribute(context, ldapMapping);
+                ModelNode codeNode = LDAPStoreMappingResourceDefinition.CODE.resolveModelAttribute(context, ldapMapping);
                 ModelNode moduleNode = LDAPStoreMappingResourceDefinition.MODULE.resolveModelAttribute(context, ldapMapping);
-                LDAPMappingConfigurationBuilder storeMapping = storeConfig.mapping(this.<AttributedType>loadClass(moduleNode, mappingClass));
 
-                ModelNode relatesTo = LDAPStoreMappingResourceDefinition.RELATES_TO.resolveModelAttribute(context, ldapMapping);
+                String typeName;
 
-                if (relatesTo.isDefined()) {
-                    storeMapping.forMapping(this.<AttributedType>loadClass(moduleNode, relatesTo.asString()));
+                if (classNameNode.isDefined()) {
+                    typeName = classNameNode.asString();
+                } else if (codeNode.isDefined()) {
+                    typeName = AttributedTypeEnum.forType(codeNode.asString());
                 } else {
-                    String baseDN = LDAPStoreMappingResourceDefinition.BASE_DN.resolveModelAttribute(context, ldapMapping).asString();
+                    throw MESSAGES.idmTypeNotProvided(LDAP_STORE_MAPPING.getName());
+                }
+
+                LDAPMappingConfigurationBuilder storeMapping = storeConfig.mapping(this.<AttributedType>loadClass(moduleNode, typeName));
+                ModelNode relatesToNode = LDAPStoreMappingResourceDefinition.RELATES_TO.resolveModelAttribute(context, ldapMapping);
+
+                if (relatesToNode.isDefined()) {
+                    String relatesTo = AttributedTypeEnum.forType(relatesToNode.asString());
+
+                    if (relatesTo == null) {
+                        relatesTo = relatesToNode.asString();
+                    }
+
+                    storeMapping.forMapping(this.<AttributedType>loadClass(moduleNode, relatesTo));
+                } else {
+                    String baseDN = LDAPStoreMappingResourceDefinition.BASE_DN.resolveModelAttribute(context, ldapMapping)
+                        .asString();
 
                     storeMapping.baseDN(baseDN);
 
@@ -200,16 +222,20 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
                 }
 
                 if (ldapMapping.hasDefined(LDAP_STORE_ATTRIBUTE.getName())) {
-                    for (ModelNode attributeNode : ldapMapping.get(LDAP_STORE_ATTRIBUTE.getName()).asList()) {
-                        ModelNode attribute = attributeNode.asProperty().getValue();
-                        String name = LDAPStoreAttributeResourceDefinition.NAME.resolveModelAttribute(context, attribute).asString();
-                        String ldapName = LDAPStoreAttributeResourceDefinition.LDAP_NAME.resolveModelAttribute(context, attribute).asString();
-                        boolean readOnly = LDAPStoreAttributeResourceDefinition.READ_ONLY.resolveModelAttribute(context, attribute).asBoolean();
+                    for (Property attributeNode : ldapMapping.get(LDAP_STORE_ATTRIBUTE.getName()).asPropertyList()) {
+                        ModelNode attribute = attributeNode.getValue();
+                        String name = LDAPStoreAttributeResourceDefinition.NAME.resolveModelAttribute(context, attribute)
+                            .asString();
+                        String ldapName = LDAPStoreAttributeResourceDefinition.LDAP_NAME.resolveModelAttribute(context, attribute)
+                            .asString();
+                        boolean readOnly = LDAPStoreAttributeResourceDefinition.READ_ONLY.resolveModelAttribute(context, attribute)
+                            .asBoolean();
 
                         if (readOnly) {
                             storeMapping.readOnlyAttribute(name, ldapName);
                         } else {
-                            boolean isIdentifier = LDAPStoreAttributeResourceDefinition.IS_IDENTIFIER.resolveModelAttribute(context, attribute).asBoolean();
+                            boolean isIdentifier = LDAPStoreAttributeResourceDefinition.IS_IDENTIFIER
+                                .resolveModelAttribute(context, attribute).asBoolean();
                             storeMapping.attribute(name, ldapName, isIdentifier);
                         }
                     }
@@ -226,7 +252,8 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
         String relativeTo = FileStoreResourceDefinition.RELATIVE_TO.resolveModelAttribute(context, resource).asString();
         ModelNode alwaysCreateFiles = FileStoreResourceDefinition.ALWAYS_CREATE_FILE.resolveModelAttribute(context, resource);
         ModelNode asyncWrite = FileStoreResourceDefinition.ASYNC_WRITE.resolveModelAttribute(context, resource);
-        ModelNode asyncWriteThreadPool = FileStoreResourceDefinition.ASYNC_WRITE_THREAD_POOL.resolveModelAttribute(context, resource);
+        ModelNode asyncWriteThreadPool = FileStoreResourceDefinition.ASYNC_WRITE_THREAD_POOL
+            .resolveModelAttribute(context, resource);
 
         fileStoreBuilder.preserveState(!alwaysCreateFiles.asBoolean());
         fileStoreBuilder.asyncWrite(asyncWrite.asBoolean());
@@ -240,12 +267,15 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
     }
 
     private JPAStoreSubsystemConfigurationBuilder configureJPAIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, PartitionManagerService partitionManagerService, final ModelNode identityStore, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
-        JPAStoreSubsystemConfigurationBuilder storeConfig = builder.stores().add(JPAStoreSubsystemConfiguration.class, JPAStoreSubsystemConfigurationBuilder.class);
+        JPAStoreSubsystemConfigurationBuilder storeConfig = builder.stores()
+            .add(JPAStoreSubsystemConfiguration.class, JPAStoreSubsystemConfigurationBuilder.class);
 
         ModelNode jpaDataSourceNode = JPAStoreResourceDefinition.DATA_SOURCE.resolveModelAttribute(context, identityStore);
         ModelNode jpaEntityModule = JPAStoreResourceDefinition.ENTITY_MODULE.resolveModelAttribute(context, identityStore);
-        ModelNode jpaEntityModuleUnitName = JPAStoreResourceDefinition.ENTITY_MODULE_UNIT_NAME.resolveModelAttribute(context, identityStore);
-        ModelNode jpaEntityManagerFactoryNode = JPAStoreResourceDefinition.ENTITY_MANAGER_FACTORY.resolveModelAttribute(context, identityStore);
+        ModelNode jpaEntityModuleUnitName = JPAStoreResourceDefinition.ENTITY_MODULE_UNIT_NAME
+            .resolveModelAttribute(context, identityStore);
+        ModelNode jpaEntityManagerFactoryNode = JPAStoreResourceDefinition.ENTITY_MANAGER_FACTORY
+            .resolveModelAttribute(context, identityStore);
 
         if (jpaEntityModule.isDefined()) {
             storeConfig.entityModule(jpaEntityModule.asString());
@@ -255,16 +285,19 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
 
         if (jpaDataSourceNode.isDefined()) {
             storeConfig.dataSourceJndiUrl(toJndiName(jpaDataSourceNode.asString()));
-            serviceBuilder.addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(toJndiName(jpaDataSourceNode.asString()).split("/")));
+            serviceBuilder
+                .addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(toJndiName(jpaDataSourceNode.asString()).split("/")));
         }
 
         if (jpaEntityManagerFactoryNode.isDefined()) {
             storeConfig.entityManagerFactoryJndiName(jpaEntityManagerFactoryNode.asString());
-            serviceBuilder.addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jpaEntityManagerFactoryNode.asString().split("/")),
-                                            ValueManagedReferenceFactory.class, new InjectedValue<ValueManagedReferenceFactory>());
+            serviceBuilder
+                .addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jpaEntityManagerFactoryNode.asString().split("/")),
+                    ValueManagedReferenceFactory.class, new InjectedValue<ValueManagedReferenceFactory>());
         }
 
-        serviceBuilder.addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER, TransactionManager.class, partitionManagerService.getTransactionManager());
+        serviceBuilder.addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER, TransactionManager.class, partitionManagerService
+            .getTransactionManager());
 
         partitionManagerService.register(new JPAIdentityStoreInitializer(storeConfig));
 
@@ -274,18 +307,31 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
     @SuppressWarnings("unchecked")
     private void configureSupportedTypes(OperationContext context, ModelNode identityStore, IdentityStoreConfigurationBuilder storeConfig) throws OperationFailedException {
         if (identityStore.hasDefined(SUPPORTED_TYPES.getName())) {
-            ModelNode featuresSet = identityStore.get(SUPPORTED_TYPES.getName()).asProperty().getValue();
-            ModelNode supportsAll = SupportedTypesResourceDefinition.SUPPORTS_ALL.resolveModelAttribute(context, featuresSet);
+            ModelNode featuresSetNode = identityStore.get(SUPPORTED_TYPES.getName()).asProperty().getValue();
+            ModelNode supportsAllNode = SupportedTypesResourceDefinition.SUPPORTS_ALL
+                .resolveModelAttribute(context, featuresSetNode);
 
-            if (supportsAll.asBoolean()) {
+            if (supportsAllNode.asBoolean()) {
                 storeConfig.supportAllFeatures();
             }
 
-            if (featuresSet.hasDefined(SUPPORTED_TYPE.getName())) {
-                for (Property featureNode : featuresSet.get(SUPPORTED_TYPE.getName()).asPropertyList()) {
-                    ModelNode feature = featureNode.getValue();
-                    String typeName = SupportedTypeResourceDefinition.CLASS_NAME.resolveModelAttribute(context, feature).asString();
-                    ModelNode moduleNode = SupportedTypeResourceDefinition.MODULE.resolveModelAttribute(context, feature);
+            if (featuresSetNode.hasDefined(SUPPORTED_TYPE.getName())) {
+                for (Property supportedTypeNode : featuresSetNode.get(SUPPORTED_TYPE.getName()).asPropertyList()) {
+                    ModelNode supportedType = supportedTypeNode.getValue();
+                    ModelNode classNameNode = SupportedTypeResourceDefinition.CLASS_NAME
+                        .resolveModelAttribute(context, supportedType);
+                    ModelNode codeNode = SupportedTypeResourceDefinition.CODE.resolveModelAttribute(context, supportedType);
+                    String typeName;
+
+                    if (classNameNode.isDefined()) {
+                        typeName = classNameNode.asString();
+                    } else if (codeNode.isDefined()) {
+                        typeName = AttributedTypeEnum.forType(codeNode.asString());
+                    } else {
+                        throw MESSAGES.idmTypeNotProvided(SUPPORTED_TYPE.getName());
+                    }
+
+                    ModelNode moduleNode = SupportedTypeResourceDefinition.MODULE.resolveModelAttribute(context, supportedType);
                     Class<? extends AttributedType> attributedTypeClass = loadClass(moduleNode, typeName);
 
                     if (Relationship.class.isAssignableFrom(attributedTypeClass)) {
@@ -300,9 +346,22 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
 
     private void configureCredentialHandlers(OperationContext context, ModelNode identityStore, IdentityStoreConfigurationBuilder storeConfig) throws OperationFailedException {
         if (identityStore.hasDefined(IDENTITY_STORE_CREDENTIAL_HANDLER.getName())) {
-            for (ModelNode credentialHandler : identityStore.get(IDENTITY_STORE_CREDENTIAL_HANDLER.getName()).asList()) {
-                String typeName = CredentialHandlerResourceDefinition.CLASS_NAME.resolveModelAttribute(context, credentialHandler.asProperty().getValue()).asString();
-                ModelNode moduleNode = CredentialHandlerResourceDefinition.MODULE.resolveModelAttribute(context, credentialHandler.asProperty().getValue());
+            for (Property credentialHandler : identityStore.get(IDENTITY_STORE_CREDENTIAL_HANDLER.getName()).asPropertyList()) {
+                ModelNode classNameNode = CredentialHandlerResourceDefinition.CLASS_NAME
+                    .resolveModelAttribute(context, credentialHandler.getValue());
+                ModelNode codeNode = CredentialHandlerResourceDefinition.CODE
+                    .resolveModelAttribute(context, credentialHandler.getValue());
+                ModelNode moduleNode = CredentialHandlerResourceDefinition.MODULE
+                    .resolveModelAttribute(context, credentialHandler.getValue());
+                String typeName;
+
+                if (classNameNode.isDefined()) {
+                    typeName = classNameNode.asString();
+                } else if (codeNode.isDefined()) {
+                    typeName = CredentialTypeEnum.forType(codeNode.asString());
+                } else {
+                    throw MESSAGES.idmTypeNotProvided(IDENTITY_STORE_CREDENTIAL_HANDLER.getName());
+                }
 
                 storeConfig.addCredentialHandler(loadClass(moduleNode, typeName));
             }
@@ -345,5 +404,4 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
             throw MESSAGES.couldNotLoadClass(typeName, cnfe);
         }
     }
-
 }

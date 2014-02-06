@@ -24,6 +24,7 @@ package org.jboss.as.picketlink.subsystems.idm.model;
 
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
+import org.jboss.as.controller.operations.validation.EnumValidator;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.dmr.ModelType;
 
@@ -33,7 +34,11 @@ import org.jboss.dmr.ModelType;
  */
 public class LDAPStoreMappingResourceDefinition extends AbstractResourceDefinition {
 
-    public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, false)
+    public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, true)
+        .setAllowExpression(true)
+        .build();
+    public static final SimpleAttributeDefinition CODE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CODE.getName(), ModelType.STRING, true)
+        .setValidator(new EnumValidator<>(AttributedTypeEnum.class, true, true))
         .setAllowExpression(true)
         .build();
     public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true)
@@ -51,7 +56,7 @@ public class LDAPStoreMappingResourceDefinition extends AbstractResourceDefiniti
     public static final SimpleAttributeDefinition RELATES_TO = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_RELATES_TO.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
         .build();
-    public static final LDAPStoreMappingResourceDefinition INSTANCE = new LDAPStoreMappingResourceDefinition(CLASS_NAME, MODULE, BASE_DN, OBJECT_CLASSES, PARENT_ATTRIBUTE, RELATES_TO);
+    public static final LDAPStoreMappingResourceDefinition INSTANCE = new LDAPStoreMappingResourceDefinition(CLASS_NAME, CODE, MODULE, BASE_DN, OBJECT_CLASSES, PARENT_ATTRIBUTE, RELATES_TO);
 
     private LDAPStoreMappingResourceDefinition(SimpleAttributeDefinition... attributes) {
         super(ModelElement.LDAP_STORE_MAPPING, new IDMConfigAddStepHandler(attributes), attributes);

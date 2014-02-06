@@ -5,6 +5,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.picketlink.subsystems.idm.model.AttributedTypeEnum;
 import org.jboss.as.picketlink.subsystems.idm.model.ModelElement;
 import org.jboss.as.test.integration.picketlink.idm.util.AbstractIdentityManagementServerSetupTask;
 import org.jboss.as.test.integration.picketlink.idm.util.LdapMapping;
@@ -34,6 +35,7 @@ import javax.annotation.Resource;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_CLASS_NAME;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_CODE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_SUPPORTS_ALL;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_STORE_SUPPORT_ATTRIBUTE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_STORE_SUPPORT_CREDENTIAL;
@@ -150,14 +152,14 @@ public class MultipleIdentityStoreConfigurationTestCase {
 
             createLdapSupportedTypesAddOperation(operationSteps, operationAddIdentityStore);
 
-            LdapMapping agentMapping = new LdapMapping(Agent.class.getName(), "ou=Agent,dc=jboss,dc=org", "account");
+            LdapMapping agentMapping = new LdapMapping(AttributedTypeEnum.AGENT.getAlias(), "ou=Agent,dc=jboss,dc=org", "account");
 
             agentMapping.addAttribute("loginName", "uid", true, false);
             agentMapping.addAttribute("createdDate", "createTimeStamp", false, true);
 
             operationSteps.add(agentMapping.createAddOperation(operationAddIdentityStore));
 
-            LdapMapping userMapping = new LdapMapping(User.class.getName(), "ou=People,dc=jboss,dc=org", "inetOrgPerson, organizationalPerson");
+            LdapMapping userMapping = new LdapMapping(AttributedTypeEnum.USER.getAlias(), "ou=People,dc=jboss,dc=org", "inetOrgPerson, organizationalPerson");
 
             userMapping.addAttribute("loginName", "uid", true, false);
             userMapping.addAttribute("firstName", "cn", false, false);
@@ -167,14 +169,14 @@ public class MultipleIdentityStoreConfigurationTestCase {
 
             operationSteps.add(userMapping.createAddOperation(operationAddIdentityStore));
 
-            LdapMapping roleMapping = new LdapMapping(Role.class.getName(), "ou=Roles,dc=jboss,dc=org", "groupOfNames");
+            LdapMapping roleMapping = new LdapMapping(AttributedTypeEnum.ROLE.getAlias(), "ou=Roles,dc=jboss,dc=org", "groupOfNames");
 
             roleMapping.addAttribute("name", "cn", true, false);
             roleMapping.addAttribute("createdDate", "createTimeStamp", false, true);
 
             operationSteps.add(roleMapping.createAddOperation(operationAddIdentityStore));
 
-            LdapMapping groupMapping = new LdapMapping(Group.class.getName(), "ou=Groups,dc=jboss,dc=org", "groupOfNames");
+            LdapMapping groupMapping = new LdapMapping(AttributedTypeEnum.GROUP.getAlias(), "ou=Groups,dc=jboss,dc=org", "groupOfNames");
 
             groupMapping.addAttribute("name", "cn", true, false);
             groupMapping.addAttribute("createdDate", "createTimeStamp", false, true);
@@ -190,9 +192,9 @@ public class MultipleIdentityStoreConfigurationTestCase {
             operationSteps.add(operationAddSupportedTypes);
 
             ModelNode identityTypeAddOperation = Util.createAddOperation(PathAddress.pathAddress(operationAddSupportedTypes.get(OP_ADDR))
-                                                                         .append(SUPPORTED_TYPE.getName(), IdentityType.class.getName()));
+                                                                         .append(SUPPORTED_TYPE.getName(), IdentityType.class.getSimpleName()));
 
-            identityTypeAddOperation.get(COMMON_CLASS_NAME.getName()).set(IdentityType.class.getName());
+            identityTypeAddOperation.get(COMMON_CODE.getName()).set(IdentityType.class.getSimpleName());
 
             operationSteps.add(identityTypeAddOperation);
         }

@@ -51,9 +51,9 @@
             <identity-configuration name="jpa.config">
                 <jpa-store entity-manager-factory="jboss/TestingIDMEMF">
                     <supported-types>
-                        <supported-type class-name="org.picketlink.idm.model.Partition"/>
-                        <supported-type class-name="org.picketlink.idm.model.IdentityType"/>
-                        <supported-type class-name="org.picketlink.idm.model.Relationship"/>
+                        <supported-type code="Partition"/>
+                        <supported-type code="IdentityType"/>
+                        <supported-type code="Relationship"/>
                     </supported-types>
                 </jpa-store>
           </identity-configuration>

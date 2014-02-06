@@ -136,7 +136,7 @@
       <generate-server-config
            paramTemplateFile="configuration/standalone/template.xml"
            paramSubsystemsFile="configuration/examples/subsystems-picketlink-identity-management.xml"
-           paramOutputFile="${generated.configs.examples}/subsystems-picketlink-identity-management.xml"/>
+           paramOutputFile="${generated.configs.examples}/standalone-picketlink-identity-management.xml"/>
     </target>
 
 

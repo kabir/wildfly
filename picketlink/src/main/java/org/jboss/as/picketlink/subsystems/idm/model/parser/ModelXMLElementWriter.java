@@ -24,7 +24,6 @@ package org.jboss.as.picketlink.subsystems.idm.model.parser;
 
 import org.jboss.as.controller.ResourceDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
-import org.jboss.as.picketlink.subsystems.idm.model.AbstractResourceDefinition;
 import org.jboss.as.picketlink.subsystems.idm.model.ModelElement;
 import org.jboss.as.picketlink.subsystems.idm.model.XMLElement;
 import org.jboss.dmr.ModelNode;
@@ -35,6 +34,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.jboss.as.picketlink.subsystems.idm.model.AbstractResourceDefinition.getAttributeDefinition;
+import static org.jboss.as.picketlink.subsystems.idm.model.AbstractResourceDefinition.getChildResourceDefinitions;
 
 /**
  * <p> A generic XML Writer for all {@link ModelElement} definitions. </p>
@@ -49,30 +51,25 @@ public class ModelXMLElementWriter {
     private XMLElement parentElement;
     private String nameAttribute;
 
-    public ModelXMLElementWriter(ModelElement element, Map<String, ModelXMLElementWriter> register) {
+    ModelXMLElementWriter(ModelElement element, Map<String, ModelXMLElementWriter> register) {
         this.modelElement = element;
         this.register = Collections.unmodifiableMap(register);
     }
 
-    public ModelXMLElementWriter(ModelElement element, XMLElement parentElement, Map<String, ModelXMLElementWriter> register) {
+    ModelXMLElementWriter(ModelElement element, XMLElement parentElement, Map<String, ModelXMLElementWriter> register) {
         this(element, register);
         this.parentElement = parentElement;
     }
 
-    public ModelXMLElementWriter(ModelElement element, XMLElement parentElement, String nameAttribute,
-                                        Map<String, ModelXMLElementWriter> register) {
-        this(element, parentElement, register);
-        this.nameAttribute = nameAttribute;
-    }
-
-    public ModelXMLElementWriter(ModelElement element, String nameAttribute, Map<String, ModelXMLElementWriter> register) {
+    ModelXMLElementWriter(ModelElement element, String nameAttribute, Map<String, ModelXMLElementWriter> register) {
         this(element, register);
         this.nameAttribute = nameAttribute;
     }
 
-    public void write(XMLExtendedStreamWriter writer, ModelNode modelNode) throws XMLStreamException {
-        if (modelNode.asProperty().getName().equals(this.modelElement.getName())
-                    || modelNode.asProperty().getValue().hasDefined(this.modelElement.getName())) {
+    void write(XMLExtendedStreamWriter writer, ModelNode modelNode) throws XMLStreamException {
+        String nodeName = modelNode.asProperty().getName();
+
+        if (nodeName.equals(this.modelElement.getName())) {
             if (this.parentElement != null) {
                 writer.writeStartElement(this.parentElement.getName());
             }
@@ -87,7 +84,7 @@ public class ModelXMLElementWriter {
                 writeAttributes(writer, valueNode.asProperty().getValue());
 
                 for (ModelNode propertyIdentity : valueNode.asProperty().getValue().asList()) {
-                    List<ResourceDefinition> children = AbstractResourceDefinition.getChildResourceDefinitions().get(this.modelElement);
+                    List<ResourceDefinition> children = getChildResourceDefinitions().get(this.modelElement);
 
                     if (children != null) {
                         for (ResourceDefinition child : children) {
@@ -110,11 +107,8 @@ public class ModelXMLElementWriter {
     }
 
     private void writeAttributes(XMLStreamWriter writer, ModelNode modelNode) throws XMLStreamException {
-        for (SimpleAttributeDefinition simpleAttributeDefinition : AbstractResourceDefinition.getAttributeDefinition(this.modelElement)) {
-            if (modelNode.hasDefined(simpleAttributeDefinition.getXmlName())) {
-                simpleAttributeDefinition.marshallAsAttribute(modelNode, writer);
-            }
+        for (SimpleAttributeDefinition simpleAttributeDefinition : getAttributeDefinition(this.modelElement)) {
+            simpleAttributeDefinition.marshallAsAttribute(modelNode, writer);
         }
     }
-
 }

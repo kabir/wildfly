@@ -60,7 +60,12 @@ public abstract class AbstractResourceDefinition extends SimpleResourceDefinitio
                                             final OperationStepHandler removeHandler, SimpleAttributeDefinition... attributes) {
         super(PathElement.pathElement(modelElement.getName()), IDMExtension.getResourceDescriptionResolver(modelElement.getName()), addHandler, removeHandler);
         this.modelElement = modelElement;
+        Collections.addAll(this.attributes, attributes);
+    }
 
+    protected AbstractResourceDefinition(ModelElement modelElement, String name, final OperationStepHandler addHandler, SimpleAttributeDefinition... attributes) {
+        super(PathElement.pathElement(modelElement.getName(), name), IDMExtension.getResourceDescriptionResolver(modelElement.getName()), addHandler, ReloadRequiredRemoveStepHandler.INSTANCE);
+        this.modelElement = modelElement;
         Collections.addAll(this.attributes, attributes);
     }
 

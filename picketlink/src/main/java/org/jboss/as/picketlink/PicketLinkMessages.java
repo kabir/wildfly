@@ -59,15 +59,15 @@ public interface PicketLinkMessages {
     RuntimeException couldNotLoadClass(String mappingClass, @Cause Throwable e);
 
     // IDM Messages
-    @Message(id = 12504, value = "No IdentityConfiguration provided. Maybe you forgot to provide a @Producer method for the IdentityConfiguration.")
-    OperationFailedException idmNoConfigurationProvided();
-
-    @Message(id = 12505, value = "Entities module not found [%s].")
+    @Message(id = 12504, value = "Entities module not found [%s].")
     SecurityConfigurationException idmJpaEntityModuleNotFound(String entityModuleName);
 
-    @Message(id = 12506, value = "Could not configure JPA store.")
+    @Message(id = 12505, value = "Could not configure JPA store.")
     SecurityConfigurationException idmJpaStartFailed(@Cause Throwable e);
 
-    @Message(id = 12507, value = "Could not lookup EntityManagerFactory [%s].")
+    @Message(id = 12506, value = "Could not lookup EntityManagerFactory [%s].")
     SecurityConfigurationException idmJpaEMFLookupFailed(String entityManagerFactoryJndiName);
+
+    @Message(id = 12507, value = "No type provided for %s. You must specify a class-name or code.")
+    OperationFailedException idmTypeNotProvided(String elementName);
 }

@@ -38,6 +38,7 @@ public enum ModelElement {
     COMMON_NAME("name"),
     COMMON_VALUE("value"),
     COMMON_CLASS_NAME("class-name"),
+    COMMON_CODE("code"),
     COMMON_SUPPORTS_ALL("supports-all"),
     COMMON_MODULE("module"),
     /*

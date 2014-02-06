@@ -41,7 +41,7 @@ public class SupportedTypesResourceDefinition extends AbstractResourceDefinition
     public static final SupportedTypesResourceDefinition INSTANCE = new SupportedTypesResourceDefinition(SUPPORTS_ALL);
 
     private SupportedTypesResourceDefinition(SimpleAttributeDefinition... attributes) {
-        super(ModelElement.SUPPORTED_TYPES, new IDMConfigAddStepHandler(attributes), attributes);
+        super(ModelElement.SUPPORTED_TYPES, ModelElement.SUPPORTED_TYPES.getName(), new IDMConfigAddStepHandler(attributes), attributes);
     }
 
     @Override
