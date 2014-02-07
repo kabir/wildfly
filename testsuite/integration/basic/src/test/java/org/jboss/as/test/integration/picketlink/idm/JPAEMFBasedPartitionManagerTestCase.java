@@ -2,7 +2,6 @@ package org.jboss.as.test.integration.picketlink.idm;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
@@ -14,14 +13,12 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.runner.RunWith;
 import org.picketlink.idm.PartitionManager;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.annotation.Resource;
 import java.io.File;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.JPA_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.JPA_STORE_ENTITY_MANAGER_FACTORY;
-import static org.junit.Assert.fail;
 
 /**
  * @author Pedro Igor
@@ -43,21 +40,11 @@ public class JPAEMFBasedPartitionManagerTestCase extends AbstractBasicIdentityMa
             .addAsManifestResource(new File(JPAEMFBasedPartitionManagerTestCase.class.getResource("simple-schema-persistence.xml").getFile()), "persistence.xml");
     }
 
-    @ArquillianResource
-    private InitialContext initialContext;
-
+    @Resource(mappedName = PARTITION_MANAGER_JNDI_NAME)
     private PartitionManager partitionManager;
 
     @Override
     protected PartitionManager getPartitionManager() {
-        if (this.partitionManager == null) {
-            try {
-                this.partitionManager = (PartitionManager) this.initialContext.lookup("java:/" + PARTITION_MANAGER_JNDI_NAME);
-            } catch (NamingException e) {
-                fail(e.getMessage());
-            }
-        }
-
         return this.partitionManager;
     }
 
