@@ -200,10 +200,11 @@ public class JPAIdentityStoreInitializer implements IdentityStoreInitializer {
             if (isTxRequired(method)) {
                 if (this.transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION) {
                     this.transactionManager.begin();
-                    tx = this.transactionManager.getTransaction();
                 }
 
                 this.em.joinTransaction();
+
+                tx = this.transactionManager.getTransaction();
             }
 
             ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
