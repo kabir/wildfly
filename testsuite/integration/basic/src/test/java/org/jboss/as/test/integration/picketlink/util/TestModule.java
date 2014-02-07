@@ -59,6 +59,10 @@ public class TestModule {
      * @param moduleXml The module definition file..
      */
     public TestModule(String moduleName, File moduleXml) {
+        if (!moduleXml.exists()) {
+            throw new IllegalArgumentException("The module definition must exists.");
+        }
+
         this.moduleName = moduleName;
         this.moduleXml = moduleXml;
     }
