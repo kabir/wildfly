@@ -399,7 +399,13 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
     @SuppressWarnings("unchecked")
     private <T> Class<T> loadClass(ModelNode moduleNode, String typeName) {
         try {
-            return (Class<T>) getModule(moduleNode).getClassLoader().loadClass(typeName);
+            Module module = getModule(moduleNode);
+
+            if (module != null) {
+                return (Class<T>) module.getClassLoader().loadClass(typeName);
+            } else {
+                return (Class<T>) getClass().getClassLoader().loadClass(typeName);
+            }
         } catch (ClassNotFoundException cnfe) {
             throw MESSAGES.couldNotLoadClass(typeName, cnfe);
         }

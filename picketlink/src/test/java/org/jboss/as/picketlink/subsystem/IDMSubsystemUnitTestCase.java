@@ -21,15 +21,18 @@
  */
 package org.jboss.as.picketlink.subsystem;
 
+import org.jboss.as.controller.RunningMode;
 import org.jboss.as.picketlink.subsystems.idm.IDMExtension;
 import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
 import org.jboss.as.subsystem.test.AdditionalInitialization;
+import org.jboss.as.subsystem.test.ControllerInitializer;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.as.subsystem.test.KernelServicesBuilder;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Pedro Igor
@@ -47,16 +50,28 @@ public class IDMSubsystemUnitTestCase extends AbstractSubsystemBaseTest {
 
     @Test
     public void testRuntime() throws Exception {
-        System.setProperty("server.data.dir", System.getProperty("java.io.tmpdir"));
+        System.setProperty("jboss.server.data.dir", System.getProperty("java.io.tmpdir"));
         System.setProperty("jboss.home.dir", System.getProperty("java.io.tmpdir"));
         System.setProperty("jboss.home.dir", System.getProperty("java.io.tmpdir"));
         System.setProperty("jboss.server.server.dir", System.getProperty("java.io.tmpdir"));
-        KernelServicesBuilder builder = createKernelServicesBuilder(AdditionalInitialization.MANAGEMENT).setSubsystemXml(getSubsystemXml());
-        KernelServices mainServices = builder.build();
-        if (!mainServices.isSuccessfulBoot()) {
-            Assert.fail(mainServices.getBootError().toString());
-        }
 
-        // test services installation
+        KernelServicesBuilder builder = createKernelServicesBuilder(new AdditionalInitialization() {
+            @Override
+            protected RunningMode getRunningMode() {
+                return RunningMode.NORMAL;
+            }
+
+            @Override
+            protected void setupController(ControllerInitializer controllerInitializer) {
+                super.setupController(controllerInitializer);
+                controllerInitializer.addPath("jboss.server.data.dir", System.getProperty("java.io.tmpdir"), null);
+            }
+        }).setSubsystemXml(getSubsystemXml());
+
+        KernelServices mainServices = builder.build();
+
+        assertTrue(mainServices.isSuccessfulBoot());
     }
+
+
 }
