@@ -225,4 +225,8 @@ public class TestModule {
             IoUtils.safeClose(out);
         }
     }
+
+    public String getName() {
+        return moduleName;
+    }
 }

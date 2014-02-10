@@ -35,13 +35,16 @@ public class SupportedTypeResourceDefinition extends AbstractResourceDefinition 
 
     public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
+        .setAlternatives(ModelElement.COMMON_CODE.getName())
         .build();
     public static final SimpleAttributeDefinition CODE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CODE.getName(), ModelType.STRING, true)
         .setValidator(new EnumValidator<>(AttributedTypeEnum.class, true, true))
         .setAllowExpression(true)
+        .setAlternatives(ModelElement.COMMON_CLASS_NAME.getName())
         .build();
     public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
+        .setRequires(ModelElement.COMMON_CLASS_NAME.getName())
         .build();
     public static final SupportedTypeResourceDefinition INSTANCE = new SupportedTypeResourceDefinition(CLASS_NAME, CODE, MODULE);
 

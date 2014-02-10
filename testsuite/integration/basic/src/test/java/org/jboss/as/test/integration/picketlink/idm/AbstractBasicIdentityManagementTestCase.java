@@ -70,11 +70,16 @@ public abstract class AbstractBasicIdentityManagementTestCase {
     public void testUserManagement() throws Exception {
         PartitionManager partitionManager = getPartitionManager();
         IdentityManager identityManager = partitionManager.createIdentityManager();
-        User user = new User("johny");
+        String loginName = "johny";
+        User user = getUser(identityManager, loginName);
 
-        identityManager.add(user);
+        if (user != null) {
+            identityManager.remove(user);
+        }
 
-        assertNotNull(getUser(identityManager, user.getLoginName()));
+        identityManager.add(new User(loginName));
+
+        assertNotNull(getUser(identityManager, loginName));
     }
 
     @Test
@@ -99,11 +104,16 @@ public abstract class AbstractBasicIdentityManagementTestCase {
     public void testRoleManagement() throws Exception {
         PartitionManager partitionManager = getPartitionManager();
         IdentityManager identityManager = partitionManager.createIdentityManager();
-        Role role = new Role("admin");
+        String roleName = "admin";
+        Role role = getRole(identityManager, roleName);
 
-        identityManager.add(role);
+        if (role != null) {
+            identityManager.remove(role);
+        }
 
-        assertNotNull(getRole(identityManager, role.getName()));
+        identityManager.add(new Role(roleName));
+
+        assertNotNull(getRole(identityManager, roleName));
     }
 
     @Test

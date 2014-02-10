@@ -93,16 +93,16 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
         PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
         final String federationName = address.getLastElement().getValue();
-        createPartitionManagerService(context, federationName, model, verificationHandler, newControllers);
+        ModelNode identityManagement = Resource.Tools.readModel(context.readResource(EMPTY_ADDRESS));
+        createPartitionManagerService(context, federationName, identityManagement, verificationHandler, newControllers);
     }
 
-    public void createPartitionManagerService(final OperationContext context, String federationName, final ModelNode model, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
-        String jndiName = IdentityManagementResourceDefinition.IDENTITY_MANAGEMENT_JNDI_URL.resolveModelAttribute(context, model).asString();
+    public void createPartitionManagerService(final OperationContext context, String federationName, final ModelNode identityManagement, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
+        String jndiName = IdentityManagementResourceDefinition.IDENTITY_MANAGEMENT_JNDI_URL.resolveModelAttribute(context, identityManagement).asString();
         IdentityConfigurationBuilder builder = new IdentityConfigurationBuilder();
         PartitionManagerService partitionManagerService = new PartitionManagerService(federationName, jndiName, builder);
         ServiceBuilder<PartitionManager> serviceBuilder = context.getServiceTarget()
             .addService(PartitionManagerService.createServiceName(federationName), partitionManagerService);
-        ModelNode identityManagement = Resource.Tools.readModel(context.readResource(EMPTY_ADDRESS));
 
         for (Property identityConfiguration : identityManagement.get(IDENTITY_CONFIGURATION.getName()).asPropertyList()) {
             String configurationName = identityConfiguration.getName();

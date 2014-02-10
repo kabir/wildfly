@@ -44,8 +44,8 @@ import static org.jboss.as.picketlink.subsystems.idm.IDMExtension.SUBSYSTEM_NAME
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_SUPPORTS_ALL;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_CONFIGURATION;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.PARTITION_MANAGER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_MANAGEMENT_JNDI_NAME;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.PARTITION_MANAGER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.SUPPORTED_TYPES;
 import static org.jboss.as.test.integration.security.common.Utils.applyUpdate;
 

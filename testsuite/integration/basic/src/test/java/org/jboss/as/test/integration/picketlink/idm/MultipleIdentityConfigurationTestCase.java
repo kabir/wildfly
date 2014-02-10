@@ -48,11 +48,11 @@ import static org.junit.Assert.assertNotNull;
  * @author Pedro Igor
  */
 @RunWith(Arquillian.class)
-@ServerSetup({LdapServerSetupTask.class, MultipleIdentityStoreConfigurationTestCase.IdentityManagementServerSetupTask.class
+@ServerSetup({LdapServerSetupTask.class, MultipleIdentityConfigurationTestCase.IdentityManagementServerSetupTask.class
 })
-public class MultipleIdentityStoreConfigurationTestCase {
+public class MultipleIdentityConfigurationTestCase {
 
-    static final String PARTITION_MANAGER_JNDI_NAME = "picketlink/MultipleStoreBasedPartitionManager";
+    static final String PARTITION_MANAGER_JNDI_NAME = "picketlink/MultipleIdentityConfigBasedPartitionManager";
 
     @Deployment
     public static WebArchive createDeployment() {
@@ -60,7 +60,7 @@ public class MultipleIdentityStoreConfigurationTestCase {
                .create(WebArchive.class, "test.war")
                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                .addAsManifestResource(new StringAsset("Dependencies: org.picketlink.idm.api meta-inf\n"), "MANIFEST.MF")
-               .addClass(MultipleIdentityStoreConfigurationTestCase.class)
+               .addClass(MultipleIdentityConfigurationTestCase.class)
                .addClass(LdapServerSetupTask.class)
                .addClass(AbstractIdentityManagementServerSetupTask.class);
     }
@@ -111,15 +111,15 @@ public class MultipleIdentityStoreConfigurationTestCase {
 
         @Override
         protected void doCreateIdentityManagement(ModelNode identityManagementAddOperation, ModelNode operationSteps) {
-            ModelNode operationAddIdentityConfiguration = Util.createAddOperation(createIdentityConfigurationPathAddress("multiple.store"));
+            createJpaStoreConfiguration(operationSteps);
+            createLdapStoreConfiguration(operationSteps);
+        }
+
+        private void createJpaStoreConfiguration(ModelNode operationSteps) {
+            ModelNode operationAddIdentityConfiguration = Util.createAddOperation(createIdentityConfigurationPathAddress("jpa.ds.store"));
 
             operationSteps.add(operationAddIdentityConfiguration);
 
-            createJpaStoreConfiguration(operationSteps, operationAddIdentityConfiguration);
-            createLdapStoreConfiguration(operationSteps, operationAddIdentityConfiguration);
-        }
-
-        private void createJpaStoreConfiguration(ModelNode operationSteps, ModelNode operationAddIdentityConfiguration) {
             ModelNode operationAddIdentityStore = createJpaStoreAddOperation(operationAddIdentityConfiguration);
 
             operationSteps.add(operationAddIdentityStore);
@@ -139,7 +139,11 @@ public class MultipleIdentityStoreConfigurationTestCase {
 
         }
 
-        private void createLdapStoreConfiguration(ModelNode operationSteps, ModelNode operationAddIdentityConfiguration) {
+        private void createLdapStoreConfiguration(ModelNode operationSteps) {
+            ModelNode operationAddIdentityConfiguration = Util.createAddOperation(createIdentityConfigurationPathAddress("ldap.store"));
+
+            operationSteps.add(operationAddIdentityConfiguration);
+
             ModelNode operationAddIdentityStore = createLdapStoreAddOperation(operationAddIdentityConfiguration);
 
             operationSteps.add(operationAddIdentityStore);

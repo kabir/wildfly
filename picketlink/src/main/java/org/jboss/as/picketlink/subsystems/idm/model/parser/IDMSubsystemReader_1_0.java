@@ -54,12 +54,12 @@ import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.COMMON_NAME;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.FILE_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_CONFIGURATION;
-import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.PARTITION_MANAGER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_STORE_CREDENTIAL_HANDLER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.JPA_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE_ATTRIBUTE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.LDAP_STORE_MAPPING;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.PARTITION_MANAGER;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.SUPPORTED_TYPE;
 import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.SUPPORTED_TYPES;
 
@@ -231,8 +231,10 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
 
     private void parseLDAPMappingConfig(final XMLExtendedStreamReader reader, final ModelNode identityProviderNode,
                                                final List<ModelNode> addOperations) throws XMLStreamException {
+        String name = resolveNodeName(reader, LDAPStoreMappingResourceDefinition.CLASS_NAME, LDAPStoreMappingResourceDefinition.CODE);
+
         ModelNode ldapMappingConfig = parseConfig(reader, LDAP_STORE_MAPPING,
-                                                         LDAPStoreMappingResourceDefinition.CLASS_NAME.getName(), identityProviderNode,
+                                                         name, identityProviderNode,
                                                          LDAPStoreMappingResourceDefinition.INSTANCE.getAttributes(), addOperations);
 
         parseElement(new ElementParser() {
@@ -251,8 +253,19 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
 
     private ModelNode parseCredentialHandlerConfig(XMLExtendedStreamReader reader, ModelNode identityProviderNode,
                                                           List<ModelNode> addOperations) throws XMLStreamException {
-        return parseConfig(reader, IDENTITY_STORE_CREDENTIAL_HANDLER, CredentialHandlerResourceDefinition.CLASS_NAME.getName(),
+        String name = resolveNodeName(reader, CredentialHandlerResourceDefinition.CLASS_NAME, CredentialHandlerResourceDefinition.CODE);
+
+        return parseConfig(reader, IDENTITY_STORE_CREDENTIAL_HANDLER, name,
                                   identityProviderNode, CredentialHandlerResourceDefinition.INSTANCE.getAttributes(), addOperations);
+    }
+
+    private String resolveNodeName(XMLExtendedStreamReader reader, SimpleAttributeDefinition primaryAttribute, SimpleAttributeDefinition alternativeAttribute) {
+        String name = reader.getAttributeValue("", primaryAttribute.getName());
+
+        if (name == null) {
+            name = reader.getAttributeValue("", alternativeAttribute.getName());
+        }
+        return name;
     }
 
     private ModelNode parseSupportedTypesConfig(final XMLExtendedStreamReader reader, final ModelNode identityStoreNode,
@@ -266,7 +279,9 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
                                      List<ModelNode> addOperations) throws XMLStreamException {
                 switch (element) {
                     case SUPPORTED_TYPE:
-                        parseConfig(reader, SUPPORTED_TYPE, SupportedTypeResourceDefinition.CLASS_NAME.getName(), parentNode,
+                        String name = resolveNodeName(reader, SupportedTypeResourceDefinition.CLASS_NAME, SupportedTypeResourceDefinition.CODE);
+
+                        parseConfig(reader, SUPPORTED_TYPE, name, parentNode,
                                            SupportedTypeResourceDefinition.INSTANCE.getAttributes(), addOperations);
                         break;
                 }
@@ -317,15 +332,23 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
             simpleAttributeDefinition.parseAndSetParameter(reader.getAttributeValue("", simpleAttributeDefinition.getXmlName()), modelNode, reader);
         }
 
+        String name = xmlElement.getName();
+
         if (key != null) {
+            name = key;
+
             if (modelNode.hasDefined(key)) {
-                modelNode.get(ModelDescriptionConstants.OP_ADDR).set(lastNode.clone().get(OP_ADDR).add(xmlElement.getName(), modelNode.get(key)));
+                name = modelNode.get(key).asString();
             } else {
-                modelNode.get(ModelDescriptionConstants.OP_ADDR).set(lastNode.clone().get(OP_ADDR).add(xmlElement.getName(), reader.getAttributeValue("", key)));
+                String attributeValue = reader.getAttributeValue("", key);
+
+                if (attributeValue != null) {
+                    name = attributeValue;
+                }
             }
-        } else {
-            modelNode.get(ModelDescriptionConstants.OP_ADDR).set(lastNode.clone().get(OP_ADDR).add(xmlElement.getName(), xmlElement.getName()));
         }
+
+        modelNode.get(ModelDescriptionConstants.OP_ADDR).set(lastNode.clone().get(OP_ADDR).add(xmlElement.getName(), name));
 
         addOperations.add(modelNode);
 

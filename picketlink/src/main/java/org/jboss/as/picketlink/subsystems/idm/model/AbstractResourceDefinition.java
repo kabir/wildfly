@@ -25,8 +25,6 @@ package org.jboss.as.picketlink.subsystems.idm.model;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationStepHandler;
 import org.jboss.as.controller.PathElement;
-import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
-import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.ResourceDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleResourceDefinition;
@@ -64,14 +62,14 @@ public abstract class AbstractResourceDefinition extends SimpleResourceDefinitio
     }
 
     protected AbstractResourceDefinition(ModelElement modelElement, String name, final OperationStepHandler addHandler, SimpleAttributeDefinition... attributes) {
-        super(PathElement.pathElement(modelElement.getName(), name), IDMExtension.getResourceDescriptionResolver(modelElement.getName()), addHandler, ReloadRequiredRemoveStepHandler.INSTANCE);
+        super(PathElement.pathElement(modelElement.getName(), name), IDMExtension.getResourceDescriptionResolver(modelElement.getName()), addHandler, IDMConfigRemoveStepHandler.INSTANCE);
         this.modelElement = modelElement;
         Collections.addAll(this.attributes, attributes);
     }
 
     protected AbstractResourceDefinition(ModelElement modelElement, final OperationStepHandler addHandler,
                                             SimpleAttributeDefinition... attributes) {
-        super(PathElement.pathElement(modelElement.getName()), IDMExtension.getResourceDescriptionResolver(modelElement.getName()), addHandler, ReloadRequiredRemoveStepHandler.INSTANCE);
+        super(PathElement.pathElement(modelElement.getName()), IDMExtension.getResourceDescriptionResolver(modelElement.getName()), addHandler, IDMConfigRemoveStepHandler.INSTANCE);
         this.modelElement = modelElement;
         Collections.addAll(this.attributes, attributes);
     }
@@ -123,12 +121,12 @@ public abstract class AbstractResourceDefinition extends SimpleResourceDefinitio
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
         for (SimpleAttributeDefinition attribute : getAttributes()) {
-            addAttributeDefinition(attribute, doGetAttributeWriterHandler(), resourceRegistration);
+            addAttributeDefinition(attribute, createAttributeWriterHandler(), resourceRegistration);
         }
     }
 
-    private OperationStepHandler doGetAttributeWriterHandler() {
-        return new ReloadRequiredWriteAttributeHandler(this.attributes.toArray(new AttributeDefinition[this.attributes.size()]));
+    private OperationStepHandler createAttributeWriterHandler() {
+        return new IDMConfigWriteAttributeHandler(this.attributes.toArray(new AttributeDefinition[this.attributes.size()]));
     }
 
     public List<SimpleAttributeDefinition> getAttributes() {

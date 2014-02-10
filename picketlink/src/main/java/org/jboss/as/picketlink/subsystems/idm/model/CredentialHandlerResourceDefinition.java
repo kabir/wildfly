@@ -35,14 +35,16 @@ public class CredentialHandlerResourceDefinition extends AbstractResourceDefinit
 
     public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, true)
        .setAllowExpression(true)
-        .setAlternatives()
+       .setAlternatives(ModelElement.COMMON_CODE.getName())
        .build();
     public static final SimpleAttributeDefinition CODE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CODE.getName(), ModelType.STRING, true)
         .setValidator(new EnumValidator<>(CredentialTypeEnum.class, true, true))
         .setAllowExpression(true)
+        .setAlternatives(ModelElement.COMMON_CLASS_NAME.getName())
         .build();
     public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
+        .setRequires(ModelElement.COMMON_CLASS_NAME.getName())
         .build();
     public static final CredentialHandlerResourceDefinition INSTANCE = new CredentialHandlerResourceDefinition(CLASS_NAME, CODE, MODULE);
 

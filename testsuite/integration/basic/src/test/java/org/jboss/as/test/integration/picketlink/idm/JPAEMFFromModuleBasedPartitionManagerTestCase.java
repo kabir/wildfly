@@ -44,7 +44,7 @@ import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.JPA_STOR
 @ServerSetup(JPAEMFFromModuleBasedPartitionManagerTestCase.IdentityManagementServerSetupTask.class)
 public class JPAEMFFromModuleBasedPartitionManagerTestCase extends AbstractBasicIdentityManagementTestCase {
 
-    static final String PARTITION_MANAGER_JNDI_NAME = "picketlink/JPAEMFBasedPartitionManager";
+    static final String PARTITION_MANAGER_JNDI_NAME = "picketlink/JPAEMFModuleBasedPartitionManager";
 
     @Deployment
     public static WebArchive createDeployment() {

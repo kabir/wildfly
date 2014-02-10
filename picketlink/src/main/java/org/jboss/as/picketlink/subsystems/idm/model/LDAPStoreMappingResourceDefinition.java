@@ -36,13 +36,16 @@ public class LDAPStoreMappingResourceDefinition extends AbstractResourceDefiniti
 
     public static final SimpleAttributeDefinition CLASS_NAME = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CLASS_NAME.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
+        .setAlternatives(ModelElement.COMMON_CODE.getName())
         .build();
     public static final SimpleAttributeDefinition CODE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_CODE.getName(), ModelType.STRING, true)
         .setValidator(new EnumValidator<>(AttributedTypeEnum.class, true, true))
         .setAllowExpression(true)
+        .setAlternatives(ModelElement.COMMON_CLASS_NAME.getName())
         .build();
     public static final SimpleAttributeDefinition MODULE = new SimpleAttributeDefinitionBuilder(ModelElement.COMMON_MODULE.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
+        .setRequires(ModelElement.COMMON_CLASS_NAME.getName())
         .build();
     public static final SimpleAttributeDefinition BASE_DN = new SimpleAttributeDefinitionBuilder(ModelElement.LDAP_STORE_MAPPING_BASE_DN.getName(), ModelType.STRING, true)
         .setAllowExpression(true)
