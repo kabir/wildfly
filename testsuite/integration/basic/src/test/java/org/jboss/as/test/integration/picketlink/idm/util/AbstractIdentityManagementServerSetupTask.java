@@ -24,20 +24,13 @@ package org.jboss.as.test.integration.picketlink.idm.util;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
-import org.jboss.as.picketlink.subsystems.idm.IDMExtension;
 import org.jboss.dmr.ModelNode;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADDRESS;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.COMPOSITE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.EXTENSION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.STEPS;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 import static org.jboss.as.picketlink.subsystems.idm.IDMExtension.SUBSYSTEM_NAME;
@@ -88,7 +81,8 @@ public abstract class AbstractIdentityManagementServerSetupTask implements Serve
     }
 
     protected ModelNode createSupportedAllTypesAddOperation(ModelNode identityStoreModelNode) {
-        ModelNode operationAddSupportedTypes = Util.createAddOperation(PathAddress.pathAddress(identityStoreModelNode.get(OP_ADDR)).append(SUPPORTED_TYPES.getName(), SUPPORTED_TYPES.getName()));
+        ModelNode operationAddSupportedTypes = Util.createAddOperation(PathAddress.pathAddress(identityStoreModelNode.get(OP_ADDR)).append(SUPPORTED_TYPES
+            .getName(), SUPPORTED_TYPES.getName()));
 
         operationAddSupportedTypes.get(COMMON_SUPPORTS_ALL.getName()).set(true);
 
@@ -126,43 +120,14 @@ public abstract class AbstractIdentityManagementServerSetupTask implements Serve
     }
 
     private void addExtensionAndSubsystem(ManagementClient managementClient) throws Exception {
-        if (!isExtensionConfigured(managementClient)) {
-            ModelNode operationAddExtension = Util.createAddOperation(PathAddress.pathAddress().append(EXTENSION, EXTENSION_MODULE_NAME));
+        ModelNode operationAddExtension = Util.createAddOperation(PathAddress.pathAddress()
+            .append(EXTENSION, EXTENSION_MODULE_NAME));
 
-            applyUpdate(operationAddExtension, managementClient.getControllerClient());
-        }
+        applyUpdate(operationAddExtension, managementClient.getControllerClient());
 
-        if (!isSubsystemConfigured(managementClient)) {
-            ModelNode operationAddSubsystem = Util.createAddOperation(PathAddress.pathAddress().append(SUBSYSTEM, SUBSYSTEM_NAME));
+        ModelNode operationAddSubsystem = Util.createAddOperation(PathAddress.pathAddress().append(SUBSYSTEM, SUBSYSTEM_NAME));
 
-            applyUpdate(operationAddSubsystem, managementClient.getControllerClient());
-        }
-    }
-
-    private boolean isExtensionConfigured(ManagementClient managementClient) throws IOException {
-        ModelNode readResourceOperation = Operations.createReadResourceOperation(PathAddress.pathAddress().append(EXTENSION).toModelNode());
-        List<ModelNode> extensions = managementClient.getControllerClient().execute(readResourceOperation).get(RESULT).asList();
-
-        for (ModelNode extension : extensions) {
-            if (extension.get(ADDRESS).asString().contains(EXTENSION_MODULE_NAME)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isSubsystemConfigured(ManagementClient managementClient) throws IOException {
-        ModelNode readResourceOperation = Operations.createReadResourceOperation(PathAddress.pathAddress().append(SUBSYSTEM).toModelNode());
-        List<ModelNode> subsystems = managementClient.getControllerClient().execute(readResourceOperation).get(RESULT).asList();
-
-        for (ModelNode extension : subsystems) {
-            if (extension.get(ADDRESS).asString().contains(IDMExtension.SUBSYSTEM_NAME)) {
-                return true;
-            }
-        }
-
-        return false;
+        applyUpdate(operationAddSubsystem, managementClient.getControllerClient());
     }
 
 }
