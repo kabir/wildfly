@@ -31,14 +31,14 @@ import org.jboss.dmr.ModelType;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 16, 2012
  */
-public class IdentityManagementResourceDefinition extends AbstractResourceDefinition {
+public class PartitionManagerResourceDefinition extends AbstractResourceDefinition {
 
     public static final SimpleAttributeDefinition IDENTITY_MANAGEMENT_JNDI_URL = new SimpleAttributeDefinitionBuilder(ModelElement.IDENTITY_MANAGEMENT_JNDI_NAME.getName(), ModelType.STRING, false).setAllowExpression(true).build();
-    public static final IdentityManagementResourceDefinition INSTANCE = new IdentityManagementResourceDefinition();
+    public static final PartitionManagerResourceDefinition INSTANCE = new PartitionManagerResourceDefinition();
 
-    private IdentityManagementResourceDefinition() {
-        super(ModelElement.PARTITION_MANAGER, IdentityManagementAddHandler.INSTANCE,
-                 IdentityManagementRemoveHandler.INSTANCE, IDENTITY_MANAGEMENT_JNDI_URL);
+    private PartitionManagerResourceDefinition() {
+        super(ModelElement.PARTITION_MANAGER, PartitionManagerAddHandler.INSTANCE,
+                 PartitionManagerRemoveHandler.INSTANCE, IDENTITY_MANAGEMENT_JNDI_URL);
     }
 
     @Override

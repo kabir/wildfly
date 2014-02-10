@@ -78,13 +78,13 @@ import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.SUPPORTE
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  */
-public class IdentityManagementAddHandler extends AbstractAddStepHandler {
+public class PartitionManagerAddHandler extends AbstractAddStepHandler {
 
-    static final IdentityManagementAddHandler INSTANCE = new IdentityManagementAddHandler();
+    static final PartitionManagerAddHandler INSTANCE = new PartitionManagerAddHandler();
 
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-        for (SimpleAttributeDefinition attribute : IdentityManagementResourceDefinition.INSTANCE.getAttributes()) {
+        for (SimpleAttributeDefinition attribute : PartitionManagerResourceDefinition.INSTANCE.getAttributes()) {
             attribute.validateAndSet(operation, model);
         }
     }
@@ -98,7 +98,7 @@ public class IdentityManagementAddHandler extends AbstractAddStepHandler {
     }
 
     public void createPartitionManagerService(final OperationContext context, String federationName, final ModelNode identityManagement, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
-        String jndiName = IdentityManagementResourceDefinition.IDENTITY_MANAGEMENT_JNDI_URL.resolveModelAttribute(context, identityManagement).asString();
+        String jndiName = PartitionManagerResourceDefinition.IDENTITY_MANAGEMENT_JNDI_URL.resolveModelAttribute(context, identityManagement).asString();
         IdentityConfigurationBuilder builder = new IdentityConfigurationBuilder();
         PartitionManagerService partitionManagerService = new PartitionManagerService(federationName, jndiName, builder);
         ServiceBuilder<PartitionManager> serviceBuilder = context.getServiceTarget()

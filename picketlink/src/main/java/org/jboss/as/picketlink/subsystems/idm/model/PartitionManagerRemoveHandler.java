@@ -34,11 +34,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  */
-public class IdentityManagementRemoveHandler extends AbstractRemoveStepHandler {
+public class PartitionManagerRemoveHandler extends AbstractRemoveStepHandler {
 
-    static final IdentityManagementRemoveHandler INSTANCE = new IdentityManagementRemoveHandler();
+    static final PartitionManagerRemoveHandler INSTANCE = new PartitionManagerRemoveHandler();
 
-    private IdentityManagementRemoveHandler() {
+    private PartitionManagerRemoveHandler() {
     }
 
     @Override

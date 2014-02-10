@@ -30,7 +30,7 @@ import org.jboss.as.picketlink.subsystems.idm.Namespace;
 import org.jboss.as.picketlink.subsystems.idm.model.CredentialHandlerResourceDefinition;
 import org.jboss.as.picketlink.subsystems.idm.model.FileStoreResourceDefinition;
 import org.jboss.as.picketlink.subsystems.idm.model.IdentityConfigurationResourceDefinition;
-import org.jboss.as.picketlink.subsystems.idm.model.IdentityManagementResourceDefinition;
+import org.jboss.as.picketlink.subsystems.idm.model.PartitionManagerResourceDefinition;
 import org.jboss.as.picketlink.subsystems.idm.model.JPAStoreResourceDefinition;
 import org.jboss.as.picketlink.subsystems.idm.model.LDAPStoreAttributeResourceDefinition;
 import org.jboss.as.picketlink.subsystems.idm.model.LDAPStoreMappingResourceDefinition;
@@ -124,7 +124,7 @@ public class IDMSubsystemReader_1_0 implements XMLStreamConstants, XMLElementRea
     private void parseIdentityManagementConfig(final XMLExtendedStreamReader reader, final ModelNode parentNode,
                                                       final List<ModelNode> addOperations) throws XMLStreamException {
         ModelNode identityManagementNode = parseConfig(reader, PARTITION_MANAGER, COMMON_NAME.getName(), parentNode,
-                                                              IdentityManagementResourceDefinition.INSTANCE.getAttributes(), addOperations);
+                                                              PartitionManagerResourceDefinition.INSTANCE.getAttributes(), addOperations);
 
         parseElement(new ElementParser() {
             @Override

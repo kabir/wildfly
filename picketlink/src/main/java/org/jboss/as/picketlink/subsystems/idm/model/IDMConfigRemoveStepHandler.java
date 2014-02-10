@@ -43,7 +43,7 @@ public class IDMConfigRemoveStepHandler extends RestartParentResourceRemoveHandl
 
     @Override
     protected void recreateParentService(OperationContext context, PathAddress parentAddress, ModelNode parentModel, ServiceVerificationHandler verificationHandler) throws OperationFailedException {
-        IdentityManagementAddHandler.INSTANCE.createPartitionManagerService(context, parentAddress.getLastElement().getValue(), parentModel, verificationHandler, null);
+        PartitionManagerAddHandler.INSTANCE.createPartitionManagerService(context, parentAddress.getLastElement().getValue(), parentModel, verificationHandler, null);
     }
 
     @Override
