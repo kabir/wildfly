@@ -24,6 +24,7 @@ package org.jboss.as.test.integration.picketlink.idm.util;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 
@@ -65,7 +66,32 @@ public abstract class AbstractIdentityManagementServerSetupTask implements Serve
 
     @Override
     public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
-        applyUpdate(Util.createRemoveOperation(getIdentityManagementPathAddress()), managementClient.getControllerClient());
+        ModelControllerClient controllerClient = managementClient.getControllerClient();
+
+        removeIdentityManagementConfiguration(controllerClient);
+        applyUpdate(Util.createRemoveOperation(PathAddress.pathAddress().append(SUBSYSTEM, SUBSYSTEM_NAME)), controllerClient);
+        applyUpdate(Util.createRemoveOperation(PathAddress.pathAddress().append(EXTENSION, EXTENSION_MODULE_NAME)), controllerClient);
+    }
+
+    public void createIdentityManagementConfiguration(ManagementClient managementClient) throws Exception {
+        final ModelNode compositeOp = new ModelNode();
+
+        compositeOp.get(OP).set(COMPOSITE);
+        compositeOp.get(OP_ADDR).setEmptyList();
+
+        ModelNode steps = compositeOp.get(STEPS);
+
+        ModelNode identityManagementAddOperation = createIdentityManagementAddOperation();
+
+        steps.add(identityManagementAddOperation);
+
+        doCreateIdentityManagement(identityManagementAddOperation, steps);
+
+        applyUpdate(compositeOp, managementClient.getControllerClient());
+    }
+
+    public void removeIdentityManagementConfiguration(ModelControllerClient controllerClient) throws Exception {
+        applyUpdate(Util.createRemoveOperation(getIdentityManagementPathAddress()), controllerClient);
     }
 
     /**
@@ -100,23 +126,6 @@ public abstract class AbstractIdentityManagementServerSetupTask implements Serve
 
     private PathAddress getIdentityManagementPathAddress() {
         return PathAddress.pathAddress().append(SUBSYSTEM, SUBSYSTEM_NAME).append(PARTITION_MANAGER.getName(), this.alias);
-    }
-
-    private void createIdentityManagementConfiguration(ManagementClient managementClient) throws Exception {
-        final ModelNode compositeOp = new ModelNode();
-
-        compositeOp.get(OP).set(COMPOSITE);
-        compositeOp.get(OP_ADDR).setEmptyList();
-
-        ModelNode steps = compositeOp.get(STEPS);
-
-        ModelNode identityManagementAddOperation = createIdentityManagementAddOperation();
-
-        steps.add(identityManagementAddOperation);
-
-        doCreateIdentityManagement(identityManagementAddOperation, steps);
-
-        applyUpdate(compositeOp, managementClient.getControllerClient());
     }
 
     private void addExtensionAndSubsystem(ManagementClient managementClient) throws Exception {

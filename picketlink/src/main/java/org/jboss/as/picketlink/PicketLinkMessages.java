@@ -70,4 +70,10 @@ public interface PicketLinkMessages {
 
     @Message(id = 12507, value = "No type provided for %s. You must specify a class-name or code.")
     OperationFailedException idmTypeNotProvided(String elementName);
+
+    @Message(id = 12508, value = "You post provide at least one identity configuration.")
+    OperationFailedException idmNoIdentityConfigurationProvided();
+
+    @Message(id = 12509, value = "You post provide at least one identity store for identity configuration [%s].")
+    OperationFailedException idmNoIdentityStoreProvided(String identityConfiguration);
 }

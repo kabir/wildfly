@@ -21,31 +21,51 @@
  */
 package org.jboss.as.picketlink.subsystems.idm.service;
 
+import org.jboss.as.controller.services.path.PathManager;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
+import org.jboss.msc.value.InjectedValue;
 import org.picketlink.idm.config.FileStoreConfigurationBuilder;
 
 /**
  * @author Pedro Igor
  */
-public class FileIdentityStoreInitializer implements IdentityStoreInitializer {
+public class FileIdentityStoreService implements Service<FileIdentityStoreService> {
 
     private final String relativeTo;
     private final String workingDir;
     private final FileStoreConfigurationBuilder fileStoreConfigurationBuilder;
+    private InjectedValue<PathManager> pathManager = new InjectedValue<PathManager>();
 
-    public FileIdentityStoreInitializer(FileStoreConfigurationBuilder fileStoreConfigurationBuilder, String workingDir, String relativeTo) {
+    public static ServiceName createServiceName(String name, String configurationName, String storeType) {
+        return ServiceName.JBOSS.append(name, configurationName, storeType);
+    }
+
+    public FileIdentityStoreService(FileStoreConfigurationBuilder fileStoreConfigurationBuilder, String workingDir, String relativeTo) {
         this.fileStoreConfigurationBuilder = fileStoreConfigurationBuilder;
         this.workingDir = workingDir;
         this.relativeTo = relativeTo;
     }
 
     @Override
-    public void onStart(PartitionManagerService partitionManagerService) {
-        String resolvedPath = partitionManagerService.getPathManager().getValue().resolveRelativePathEntry(workingDir, relativeTo);
+    public void start(StartContext startContext) throws StartException {
+        String resolvedPath = getPathManager().getValue().resolveRelativePathEntry(this.workingDir, this.relativeTo);
         this.fileStoreConfigurationBuilder.workingDirectory(resolvedPath);
     }
 
     @Override
-    public void onStop(PartitionManagerService partitionManagerService) {
+    public void stop(StopContext stopContext) {
+    }
 
+    @Override
+    public FileIdentityStoreService getValue() throws IllegalStateException, IllegalArgumentException {
+        return this;
+    }
+
+    public InjectedValue<PathManager> getPathManager() {
+        return this.pathManager;
     }
 }

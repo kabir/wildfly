@@ -42,7 +42,10 @@ public class IDMConfigWriteAttributeHandler extends RestartParentWriteAttributeH
 
     @Override
     protected void recreateParentService(OperationContext context, PathAddress parentAddress, ModelNode parentModel, ServiceVerificationHandler verificationHandler) throws OperationFailedException {
+        final String federationName = parentAddress.getLastElement().getValue();
+        PartitionManagerRemoveHandler.INSTANCE.removeIdentityStoreServices(context, parentModel, federationName);
         PartitionManagerAddHandler.INSTANCE.createPartitionManagerService(context, parentAddress.getLastElement().getValue(), parentModel, verificationHandler, null);
+
     }
 
     @Override

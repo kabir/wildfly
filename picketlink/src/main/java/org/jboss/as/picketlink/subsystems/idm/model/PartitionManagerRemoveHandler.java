@@ -28,8 +28,11 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.picketlink.subsystems.idm.service.PartitionManagerService;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.picketlink.PicketLinkMessages.MESSAGES;
+import static org.jboss.as.picketlink.subsystems.idm.model.ModelElement.IDENTITY_CONFIGURATION;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -42,11 +45,37 @@ public class PartitionManagerRemoveHandler extends AbstractRemoveStepHandler {
     }
 
     @Override
-    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model)
-            throws OperationFailedException {
+    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode partitionManagerNode)
+        throws OperationFailedException {
         PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
         final String federationName = address.getLastElement().getValue();
+
+        removeIdentityStoreServices(context, partitionManagerNode, federationName);
+
         context.removeService(PartitionManagerService.createServiceName(federationName));
         context.completeStep(OperationContext.ResultHandler.NOOP_RESULT_HANDLER);
+    }
+
+    void removeIdentityStoreServices(OperationContext context, ModelNode model, String federationName) throws OperationFailedException {
+        ModelNode identityConfigurationNode = model.get(IDENTITY_CONFIGURATION.getName());
+
+        if (!identityConfigurationNode.isDefined()) {
+            throw MESSAGES.idmNoIdentityConfigurationProvided();
+        }
+
+        for (Property identityConfiguration : identityConfigurationNode.asPropertyList()) {
+            String configurationName = identityConfiguration.getName();
+
+            ModelNode value = identityConfiguration.getValue();
+
+            if (!value.isDefined()) {
+                throw MESSAGES.idmNoIdentityStoreProvided(configurationName);
+            }
+
+            for (Property store : value.asPropertyList()) {
+                context.removeService(PartitionManagerService.createIdentityStoreServiceName(federationName, configurationName, store.getName()));
+            }
+        }
+
     }
 }

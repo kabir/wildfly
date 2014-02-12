@@ -24,7 +24,10 @@ package org.jboss.as.test.integration.picketlink.idm;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.arquillian.api.ServerSetup;
+import org.jboss.as.arquillian.container.ManagementClient;
+import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.test.integration.picketlink.idm.util.AbstractIdentityManagementServerSetupTask;
+import org.jboss.dmr.ModelNode;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -44,8 +47,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(Arquillian.class)
 @ServerSetup({
-    JPADSBasedPartitionManagerTestCase.IdentityManagementServerSetupTask.class,
-    FileBasedPartitionManagerTestCase.IdentityManagementServerSetupTask.class
+    MultipleIdentityManagementConfigurationTestCase.IdentityManagementServerSetupTask.class
 })
 public class MultipleIdentityManagementConfigurationTestCase {
 
@@ -62,8 +64,8 @@ public class MultipleIdentityManagementConfigurationTestCase {
                    .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                    .addAsManifestResource(new StringAsset("Dependencies: org.picketlink.core meta-inf,org.picketlink.core.api meta-inf,org.picketlink.idm.api meta-inf\n"), "MANIFEST.MF")
                    .addClass(MultipleIdentityManagementConfigurationTestCase.class)
-                   .addClass(JPADSBasedPartitionManagerTestCase.IdentityManagementServerSetupTask.class)
-                   .addClass(FileBasedPartitionManagerTestCase.IdentityManagementServerSetupTask.class)
+                   .addClass(MultipleIdentityManagementConfigurationTestCase.IdentityManagementServerSetupTask.class)
+                   .addClass(AbstractBasicIdentityManagementTestCase.class)
                    .addClass(AbstractIdentityManagementServerSetupTask.class);
     }
 
@@ -71,6 +73,35 @@ public class MultipleIdentityManagementConfigurationTestCase {
     public void testInjection() {
         assertTrue(FileIdentityStoreConfiguration.class.isInstance(this.filePartitionManager.getConfigurations().iterator().next().getStoreConfiguration().get(0)));
         assertTrue(JPAIdentityStoreConfiguration.class.isInstance(this.jpaDSPartitionManager.getConfigurations().iterator().next().getStoreConfiguration().get(0)));
+    }
+
+    static class IdentityManagementServerSetupTask extends AbstractIdentityManagementServerSetupTask {
+
+        private FileBasedPartitionManagerTestCase.IdentityManagementServerSetupTask fileIdentityManagementSetupTask;
+        private JPADSBasedPartitionManagerTestCase.IdentityManagementServerSetupTask jpaIdentityManagementSetupTask;
+
+        public IdentityManagementServerSetupTask() {
+            super("", "");
+            this.jpaIdentityManagementSetupTask = new JPADSBasedPartitionManagerTestCase.IdentityManagementServerSetupTask();
+            this.fileIdentityManagementSetupTask = new FileBasedPartitionManagerTestCase.IdentityManagementServerSetupTask();
+        }
+
+        @Override
+        protected void doCreateIdentityManagement(ModelNode identityManagementAddOperation, ModelNode operationSteps) {
+            // no-op
+        }
+
+        @Override
+        public void createIdentityManagementConfiguration(ManagementClient managementClient) throws Exception {
+            this.jpaIdentityManagementSetupTask.createIdentityManagementConfiguration(managementClient);
+            this.fileIdentityManagementSetupTask.createIdentityManagementConfiguration(managementClient);
+        }
+
+        @Override
+        public void removeIdentityManagementConfiguration(ModelControllerClient controllerClient) throws Exception {
+            this.jpaIdentityManagementSetupTask.removeIdentityManagementConfiguration(controllerClient);
+            this.fileIdentityManagementSetupTask.removeIdentityManagementConfiguration(controllerClient);
+        }
     }
 
 }
