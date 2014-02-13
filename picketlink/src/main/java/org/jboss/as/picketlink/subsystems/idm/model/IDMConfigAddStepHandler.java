@@ -27,9 +27,9 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.RestartParentResourceAddHandler;
 import org.jboss.as.controller.ServiceVerificationHandler;
+import org.jboss.as.picketlink.subsystems.idm.service.PartitionManagerService;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceName;
-import org.jboss.as.picketlink.subsystems.idm.service.PartitionManagerService;
 
 /**
  * @author Pedro Silva
@@ -45,6 +45,8 @@ public class IDMConfigAddStepHandler extends RestartParentResourceAddHandler {
 
     @Override
     protected void recreateParentService(OperationContext context, PathAddress parentAddress, ModelNode parentModel, ServiceVerificationHandler verificationHandler) throws OperationFailedException {
+        final String federationName = parentAddress.getLastElement().getValue();
+        PartitionManagerRemoveHandler.INSTANCE.removeIdentityStoreServices(context, parentModel, federationName);
         PartitionManagerAddHandler.INSTANCE.createPartitionManagerService(context, parentAddress.getLastElement().getValue(), parentModel, verificationHandler, null);
     }
 

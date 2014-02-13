@@ -60,13 +60,13 @@ public class MultipleIdentityManagementConfigurationTestCase {
     @Deployment
     public static WebArchive createDeployment() {
         return ShrinkWrap
-            .create(WebArchive.class, "test.war")
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsManifestResource(new StringAsset("Dependencies: org.picketlink.core meta-inf,org.picketlink.core.api meta-inf,org.picketlink.idm.api meta-inf\n"), "MANIFEST.MF")
-            .addClass(MultipleIdentityManagementConfigurationTestCase.class)
-            .addClass(MultipleIdentityManagementConfigurationTestCase.IdentityManagementServerSetupTask.class)
-            .addClass(AbstractBasicIdentityManagementTestCase.class)
-            .addClass(AbstractIdentityManagementServerSetupTask.class);
+                   .create(WebArchive.class, "test.war")
+                   .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                   .addAsManifestResource(new StringAsset("Dependencies: org.picketlink.core meta-inf,org.picketlink.core.api meta-inf,org.picketlink.idm.api meta-inf\n"), "MANIFEST.MF")
+                   .addClass(MultipleIdentityManagementConfigurationTestCase.class)
+                   .addClass(MultipleIdentityManagementConfigurationTestCase.IdentityManagementServerSetupTask.class)
+                   .addClass(AbstractBasicIdentityManagementTestCase.class)
+                   .addClass(AbstractIdentityManagementServerSetupTask.class);
     }
 
     @Test
@@ -103,5 +103,4 @@ public class MultipleIdentityManagementConfigurationTestCase {
             this.fileIdentityManagementSetupTask.removeIdentityManagementConfiguration(controllerClient);
         }
     }
-
 }

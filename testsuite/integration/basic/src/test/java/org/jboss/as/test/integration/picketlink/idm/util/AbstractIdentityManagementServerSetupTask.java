@@ -70,8 +70,7 @@ public abstract class AbstractIdentityManagementServerSetupTask implements Serve
 
         removeIdentityManagementConfiguration(controllerClient);
         applyUpdate(Util.createRemoveOperation(PathAddress.pathAddress().append(SUBSYSTEM, SUBSYSTEM_NAME)), controllerClient);
-        applyUpdate(Util
-            .createRemoveOperation(PathAddress.pathAddress().append(EXTENSION, EXTENSION_MODULE_NAME)), controllerClient);
+        applyUpdate(Util.createRemoveOperation(PathAddress.pathAddress().append(EXTENSION, EXTENSION_MODULE_NAME)), controllerClient);
     }
 
     public void createIdentityManagementConfiguration(ManagementClient managementClient) throws Exception {

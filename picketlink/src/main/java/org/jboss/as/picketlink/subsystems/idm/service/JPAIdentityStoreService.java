@@ -26,6 +26,11 @@ import org.hibernate.engine.transaction.jta.platform.internal.JBossAppServerJtaP
 import org.jboss.as.picketlink.subsystems.idm.config.JPAStoreSubsystemConfiguration;
 import org.jboss.as.picketlink.subsystems.idm.config.JPAStoreSubsystemConfigurationBuilder;
 import org.jboss.modules.Module;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
+import org.jboss.msc.value.InjectedValue;
 import org.picketlink.idm.jpa.internal.JPAIdentityStore;
 import org.picketlink.idm.spi.ContextInitializer;
 import org.picketlink.idm.spi.IdentityContext;
@@ -56,20 +61,22 @@ import static org.picketlink.common.util.StringUtil.isNullOrEmpty;
 /**
  * @author Pedro Igor
  */
-public class JPAIdentityStoreInitializer implements IdentityStoreInitializer {
+public class JPAIdentityStoreService implements Service<JPAIdentityStoreService> {
 
     private static final String JPA_ANNOTATION_PACKAGE = "org.picketlink.idm.jpa.annotations";
     private final JPAStoreSubsystemConfigurationBuilder configurationBuilder;
-    private final JPAStoreSubsystemConfiguration storeConfig;
+    private JPAStoreSubsystemConfiguration storeConfig;
     private EntityManagerFactory emf;
+    private final InjectedValue<TransactionManager> transactionManager = new InjectedValue<TransactionManager>();
 
-    public JPAIdentityStoreInitializer(JPAStoreSubsystemConfigurationBuilder configurationBuilder) {
+    public JPAIdentityStoreService(JPAStoreSubsystemConfigurationBuilder configurationBuilder) {
         this.configurationBuilder = configurationBuilder;
-        this.storeConfig = this.configurationBuilder.create();
     }
 
     @Override
-    public void onStart(final PartitionManagerService partitionManagerService) {
+    public void start(StartContext startContext) throws StartException {
+        this.storeConfig = this.configurationBuilder.create();
+
         try {
             configureEntityManagerFactory();
             configureEntities();
@@ -84,7 +91,7 @@ public class JPAIdentityStoreInitializer implements IdentityStoreInitializer {
             public void initContextForStore(IdentityContext context, IdentityStore<?> store) {
                 if (store instanceof JPAIdentityStore) {
                     if (!context.isParameterSet(JPAIdentityStore.INVOCATION_CTX_ENTITY_MANAGER)) {
-                        context.setParameter(JPAIdentityStore.INVOCATION_CTX_ENTITY_MANAGER, getEntityManager(partitionManagerService.getTransactionManager().getValue()));
+                        context.setParameter(JPAIdentityStore.INVOCATION_CTX_ENTITY_MANAGER, getEntityManager(getTransactionManager().getValue()));
                     }
                 }
             }
@@ -92,10 +99,19 @@ public class JPAIdentityStoreInitializer implements IdentityStoreInitializer {
     }
 
     @Override
-    public void onStop(PartitionManagerService partitionManagerService) {
+    public void stop(StopContext stopContext) {
         if (this.storeConfig.getEntityManagerFactoryJndiName() == null) {
             this.emf.close();
         }
+    }
+
+    @Override
+    public JPAIdentityStoreService getValue() throws IllegalStateException, IllegalArgumentException {
+        return this;
+    }
+
+    public InjectedValue<TransactionManager> getTransactionManager() {
+        return this.transactionManager;
     }
 
     private void configureEntityManagerFactory() {
@@ -178,7 +194,9 @@ public class JPAIdentityStoreInitializer implements IdentityStoreInitializer {
     }
 
     private EntityManager getEntityManager(TransactionManager transactionManager) {
-        return (EntityManager) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[]{EntityManager.class}, new EntityManagerInvocationHandler(this.emf.createEntityManager(), this.storeConfig.getEntityModule(), transactionManager));
+        return (EntityManager) Proxy.newProxyInstance(Thread.currentThread()
+            .getContextClassLoader(), new Class<?>[]{EntityManager.class}, new EntityManagerInvocationHandler(this.emf
+            .createEntityManager(), this.storeConfig.getEntityModule(), transactionManager));
     }
 
     private class EntityManagerInvocationHandler implements InvocationHandler {

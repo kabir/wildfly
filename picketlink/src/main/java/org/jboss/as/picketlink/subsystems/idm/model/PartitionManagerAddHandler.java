@@ -35,8 +35,8 @@ import org.jboss.as.naming.ValueManagedReferenceFactory;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.picketlink.subsystems.idm.config.JPAStoreSubsystemConfiguration;
 import org.jboss.as.picketlink.subsystems.idm.config.JPAStoreSubsystemConfigurationBuilder;
-import org.jboss.as.picketlink.subsystems.idm.service.FileIdentityStoreInitializer;
-import org.jboss.as.picketlink.subsystems.idm.service.JPAIdentityStoreInitializer;
+import org.jboss.as.picketlink.subsystems.idm.service.FileIdentityStoreService;
+import org.jboss.as.picketlink.subsystems.idm.service.JPAIdentityStoreService;
 import org.jboss.as.picketlink.subsystems.idm.service.PartitionManagerService;
 import org.jboss.as.txn.service.TxnServices;
 import org.jboss.dmr.ModelNode;
@@ -48,6 +48,7 @@ import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.value.InjectedValue;
 import org.picketlink.idm.PartitionManager;
 import org.picketlink.idm.config.FileStoreConfigurationBuilder;
@@ -93,27 +94,43 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
         PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
         final String federationName = address.getLastElement().getValue();
-        ModelNode identityManagement = Resource.Tools.readModel(context.readResource(EMPTY_ADDRESS));
-        createPartitionManagerService(context, federationName, identityManagement, verificationHandler, newControllers);
+        ModelNode partitionManager = Resource.Tools.readModel(context.readResource(EMPTY_ADDRESS));
+        createPartitionManagerService(context, federationName, partitionManager, verificationHandler, newControllers);
     }
 
-    public void createPartitionManagerService(final OperationContext context, String federationName, final ModelNode identityManagement, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
-        String jndiName = PartitionManagerResourceDefinition.IDENTITY_MANAGEMENT_JNDI_URL.resolveModelAttribute(context, identityManagement).asString();
+    public void createPartitionManagerService(final OperationContext context, String federationName, final ModelNode partitionManager, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
+        String jndiName = PartitionManagerResourceDefinition.IDENTITY_MANAGEMENT_JNDI_URL
+            .resolveModelAttribute(context, partitionManager).asString();
         IdentityConfigurationBuilder builder = new IdentityConfigurationBuilder();
         PartitionManagerService partitionManagerService = new PartitionManagerService(federationName, jndiName, builder);
         ServiceBuilder<PartitionManager> serviceBuilder = context.getServiceTarget()
             .addService(PartitionManagerService.createServiceName(federationName), partitionManagerService);
+        ModelNode identityConfigurationNode = partitionManager.get(IDENTITY_CONFIGURATION.getName());
 
-        for (Property identityConfiguration : identityManagement.get(IDENTITY_CONFIGURATION.getName()).asPropertyList()) {
+        if (!identityConfigurationNode.isDefined()) {
+            throw MESSAGES.idmNoIdentityConfigurationProvided();
+        }
+
+        for (Property identityConfiguration : identityConfigurationNode.asPropertyList()) {
             String configurationName = identityConfiguration.getName();
             NamedIdentityConfigurationBuilder namedIdentityConfigurationBuilder = builder.named(configurationName);
 
-            for (ModelNode store : identityConfiguration.getValue().asList()) {
-                configureIdentityStore(context, serviceBuilder, partitionManagerService, namedIdentityConfigurationBuilder, store);
+            ModelNode value = identityConfiguration.getValue();
+
+            if (!value.isDefined()) {
+                throw MESSAGES.idmNoIdentityStoreProvided(configurationName);
+            }
+
+            for (ModelNode store : value.asList()) {
+                configureIdentityStore(context, serviceBuilder, verificationHandler, newControllers, partitionManagerService, configurationName, namedIdentityConfigurationBuilder, store);
             }
         }
 
-        ServiceController<PartitionManager> controller = serviceBuilder.addListener(verificationHandler)
+        if (verificationHandler != null) {
+            serviceBuilder.addListener(verificationHandler);
+        }
+
+        ServiceController<PartitionManager> controller = serviceBuilder
             .setInitialMode(Mode.PASSIVE)
             .install();
 
@@ -122,16 +139,16 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
         }
     }
 
-    private void configureIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, PartitionManagerService partitionManagerService, NamedIdentityConfigurationBuilder namedIdentityConfigurationBuilder, ModelNode modelNode) throws OperationFailedException {
+    private void configureIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers, PartitionManagerService partitionManagerService, String configurationName, NamedIdentityConfigurationBuilder namedIdentityConfigurationBuilder, ModelNode modelNode) throws OperationFailedException {
         Property prop = modelNode.asProperty();
         String storeType = prop.getName();
         ModelNode identityStore = prop.getValue().asProperty().getValue();
         IdentityStoreConfigurationBuilder storeConfig = null;
 
         if (storeType.equals(JPA_STORE.getName())) {
-            storeConfig = configureJPAIdentityStore(context, serviceBuilder, partitionManagerService, identityStore, namedIdentityConfigurationBuilder);
+            storeConfig = configureJPAIdentityStore(context, serviceBuilder, verificationHandler, newControllers, partitionManagerService, identityStore, configurationName, namedIdentityConfigurationBuilder);
         } else if (storeType.equals(FILE_STORE.getName())) {
-            storeConfig = configureFileIdentityStore(context, serviceBuilder, partitionManagerService, identityStore, namedIdentityConfigurationBuilder);
+            storeConfig = configureFileIdentityStore(context, serviceBuilder, verificationHandler, newControllers, partitionManagerService, identityStore, configurationName, namedIdentityConfigurationBuilder);
         } else if (storeType.equals(LDAP_STORE.getName())) {
             storeConfig = configureLDAPIdentityStore(context, identityStore, namedIdentityConfigurationBuilder);
         }
@@ -189,7 +206,8 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
                     throw MESSAGES.idmTypeNotProvided(LDAP_STORE_MAPPING.getName());
                 }
 
-                LDAPMappingConfigurationBuilder storeMapping = storeConfig.mapping(this.<AttributedType>loadClass(moduleNode, typeName));
+                LDAPMappingConfigurationBuilder storeMapping = storeConfig
+                    .mapping(this.<AttributedType>loadClass(moduleNode, typeName));
                 ModelNode relatesToNode = LDAPStoreMappingResourceDefinition.RELATES_TO.resolveModelAttribute(context, ldapMapping);
 
                 if (relatesToNode.isDefined()) {
@@ -206,7 +224,8 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
 
                     storeMapping.baseDN(baseDN);
 
-                    String objectClasses = LDAPStoreMappingResourceDefinition.OBJECT_CLASSES.resolveModelAttribute(context, ldapMapping).asString();
+                    String objectClasses = LDAPStoreMappingResourceDefinition.OBJECT_CLASSES
+                        .resolveModelAttribute(context, ldapMapping).asString();
 
                     for (String objClass : objectClasses.split(",")) {
                         if (!objClass.trim().isEmpty()) {
@@ -214,7 +233,8 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
                         }
                     }
 
-                    ModelNode parentAttributeName = LDAPStoreMappingResourceDefinition.PARENT_ATTRIBUTE.resolveModelAttribute(context, ldapMapping);
+                    ModelNode parentAttributeName = LDAPStoreMappingResourceDefinition.PARENT_ATTRIBUTE
+                        .resolveModelAttribute(context, ldapMapping);
 
                     if (parentAttributeName.isDefined()) {
                         storeMapping.parentMembershipAttributeName(parentAttributeName.asString());
@@ -246,7 +266,7 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
         return storeConfig;
     }
 
-    private IdentityStoreConfigurationBuilder configureFileIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, PartitionManagerService partitionManagerService, ModelNode resource, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
+    private IdentityStoreConfigurationBuilder configureFileIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers, PartitionManagerService partitionManagerService, ModelNode resource, String configurationName, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
         FileStoreConfigurationBuilder fileStoreBuilder = builder.stores().file();
         String workingDir = FileStoreResourceDefinition.WORKING_DIR.resolveModelAttribute(context, resource).asString();
         String relativeTo = FileStoreResourceDefinition.RELATIVE_TO.resolveModelAttribute(context, resource).asString();
@@ -259,14 +279,32 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
         fileStoreBuilder.asyncWrite(asyncWrite.asBoolean());
         fileStoreBuilder.asyncWriteThreadPool(asyncWriteThreadPool.asInt());
 
-        serviceBuilder.addDependency(PathManagerService.SERVICE_NAME, PathManager.class, partitionManagerService.getPathManager());
+        FileIdentityStoreService storeService = new FileIdentityStoreService(fileStoreBuilder, workingDir, relativeTo);
+        ServiceName storeServiceName = FileIdentityStoreService
+            .createServiceName(partitionManagerService.getName(), configurationName, ModelElement.FILE_STORE.getName());
+        ServiceBuilder<FileIdentityStoreService> storeServiceBuilder = context.getServiceTarget()
+            .addService(storeServiceName, storeService);
 
-        partitionManagerService.register(new FileIdentityStoreInitializer(fileStoreBuilder, workingDir, relativeTo));
+        storeServiceBuilder.addDependency(PathManagerService.SERVICE_NAME, PathManager.class, storeService.getPathManager());
+
+        serviceBuilder.addDependency(storeServiceName);
+
+        if (verificationHandler != null) {
+            storeServiceBuilder.addListener(verificationHandler);
+        }
+
+        ServiceController<FileIdentityStoreService> controller = storeServiceBuilder
+            .setInitialMode(Mode.PASSIVE)
+            .install();
+
+        if (newControllers != null) {
+            newControllers.add(controller);
+        }
 
         return fileStoreBuilder;
     }
 
-    private JPAStoreSubsystemConfigurationBuilder configureJPAIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, PartitionManagerService partitionManagerService, final ModelNode identityStore, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
+    private JPAStoreSubsystemConfigurationBuilder configureJPAIdentityStore(OperationContext context, ServiceBuilder<PartitionManager> serviceBuilder, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers, PartitionManagerService partitionManagerService, final ModelNode identityStore, String configurationName, final NamedIdentityConfigurationBuilder builder) throws OperationFailedException {
         JPAStoreSubsystemConfigurationBuilder storeConfig = builder.stores()
             .add(JPAStoreSubsystemConfiguration.class, JPAStoreSubsystemConfigurationBuilder.class);
 
@@ -283,23 +321,41 @@ public class PartitionManagerAddHandler extends AbstractAddStepHandler {
 
         storeConfig.entityModuleUnitName(jpaEntityModuleUnitName.asString());
 
+        JPAIdentityStoreService storeService = new JPAIdentityStoreService(storeConfig);
+        ServiceName storeServiceName = PartitionManagerService
+            .createIdentityStoreServiceName(partitionManagerService.getName(), configurationName, ModelElement.JPA_STORE.getName());
+        ServiceBuilder<JPAIdentityStoreService> storeServiceBuilder = context.getServiceTarget()
+            .addService(storeServiceName, storeService);
+
+        storeServiceBuilder.addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER, TransactionManager.class, storeService
+            .getTransactionManager());
+
         if (jpaDataSourceNode.isDefined()) {
             storeConfig.dataSourceJndiUrl(toJndiName(jpaDataSourceNode.asString()));
-            serviceBuilder
+            storeServiceBuilder
                 .addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(toJndiName(jpaDataSourceNode.asString()).split("/")));
         }
 
         if (jpaEntityManagerFactoryNode.isDefined()) {
             storeConfig.entityManagerFactoryJndiName(jpaEntityManagerFactoryNode.asString());
-            serviceBuilder
+            storeServiceBuilder
                 .addDependency(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jpaEntityManagerFactoryNode.asString().split("/")),
                     ValueManagedReferenceFactory.class, new InjectedValue<ValueManagedReferenceFactory>());
         }
 
-        serviceBuilder.addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER, TransactionManager.class, partitionManagerService
-            .getTransactionManager());
+        serviceBuilder.addDependency(storeServiceName);
 
-        partitionManagerService.register(new JPAIdentityStoreInitializer(storeConfig));
+        if (verificationHandler != null) {
+            storeServiceBuilder.addListener(verificationHandler);
+        }
+
+        ServiceController<JPAIdentityStoreService> controller = storeServiceBuilder
+            .setInitialMode(Mode.PASSIVE)
+            .install();
+
+        if (newControllers != null) {
+            newControllers.add(controller);
+        }
 
         return storeConfig;
     }
