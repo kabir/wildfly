@@ -26,6 +26,7 @@ import static org.jboss.as.logging.AbstractHandlerDefinition.FORMATTER;
 import static org.jboss.as.logging.AbstractHandlerDefinition.NAMED_FORMATTER;
 import static org.jboss.as.logging.AsyncHandlerResourceDefinition.QUEUE_LENGTH;
 import static org.jboss.as.logging.AsyncHandlerResourceDefinition.SUBHANDLERS;
+import static org.jboss.as.logging.CommonAttributes.CLASS;
 import static org.jboss.as.logging.CommonAttributes.ENABLED;
 import static org.jboss.as.logging.CommonAttributes.ENCODING;
 import static org.jboss.as.logging.CommonAttributes.FILE;
@@ -33,12 +34,10 @@ import static org.jboss.as.logging.CommonAttributes.FILTER;
 import static org.jboss.as.logging.CommonAttributes.FILTER_SPEC;
 import static org.jboss.as.logging.CommonAttributes.HANDLER_NAME;
 import static org.jboss.as.logging.CommonAttributes.LEVEL;
-import static org.jboss.as.logging.CommonAttributes.CLASS;
 import static org.jboss.as.logging.CommonAttributes.MODULE;
 import static org.jboss.as.logging.CommonAttributes.PROPERTIES;
 import static org.jboss.as.logging.Logging.createOperationFailure;
 import static org.jboss.as.logging.PatternFormatterResourceDefinition.PATTERN;
-import static org.jboss.as.logging.PatternFormatterResourceDefinition.PATTERN_FORMATTER;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -272,14 +271,17 @@ final class HandlerOperations {
                 try {
                     final Class<?> actualClass = Class.forName(className, false, moduleLoader.loadModule(id).getClassLoader());
                     if (Appender.class.isAssignableFrom(actualClass)) {
+                        final PojoConfiguration pojoConfiguration;
                         // Check for construction parameters
                         if (constructionProperties == null) {
-                            logContextConfiguration.addPojoConfiguration(moduleName, className, name);
+                            pojoConfiguration = logContextConfiguration.addPojoConfiguration(moduleName, className, name);
                         } else {
-                            logContextConfiguration.addPojoConfiguration(moduleName, className, name, constructionProperties);
+                            pojoConfiguration = logContextConfiguration.addPojoConfiguration(moduleName, className, name, constructionProperties);
                         }
+                        // Set the name on the appender
+                        pojoConfiguration.setPropertyValueString("name", name);
                         configuration = logContextConfiguration.addHandlerConfiguration("org.jboss.as.logging", Log4jAppenderHandler.class.getName(), name);
-                        configuration.addPostConfigurationMethod("activate");
+                        configuration.addPostConfigurationMethod(Log4jAppenderHandler.ACTIVATE_OPTIONS_METHOD_NAME);
                         configuration.setPropertyValueString("appender", name);
                     } else {
                         // Check for construction parameters
@@ -348,6 +350,10 @@ final class HandlerOperations {
                         propertyConfigurable = configuration;
                     } else {
                         propertyConfigurable = pojoConfiguration;
+                        // A log4j appender may be an OptionHandler which requires the invocation of activateOptions(). Setting
+                        // a dummy property on the Log4jAppenderHandler is required to invoke this method as all properties are
+                        // set on the POJO which is the actual appender
+                        configuration.setPropertyValueString(Log4jAppenderHandler.ACTIVATOR_PROPERTY_METHOD_NAME, "");
                     }
                     if (value.isDefined()) {
                         for (Property property : value.asPropertyList()) {
@@ -561,6 +567,7 @@ final class HandlerOperations {
     private static void handleProperty(final AttributeDefinition attribute, final OperationContext context, final ModelNode model,
                                        final LogContextConfiguration logContextConfiguration, final HandlerConfiguration configuration, final boolean resolveValue)
             throws OperationFailedException {
+
         if (attribute.getName().equals(ENABLED.getName())) {
             final boolean value = ((resolveValue ? ENABLED.resolveModelAttribute(context, model).asBoolean() : model.asBoolean()));
             if (value) {
@@ -598,7 +605,7 @@ final class HandlerOperations {
         } else if (attribute.getName().equals(NAMED_FORMATTER.getName())) {
             final String formatterName = configuration.getName();
             final ModelNode valueNode = (resolveValue ? NAMED_FORMATTER.resolveModelAttribute(context, model) : model);
-            // If the value not is undefined, this may have come from a undefine-attribute operation
+            // If the value not is undefined, this may have come from an undefine-attribute operation
             if (valueNode.isDefined()) {
                 final String resolvedValue = valueNode.asString();
                 configuration.setFormatterName(resolvedValue);
@@ -643,6 +650,10 @@ final class HandlerOperations {
                 propertyConfigurable = configuration;
             } else {
                 propertyConfigurable = pojoConfiguration;
+                // A log4j appender may be an OptionHandler which requires the invocation of activateOptions(). Setting
+                // a dummy property on the Log4jAppenderHandler is required to invoke this method as all properties are
+                // set on the POJO which is the actual appender
+                configuration.setPropertyValueString(Log4jAppenderHandler.ACTIVATOR_PROPERTY_METHOD_NAME, "");
             }
             // Should be safe here to only process defined properties. The write-attribute handler handles removing
             // undefined properties
@@ -705,26 +716,36 @@ final class HandlerOperations {
             final String currentValue = configuration.getEncoding();
             result = (resolvedValue == null ? currentValue == null : resolvedValue.equals(currentValue));
         } else if (attribute.getName().equals(FORMATTER.getName())) {
-            final String formatterName = configuration.getName();
-            // Only check the pattern if the name matches the currently configured name
-            if (formatterName.equals(configuration.getFormatterNameValueExpression().getResolvedValue())) {
-                final FormatterConfiguration fmtConfig;
-                if (logContextConfiguration.getFormatterNames().contains(formatterName)) {
-                    fmtConfig = logContextConfiguration.getFormatterConfiguration(formatterName);
-                    final String resolvedValue = FORMATTER.resolvePropertyValue(context, model);
-                    final String currentValue = fmtConfig.getPropertyValueString(PATTERN_FORMATTER.getName());
-                    result = (resolvedValue == null ? currentValue == null : resolvedValue.equals(currentValue));
+            // Ignored if there is a named-formatter defined
+            if (model.hasDefined(NAMED_FORMATTER.getName())) {
+                result = true;
+            } else {
+                final String formatterName = configuration.getName();
+                // Only check the pattern if the name matches the currently configured name
+                if (formatterName.equals(configuration.getFormatterNameValueExpression().getResolvedValue())) {
+                    final FormatterConfiguration fmtConfig;
+                    if (logContextConfiguration.getFormatterNames().contains(formatterName)) {
+                        fmtConfig = logContextConfiguration.getFormatterConfiguration(formatterName);
+                        final String resolvedValue = FORMATTER.resolvePropertyValue(context, model);
+                        final String currentValue = fmtConfig.getPropertyValueString(PATTERN.getName());
+                        result = (resolvedValue == null ? currentValue == null : resolvedValue.equals(currentValue));
+                    } else {
+                        result = false;
+                    }
                 } else {
                     result = false;
                 }
-            } else {
-                result = false;
             }
         } else if (attribute.getName().equals(NAMED_FORMATTER.getName())) {
             final ModelNode valueNode = NAMED_FORMATTER.resolveModelAttribute(context, model);
-            final String resolvedValue = (valueNode.isDefined() ? valueNode.asString() : null);
-            final String currentValue = configuration.getFormatterName();
-            result = (resolvedValue == null ? currentValue == null : resolvedValue.equals(currentValue));
+            // Ignore if not defined
+            if (valueNode.isDefined()) {
+                final String resolvedValue = valueNode.asString();
+                final String currentValue = configuration.getFormatterName();
+                result = resolvedValue.equals(currentValue);
+            } else {
+                result = true;
+            }
         } else if (attribute.getName().equals(FILTER_SPEC.getName())) {
             final ModelNode valueNode = FILTER_SPEC.resolveModelAttribute(context, model);
             final String resolvedValue = (valueNode.isDefined() ? valueNode.asString() : null);

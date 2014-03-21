@@ -27,21 +27,40 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.enterprise.inject.spi.Extension;
 
 import org.jboss.jandex.Index;
 import org.jboss.jandex.IndexWriter;
 import org.jboss.jandex.Indexer;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.xnio.IoUtils;
 
 public class ModuleUtils {
 
+    public static void createSimpleTestModule(String moduleName, Class<?>... classes) throws IOException {
+        createTestModule(moduleName, createSimpleModuleDescriptor(moduleName).openStream(), classes);
+    }
+
     public static void createTestModule(String moduleName, String moduleXml, Class<?>... classes) throws IOException {
+        URL url = classes[0].getResource(moduleXml);
+        if (url == null) {
+            throw new IllegalStateException("Could not find module.xml: " + moduleXml);
+        }
+        createTestModule(moduleName, url.openStream(), classes);
+    }
+
+    private static void createTestModule(String moduleName, InputStream moduleXml, Class<?>... classes) throws IOException {
         File testModuleRoot = new File(getModulePath(), "test" + File.separatorChar + moduleName);
         if (testModuleRoot.exists()) {
             throw new IllegalArgumentException(testModuleRoot + " already exists");
@@ -51,16 +70,12 @@ public class ModuleUtils {
             throw new IllegalArgumentException("Could not create " + file);
         }
 
-        URL url = classes[0].getResource(moduleXml);
-        if (url == null) {
-            throw new IllegalStateException("Could not find module.xml: " + moduleXml);
-        }
-        copyFile(new File(file, "module.xml"), url.openStream());
+        copyFile(new File(file, "module.xml"), moduleXml);
 
         JavaArchive jar = ShrinkWrap.create(JavaArchive.class, moduleName + ".jar");
         jar.addClasses(classes);
         jar.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-
+        addExtensionsIfAvailable(jar, classes);
 
         Indexer indexer = new Indexer();
         for (Class<?> clazz : classes) {
@@ -126,6 +141,40 @@ public class ModuleUtils {
                 }
             }
             file.delete();
+        }
+    }
+
+    private static Asset createSimpleModuleDescriptor(String moduleName) {
+        return new StringAsset(
+                "<module xmlns=\"urn:jboss:module:1.1\" name=\"test." + moduleName + "\">" +
+                "<resources>" +
+                "<resource-root path=\"" + moduleName + ".jar\"/>" +
+                "</resources>" +
+                "<dependencies>" +
+                "<module name=\"javax.enterprise.api\"/>" +
+                "<module name=\"javax.inject.api\"/>" +
+                "</dependencies>" +
+                "</module>");
+    }
+
+    /**
+     * Adds extensions to the specified archive if any available.
+     *
+     * @param jar to add extensions to
+     * @param classes to be evaluated
+     */
+    @SuppressWarnings("unchecked")
+    private static void addExtensionsIfAvailable(JavaArchive jar, final Class<?>... classes) {
+        List<Class<Extension>> extensions = new ArrayList<>(1);
+        for (Class<?> clazz : classes) {
+            if (Extension.class.isAssignableFrom(clazz)) {
+                extensions.add((Class<Extension>) clazz);
+            }
+        }
+
+        if (!extensions.isEmpty()) {
+            Class<Extension>[] a = (Class<Extension>[]) Array.newInstance(Extension.class.getClass(), 0);
+            jar.addAsServiceProvider(Extension.class, extensions.toArray(a));
         }
     }
 }

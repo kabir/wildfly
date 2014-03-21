@@ -123,7 +123,7 @@ class IdentityPatchContext implements PatchContentProvider {
      * Get a patch entry for either a layer or add-on.
      *
      * @param name  the layer name
-     * @param addOn whether the target is a add-on
+     * @param addOn whether the target is an add-on
      * @return the patch entry, {@code null} if it there is no such layer
      */
     PatchEntry getEntry(final String name, boolean addOn) {
@@ -375,7 +375,7 @@ class IdentityPatchContext implements PatchContentProvider {
                         cleanupMarker.createNewFile();
                     }
                 } catch (IOException e) {
-                    PatchLogger.ROOT_LOGGER.infof(e, "failed to create cleanup marker");
+                    PatchLogger.ROOT_LOGGER.debugf(e, "failed to create cleanup marker");
                 }
             }
         }
@@ -432,7 +432,7 @@ class IdentityPatchContext implements PatchContentProvider {
                 final PatchingTask task = PatchingTask.Factory.create(description, entry);
                 task.execute(entry);
             } catch (Exception e) {
-                PatchLogger.ROOT_LOGGER.warnf(e, "failed to undo change (%s)", modification);
+                PatchLogger.ROOT_LOGGER.failedToUndoChange(item.toString());
             }
         }
     }

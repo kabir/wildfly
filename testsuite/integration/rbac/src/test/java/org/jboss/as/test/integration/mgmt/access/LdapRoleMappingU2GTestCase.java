@@ -58,7 +58,8 @@ public class LdapRoleMappingU2GTestCase {
             allowAnonAccess = true
     )
     @CreateLdapServer(
-            transports = @CreateTransport(protocol = "LDAP", address = "localhost", port = 10389)
+            transports = @CreateTransport(protocol = "LDAP", address = "localhost", port = 10389),
+            allowAnonymousAccess = true
     )
     public static void setUp() throws Exception {
         directoryService = DSAnnotationProcessor.getDirectoryService();

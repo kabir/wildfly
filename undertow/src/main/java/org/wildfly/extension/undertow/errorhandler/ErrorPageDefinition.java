@@ -26,9 +26,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import io.undertow.predicate.Predicate;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.error.FileErrorPageHandler;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
+import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.wildfly.extension.undertow.AbstractHandlerDefinition;
 import org.wildfly.extension.undertow.Constants;
@@ -38,7 +41,6 @@ import org.wildfly.extension.undertow.Constants;
  */
 public class ErrorPageDefinition extends AbstractHandlerDefinition {
 
-    public static final ErrorPageDefinition INSTANCE = new ErrorPageDefinition();
     public static final AttributeDefinition CODE = new SimpleAttributeDefinitionBuilder("code", ModelType.INT)
             .setAllowExpression(true)
             .setAllowNull(true)
@@ -48,6 +50,7 @@ public class ErrorPageDefinition extends AbstractHandlerDefinition {
             .setAllowNull(true)
             .build();
     public static final Collection<AttributeDefinition> ATTRIBUTES = Collections.unmodifiableCollection(Arrays.asList(CODE, PATH));
+    public static final ErrorPageDefinition INSTANCE = new ErrorPageDefinition();
 
     private ErrorPageDefinition() {
         super(Constants.ERROR_PAGE);
@@ -59,7 +62,12 @@ public class ErrorPageDefinition extends AbstractHandlerDefinition {
     }
 
     @Override
-    public Class getHandlerClass() {
+    public Class<? extends HttpHandler> getHandlerClass() {
         return FileErrorPageHandler.class;
+    }
+
+    @Override
+    public HttpHandler createHttpHandler(Predicate predicate, ModelNode model, HttpHandler next) {
+        throw new IllegalStateException("not implemented!");
     }
 }

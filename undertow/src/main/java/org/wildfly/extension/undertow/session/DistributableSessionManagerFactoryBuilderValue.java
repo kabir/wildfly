@@ -26,7 +26,8 @@ import java.util.ServiceLoader;
 import org.jboss.msc.value.Value;
 
 /**
- * Uses a service loader to load an {@link DistributableSessionManagerFactoryBuilder} implementation.
+ * Uses a service loader to load a {@link DistributableSessionManagerFactoryBuilder} implementation.
+ * This serves to decouple the undertow subsystem from the clustering modules.
  * @author Paul Ferraro
  */
 public class DistributableSessionManagerFactoryBuilderValue implements Value<DistributableSessionManagerFactoryBuilder> {

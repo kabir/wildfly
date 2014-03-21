@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.wildfly</groupId>
         <artifactId>wildfly-parent</artifactId>
-        <version>8.0.0.Final-SNAPSHOT</version>
+        <version>8.0.1.Final-SNAPSHOT</version>
     </parent>
 
     <artifactId>wildfly-build</artifactId>
@@ -762,6 +762,10 @@
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-search-infinispan</artifactId>
                 </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-search-orm</artifactId>
+                </dependency>
 
                 <dependency>
                     <groupId>org.hibernate.javax.persistence</groupId>
@@ -1005,11 +1009,6 @@
                 </dependency>
 
                 <dependency>
-                    <groupId>org.wildfly</groupId>
-                    <artifactId>wildfly-configadmin</artifactId>
-                </dependency>
-
-                <dependency>
                     <groupId>org.jboss.hal</groupId>
                     <artifactId>release-stream</artifactId>                    
                     <classifier>resources</classifier>
@@ -1038,6 +1037,11 @@
                 <dependency>
                     <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-controller-client</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-core-security-api</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1172,6 +1176,11 @@
 
                 <dependency>
                     <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-picketlink</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-pojo</artifactId>
                 </dependency>
 
@@ -1193,6 +1202,11 @@
                 <dependency>
                     <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-sar</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-security-api</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1339,11 +1353,6 @@
                 <dependency>
                     <groupId>org.jipijapa</groupId>
                     <artifactId>jipijapa-spi</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.wildfly</groupId>
-                    <artifactId>wildfly-jpa-util</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1852,12 +1861,17 @@
 
                 <dependency>
                     <groupId>org.jboss.ws.projects</groupId>
-                    <artifactId>jaxws-jboss-httpserver-httpspi</artifactId>
+                    <artifactId>jaxws-undertow-httpspi</artifactId>
                 </dependency>
 
                 <dependency>
                     <groupId>org.jboss.ws.cxf</groupId>
                     <artifactId>jbossws-cxf-client</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.ws.cxf</groupId>
+                    <artifactId>jbossws-cxf-jaspi</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1878,12 +1892,12 @@
 
                 <dependency>
                     <groupId>org.jboss.ws.cxf</groupId>
-                    <artifactId>jbossws-cxf-transports-httpserver</artifactId>
+                    <artifactId>jbossws-cxf-transports-udp</artifactId>
                 </dependency>
 
                 <dependency>
                     <groupId>org.jboss.ws.cxf</groupId>
-                    <artifactId>jbossws-cxf-transports-udp</artifactId>
+                    <artifactId>jbossws-cxf-transports-undertow</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1955,10 +1969,15 @@
                     <groupId>org.picketlink</groupId>
                     <artifactId>picketlink-idm-impl</artifactId>
                 </dependency>
-    
+
+                <dependency>
+                    <groupId>org.picketlink</groupId>
+                    <artifactId>picketlink-idm-simple-schema</artifactId>
+                </dependency>
+
                 <dependency>
                     <groupId>org.picketlink.distribution</groupId>
-                    <artifactId>picketlink-jbas7</artifactId>
+                    <artifactId>picketlink-wildfly8</artifactId>
                 </dependency>
 
                 <dependency>

@@ -104,7 +104,7 @@ public class MessageDrivenComponentDescriptionFactory extends EJBComponentDescri
             if (!assertMDBClassValidity(beanClassInfo)) {
                 continue;
             }
-            final boolean replacement = deploymentUnit.getAttachment(Attachments.EJB_ANNOTATION_PROPERTY_REPLACEMENT);
+            final boolean replacement = deploymentUnit.getAttachment(Attachments.ANNOTATION_PROPERTY_REPLACEMENT);
             final String ejbName = beanClassInfo.name().local();
             final AnnotationValue nameValue = messageBeanAnnotation.value("name");
             final String beanName = nameValue == null || nameValue.asString().isEmpty() ? ejbName : (replacement ? PropertiesValueResolver.replaceProperties(nameValue.asString()) : nameValue.asString());
@@ -197,7 +197,7 @@ public class MessageDrivenComponentDescriptionFactory extends EJBComponentDescri
     private boolean assertMDBClassValidity(final ClassInfo mdbClass) {
         final short flags = mdbClass.flags();
         final String className = mdbClass.name().toString();
-        // must *not* be a interface
+        // must *not* be an interface
         if (Modifier.isInterface(flags)) {
             EjbLogger.EJB3_LOGGER.mdbClassCannotBeAnInterface(className);
             return false;

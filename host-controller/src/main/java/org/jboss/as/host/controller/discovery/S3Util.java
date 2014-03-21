@@ -37,6 +37,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -318,7 +319,7 @@ public class S3Util {
             HttpURLConnection request=makeRequest("PUT", bucket, "", null, headers);
             if(body != null) {
                 request.setDoOutput(true);
-                request.getOutputStream().write(body.getBytes("UTF-8"));
+                request.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
             }
             return new Response(request);
         }
@@ -1649,7 +1650,7 @@ public class S3Util {
         }
 
         /**
-         * Concatenates a bunch of header values, seperating them with a comma.
+         * Concatenates a bunch of header values, separating them with a comma.
          * @param values List of header values.
          * @return String of all headers, with commas.
          */

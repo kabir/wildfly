@@ -28,14 +28,20 @@ import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
-import org.jboss.msc.value.Value;
 
 /**
- * SPI to build a factory for creating a distributable session manager.
+ * SPI for building a factory for creating a distributable session manager.
  * @author Paul Ferraro
  */
 public interface DistributableSessionManagerFactoryBuilder {
-    ServiceBuilder<SessionManagerFactory> buildDeploymentDependency(ServiceTarget target, ServiceName name, ServiceName deploymentServiceName, Module module, JBossWebMetaData metaData);
-
-    ServiceBuilder<?> buildServerDependency(ServiceTarget target, Value<String> instanceId);
+    /**
+     * Builds a {@link SessionManagerFactory} service.
+     * @param target the service target
+     * @param name the service name of the {@link SessionManagerFactory} service
+     * @param deploymentServiceName service name of the web application
+     * @param module the deployment module
+     * @param metaData the web application meta data
+     * @return a session manager factory service builder
+     */
+    ServiceBuilder<SessionManagerFactory> build(ServiceTarget target, ServiceName name, ServiceName deploymentServiceName, Module module, JBossWebMetaData metaData);
 }

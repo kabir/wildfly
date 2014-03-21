@@ -29,12 +29,12 @@
     <parent>
         <groupId>org.wildfly</groupId>
         <artifactId>wildfly-parent</artifactId>
-        <version>8.0.0.Final-SNAPSHOT</version>
+        <version>8.0.1.Final-SNAPSHOT</version>
     </parent>
 
     <groupId>org.wildfly</groupId>
     <artifactId>wildfly-ee</artifactId>
-    <version>8.0.0.Final-SNAPSHOT</version>
+    <version>8.0.1.Final-SNAPSHOT</version>
 
     <name>WildFly: EE</name>
 
@@ -128,6 +128,12 @@
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-subsystem-test</artifactId>
             <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- Needed for Hibernate Validator since it asserts the existance of javax.el during bootstrap-->
+            <groupId>org.jboss.spec.javax.el</groupId>
+            <artifactId>jboss-el-api_3.0_spec</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

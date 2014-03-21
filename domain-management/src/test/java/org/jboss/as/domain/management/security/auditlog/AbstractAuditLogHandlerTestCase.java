@@ -38,8 +38,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -51,6 +51,7 @@ import org.jboss.as.controller.audit.ManagedAuditLoggerImpl;
 import org.jboss.as.controller.audit.SyslogAuditLogHandler;
 import org.jboss.as.controller.audit.SyslogAuditLogHandler.Transport;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.controller.interfaces.InetAddressUtil;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.as.domain.management.CoreManagementResourceDefinition;
 import org.jboss.as.domain.management.audit.AccessAuditResourceDefinition;
@@ -115,14 +116,14 @@ public class AbstractAuditLogHandlerTestCase extends ManagementControllerTestBas
         Assert.assertEquals(disabled, handler.get(AuditLogHandlerResourceDefinition.DISABLED_DUE_TO_FAILURE.getName()).asBoolean());
     }
 
-    protected String stripSyslogHeader(byte[] bytes) throws UnsupportedEncodingException {
-        String s = new String(bytes, "utf-8");
+    protected String stripSyslogHeader(byte[] bytes) {
+        String s = new String(bytes, StandardCharsets.UTF_8);
         int i = s.indexOf(" - - ");
         return s.substring(i + 6);
     }
 
-    protected ModelNode getSyslogRecord(byte[] bytes) throws UnsupportedEncodingException {
-        String msg = new String(bytes, "utf-8");
+    protected ModelNode getSyslogRecord(byte[] bytes) {
+        String msg = new String(bytes, StandardCharsets.UTF_8);
         return getSyslogRecord(msg);
     }
 
@@ -235,7 +236,7 @@ public class AbstractAuditLogHandlerTestCase extends ManagementControllerTestBas
         composite.get(STEPS).add(handler);
 
         ModelNode protocol = Util.createAddOperation(createSyslogHandlerProtocolAddress(handlerName, SyslogAuditLogHandler.Transport.UDP));
-        protocol.get(HOST).set(addr.getHostName());
+        protocol.get(HOST).set(InetAddressUtil.canonize(addr.getHostName()));
         protocol.get(PORT).set(port);
         composite.get(STEPS).add(protocol);
 
@@ -256,7 +257,7 @@ public class AbstractAuditLogHandlerTestCase extends ManagementControllerTestBas
         composite.get(STEPS).add(handler);
 
         ModelNode protocol = Util.createAddOperation(createSyslogHandlerProtocolAddress(handlerName, SyslogAuditLogHandler.Transport.TCP));
-        protocol.get(HOST).set(addr.getHostName());
+        protocol.get(HOST).set(InetAddressUtil.canonize(addr.getHostName()));
         protocol.get(PORT).set(port);
         if (transfer != null) {
             protocol.get(MESSAGE_TRANSFER).set(transfer.name());
@@ -281,7 +282,7 @@ public class AbstractAuditLogHandlerTestCase extends ManagementControllerTestBas
         composite.get(STEPS).add(handler);
 
         ModelNode protocol = Util.createAddOperation(createSyslogHandlerProtocolAddress(handlerName, SyslogAuditLogHandler.Transport.TLS));
-        protocol.get(HOST).set(addr.getHostName());
+        protocol.get(HOST).set(InetAddressUtil.canonize(addr.getHostName()));
         protocol.get(PORT).set(port);
         if (transfer != null) {
             protocol.get(MESSAGE_TRANSFER).set(transfer.name());

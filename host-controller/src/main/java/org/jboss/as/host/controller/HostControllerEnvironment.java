@@ -36,6 +36,7 @@ import java.util.Map;
 import org.jboss.as.controller.RunningMode;
 import org.jboss.as.controller.operations.common.ProcessEnvironment;
 import org.jboss.as.controller.persistence.ConfigurationFile;
+import org.jboss.as.network.NetworkUtils;
 import org.jboss.as.process.DefaultJvmUtils;
 import org.jboss.as.version.ProductConfig;
 import org.wildfly.security.manager.WildFlySecurityManager;
@@ -286,7 +287,7 @@ public class HostControllerEnvironment extends ProcessEnvironment {
             }
             if (qualifiedHostName == null) {
                 try {
-                    qualifiedHostName = InetAddress.getLocalHost().getHostName();
+                    qualifiedHostName = NetworkUtils.canonize(InetAddress.getLocalHost().getHostName());
                 } catch (UnknownHostException e) {
                     qualifiedHostName = null;
                 }
@@ -477,18 +478,20 @@ public class HostControllerEnvironment extends ProcessEnvironment {
     }
 
     /**
-     * Gets the address the process controller told this Host Controller to listen on for communication from the servers.
+     * Gets the address the process controller told this Host Controller to use for communication with it.
+     * Not related to communication with management clients.
      *
-     * @return the host controller's address
+     * @return the address used for inter-process communication with the Process Controller
      */
     public InetAddress getHostControllerAddress() {
         return hostControllerAddress;
     }
 
     /**
-     * Gets the port the process controller told this Host Controller to listen on for communication from the servers.
+     * Gets the port the process controller told this Host Controller to use for communication with it.
+     * Not related to communication with management clients.
      *
-     * @return the host controller's port
+     * @return the port used for inter-process communication with the Process Controller
      */
     public Integer getHostControllerPort() {
         return hostControllerPort;

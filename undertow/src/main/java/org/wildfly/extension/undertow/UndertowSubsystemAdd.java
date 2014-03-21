@@ -39,7 +39,6 @@ import org.jboss.as.web.common.SharedTldsMetaDataBuilder;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
-import org.jboss.msc.value.ImmediateValue;
 import org.wildfly.extension.undertow.deployment.EarContextRootProcessor;
 import org.wildfly.extension.undertow.deployment.JBossWebParsingDeploymentProcessor;
 import org.wildfly.extension.undertow.deployment.ServletContainerInitializerDeploymentProcessor;
@@ -55,8 +54,9 @@ import org.wildfly.extension.undertow.deployment.WarStructureDeploymentProcessor
 import org.wildfly.extension.undertow.deployment.WebFragmentParsingDeploymentProcessor;
 import org.wildfly.extension.undertow.deployment.WebJBossAllParser;
 import org.wildfly.extension.undertow.deployment.WebParsingDeploymentProcessor;
-import org.wildfly.extension.undertow.session.DistributableSessionManagerFactoryBuilder;
-import org.wildfly.extension.undertow.session.DistributableSessionManagerFactoryBuilderValue;
+import org.wildfly.extension.undertow.session.DistributableSessionIdentifierCodecBuilder;
+import org.wildfly.extension.undertow.session.DistributableSessionIdentifierCodecBuilderValue;
+import org.wildfly.extension.undertow.session.RouteValueService;
 
 
 /**
@@ -98,12 +98,13 @@ class UndertowSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final String defaultVirtualHost = UndertowRootDefinition.DEFAULT_VIRTUAL_HOST.resolveModelAttribute(context, model).asString();
         final String defaultContainer = UndertowRootDefinition.DEFAULT_SERVLET_CONTAINER.resolveModelAttribute(context, model).asString();
         final String defaultServer = UndertowRootDefinition.DEFAULT_SERVER.resolveModelAttribute(context, model).asString();
+        final boolean stats = UndertowRootDefinition.STATISTICS_ENABLED.resolveModelAttribute(context, model).asBoolean();
 
         final ModelNode instanceIdModel = UndertowRootDefinition.INSTANCE_ID.resolveModelAttribute(context, model);
         final String instanceId = instanceIdModel.isDefined() ? instanceIdModel.asString() : null;
         ServiceTarget target = context.getServiceTarget();
 
-        newControllers.add(target.addService(UndertowService.UNDERTOW, new UndertowService(defaultContainer, defaultServer, defaultVirtualHost, instanceId))
+        newControllers.add(target.addService(UndertowService.UNDERTOW, new UndertowService(defaultContainer, defaultServer, defaultVirtualHost, instanceId, stats))
                 .setInitialMode(ServiceController.Mode.ACTIVE)
                 .install());
 
@@ -141,9 +142,18 @@ class UndertowSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         UndertowLogger.ROOT_LOGGER.serverStarting(Version.getVersionString());
 
-        DistributableSessionManagerFactoryBuilder builder = new DistributableSessionManagerFactoryBuilderValue().getValue();
+        DistributableSessionIdentifierCodecBuilder builder = new DistributableSessionIdentifierCodecBuilderValue().getValue();
         if (builder != null) {
-            newControllers.add(builder.buildServerDependency(target, new ImmediateValue<>(instanceId)).setInitialMode(ServiceController.Mode.ON_DEMAND).install());
+            ServiceController<?> codecService = builder.buildServerDependency(target).setInitialMode(ServiceController.Mode.ON_DEMAND).install();
+            if (newControllers != null) {
+                newControllers.add(codecService);
+            }
         }
+
+        ServiceController<?> sc = RouteValueService.build(target).setInitialMode(ServiceController.Mode.ON_DEMAND).install();
+        if (newControllers != null) {
+            newControllers.add(sc);
+        }
+
     }
 }

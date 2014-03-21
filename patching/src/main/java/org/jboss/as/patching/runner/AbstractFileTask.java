@@ -79,7 +79,7 @@ abstract class AbstractFileTask extends AbstractPatchingTask<MiscContentItem> {
     byte[] apply(PatchingTaskContext context, PatchContentLoader loader) throws IOException {
         final MiscContentItem item = contentItem;
         if(item.isDirectory()) {
-            if(! target.mkdir() && ! target.isDirectory()) {
+            if(! target.mkdirs() && ! target.isDirectory()) {
                 throw PatchMessages.MESSAGES.cannotCreateDirectory(target.getAbsolutePath());
             }
             return NO_CONTENT;

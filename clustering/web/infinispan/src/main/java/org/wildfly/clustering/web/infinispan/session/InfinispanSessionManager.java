@@ -24,7 +24,6 @@ package org.wildfly.clustering.web.infinispan.session;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -37,11 +36,8 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.infinispan.Cache;
-import org.infinispan.affinity.KeyAffinityService;
-import org.infinispan.affinity.KeyGenerator;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.context.Flag;
-import org.infinispan.distribution.DistributionManager;
 import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.notifications.KeyFilter;
 import org.infinispan.notifications.Listener;
@@ -55,13 +51,9 @@ import org.infinispan.notifications.cachelistener.event.CacheEntryRemovedEvent;
 import org.infinispan.notifications.cachelistener.event.TopologyChangedEvent;
 import org.infinispan.remoting.transport.Address;
 import org.jboss.as.clustering.concurrent.Scheduler;
-import org.jboss.as.clustering.infinispan.affinity.KeyAffinityServiceFactory;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
-import org.wildfly.clustering.web.Batch;
-import org.wildfly.clustering.group.Node;
-import org.wildfly.clustering.group.NodeFactory;
-import org.wildfly.clustering.registry.Registry;
 import org.wildfly.clustering.web.Batcher;
+import org.wildfly.clustering.web.IdentifierFactory;
 import org.wildfly.clustering.web.infinispan.InfinispanWebLogger;
 import org.wildfly.clustering.web.session.ImmutableHttpSessionAdapter;
 import org.wildfly.clustering.web.session.ImmutableSession;
@@ -69,7 +61,6 @@ import org.wildfly.clustering.web.session.ImmutableSessionAttributes;
 import org.wildfly.clustering.web.session.Session;
 import org.wildfly.clustering.web.session.SessionAttributes;
 import org.wildfly.clustering.web.session.SessionContext;
-import org.wildfly.clustering.web.session.SessionIdentifierFactory;
 import org.wildfly.clustering.web.session.SessionManager;
 import org.wildfly.clustering.web.session.SessionMetaData;
 
@@ -78,27 +69,23 @@ import org.wildfly.clustering.web.session.SessionMetaData;
  * @author Paul Ferraro
  */
 @Listener
-public class InfinispanSessionManager<V, L> implements SessionManager<L>, KeyGenerator<String>, Batcher, KeyFilter {
+public class InfinispanSessionManager<V, L> implements SessionManager<L>, KeyFilter {
     private final SessionContext context;
-    final Cache<String, V> cache;
+    private final Batcher batcher;
+    private final Cache<String, V> cache;
     private final SessionFactory<V, L> factory;
-    private final SessionIdentifierFactory idFactory;
-    private final KeyAffinityService<String> affinity;
-    private final Registry<String, Void> registry;
-    private final NodeFactory<Address> nodeFactory;
+    private final IdentifierFactory<String> identifierFactory;
     private final List<Scheduler<ImmutableSession>> schedulers = new CopyOnWriteArrayList<>();
     private final int maxActiveSessions;
     private volatile Time defaultMaxInactiveInterval = new Time(30, TimeUnit.MINUTES);
     private final boolean persistent;
 
-    public InfinispanSessionManager(SessionContext context, SessionIdentifierFactory idFactory, Cache<String, V> cache, SessionFactory<V, L> factory, KeyAffinityServiceFactory affinityFactory, Registry<String, Void> registry, NodeFactory<Address> nodeFactory, JBossWebMetaData metaData) {
+    public InfinispanSessionManager(SessionContext context, IdentifierFactory<String> identifierFactory, Cache<String, V> cache, SessionFactory<V, L> factory, Batcher batcher, JBossWebMetaData metaData) {
         this.context = context;
         this.factory = factory;
-        this.idFactory = idFactory;
+        this.identifierFactory = identifierFactory;
         this.cache = cache;
-        this.affinity = affinityFactory.createService(this.cache, this);
-        this.registry = registry;
-        this.nodeFactory = nodeFactory;
+        this.batcher = batcher;
         this.maxActiveSessions = metaData.getMaxActiveSessions().intValue();
         Configuration config = cache.getCacheConfiguration();
         // If cache is clustered or configured with a write-through cache store
@@ -110,10 +97,10 @@ public class InfinispanSessionManager<V, L> implements SessionManager<L>, KeyGen
     @Override
     public void start() {
         this.cache.addListener(this, this);
-        this.affinity.start();
-        this.schedulers.add(new SessionExpirationScheduler(this, new ExpiredSessionRemover<>(this.factory)));
+        this.identifierFactory.start();
+        this.schedulers.add(new SessionExpirationScheduler(this.batcher, new ExpiredSessionRemover<>(this.factory)));
         if (this.maxActiveSessions >= 0) {
-            this.schedulers.add(new SessionEvictionScheduler(this, this.factory, this.maxActiveSessions));
+            this.schedulers.add(new SessionEvictionScheduler(this.batcher, this.factory, this.maxActiveSessions));
         }
     }
 
@@ -123,7 +110,7 @@ public class InfinispanSessionManager<V, L> implements SessionManager<L>, KeyGen
             scheduler.close();
         }
         this.schedulers.clear();
-        this.affinity.stop();
+        this.identifierFactory.stop();
         this.cache.removeListener(this);
     }
 
@@ -133,51 +120,8 @@ public class InfinispanSessionManager<V, L> implements SessionManager<L>, KeyGen
     }
 
     @Override
-    public Batch startBatch() {
-        final boolean started = this.cache.startBatch();
-        return new Batch() {
-            @Override
-            public void close() {
-                this.end(true);
-            }
-
-            @Override
-            public void discard() {
-                this.end(false);
-            }
-
-            private void end(boolean success) {
-                if (started) {
-                    InfinispanSessionManager.this.cache.endBatch(success);
-                }
-            }
-        };
-    }
-
-    @Override
-    public String locate(String sessionId) {
-        if (this.registry == null) return null;
-        Map.Entry<String, Void> entry = null;
-        Address location = this.locatePrimaryOwner(sessionId);
-        if ((location != null) && (this.nodeFactory != null)) {
-            Node node = this.nodeFactory.createNode(location);
-            entry = this.registry.getEntry(node);
-        }
-        if (entry == null) {
-            // Accommodate mod_cluster's lazy route auto-generation
-            entry = this.registry.getLocalEntry();
-        }
-        return (entry != null) ? entry.getKey() : null;
-    }
-
-    private Address locatePrimaryOwner(String sessionId) {
-        DistributionManager dist = this.cache.getAdvancedCache().getDistributionManager();
-        return (dist != null) ? dist.getPrimaryLocation(sessionId) : this.cache.getCacheManager().getAddress();
-    }
-
-    @Override
     public Batcher getBatcher() {
-        return this;
+        return this.batcher;
     }
 
     @Override
@@ -191,13 +135,8 @@ public class InfinispanSessionManager<V, L> implements SessionManager<L>, KeyGen
     }
 
     @Override
-    public String getKey() {
-        return this.idFactory.createSessionId();
-    }
-
-    @Override
-    public String createSessionId() {
-        return this.affinity.getKeyForAddress(this.cache.getCacheManager().getAddress());
+    public String createIdentifier() {
+        return this.identifierFactory.createIdentifier();
     }
 
     @Override

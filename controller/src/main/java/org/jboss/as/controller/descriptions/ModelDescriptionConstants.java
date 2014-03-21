@@ -334,6 +334,7 @@ public class ModelDescriptionConstants {
     public static final String SEARCH_BY = "search-by";
     public static final String SEARCH_DN = "search-dn";
     public static final String SECRET = "secret";
+    public static final String SECURE_INTERFACE = "secure-interface";
     public static final String SECURE_PORT = "secure-port";
     public static final String SECURE_SOCKET_BINDING = "secure-socket-binding";
     public static final String SECURITY_REALM = "security-realm";
@@ -411,6 +412,7 @@ public class ModelDescriptionConstants {
     public static final String USERNAME_ATTRIBUTE = "username-attribute";
     public static final String USERNAME_IS_DN = "username-is-dn";
     public static final String USERNAME_FILTER = "username-filter";
+    public static final String USERNAME_LOAD = "username-load";
     public static final String USERNAME_TO_DN = "username-to-dn";
     public static final String USERS = "users";
     public static final String VALIDATE_OPERATION = "validate-operation";

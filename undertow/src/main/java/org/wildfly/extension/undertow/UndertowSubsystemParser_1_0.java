@@ -44,7 +44,8 @@ import org.wildfly.extension.undertow.filters.BasicAuthHandler;
 import org.wildfly.extension.undertow.filters.ConnectionLimitHandler;
 import org.wildfly.extension.undertow.filters.FilterDefinitions;
 import org.wildfly.extension.undertow.filters.FilterRefDefinition;
-import org.wildfly.extension.undertow.filters.ResponseHeaderHandler;
+import org.wildfly.extension.undertow.filters.GzipFilter;
+import org.wildfly.extension.undertow.filters.ResponseHeaderFilter;
 import org.wildfly.extension.undertow.handlers.FileHandler;
 import org.wildfly.extension.undertow.handlers.HandlerDefinitions;
 import org.wildfly.extension.undertow.handlers.ReverseProxyHandler;
@@ -60,6 +61,7 @@ public class UndertowSubsystemParser_1_0 implements XMLStreamConstants, XMLEleme
     static {
         xmlDescription = builder(UndertowRootDefinition.INSTANCE)
                 .addAttributes(UndertowRootDefinition.DEFAULT_VIRTUAL_HOST, UndertowRootDefinition.DEFAULT_SERVLET_CONTAINER, UndertowRootDefinition.DEFAULT_SERVER, UndertowRootDefinition.INSTANCE_ID)
+                .addAttribute(UndertowRootDefinition.STATISTICS_ENABLED)
                 .addChild(
 
                         builder(BufferCacheDefinition.INSTANCE)
@@ -88,14 +90,18 @@ public class UndertowSubsystemParser_1_0 implements XMLStreamConstants, XMLEleme
                                                         .addAttributes(LocationDefinition.HANDLER)
                                                         .addChild(
                                                                 builder(FilterRefDefinition.INSTANCE)
+                                                                        .addAttributes(FilterRefDefinition.INSTANCE.getAttributes())
                                                         )
                                         ).addChild(
-                                        builder(AccessLogDefinition.INSTANCE)
-                                                .addAttributes(AccessLogDefinition.PATTERN, AccessLogDefinition.DIRECTORY, AccessLogDefinition.PREFIX, AccessLogDefinition.WORKER, AccessLogDefinition.ROTATE)
+                                                builder(AccessLogDefinition.INSTANCE)
+                                                    .addAttributes(AccessLogDefinition.PATTERN, AccessLogDefinition.DIRECTORY, AccessLogDefinition.PREFIX, AccessLogDefinition.WORKER, AccessLogDefinition.ROTATE)
                                         ).addChild(
-                                        builder(FilterRefDefinition.INSTANCE)
-                                )
-
+                                                builder(FilterRefDefinition.INSTANCE)
+                                                    .addAttributes(FilterRefDefinition.INSTANCE.getAttributes())
+                                        ).addChild(
+                                                builder(SingleSignOnDefinition.INSTANCE)
+                                                    .addAttributes(SingleSignOnDefinition.INSTANCE.getAttributes())
+                                        )
                         )
                 )
                 .addChild(
@@ -189,10 +195,13 @@ public class UndertowSubsystemParser_1_0 implements XMLStreamConstants, XMLEleme
                                 )
                                 .addChild(
                                         builder(ConnectionLimitHandler.INSTANCE)
-                                                .addAttributes(ConnectionLimitHandler.MAX_CONCURRENT_REQUESTS)
+                                                .addAttributes(ConnectionLimitHandler.MAX_CONCURRENT_REQUESTS, ConnectionLimitHandler.QUEUE_SIZE)
                                 ).addChild(
-                                        builder(ResponseHeaderHandler.INSTANCE)
-                                                .addAttributes(ResponseHeaderHandler.INSTANCE.getAttributes())
+                                        builder(ResponseHeaderFilter.INSTANCE)
+                                                .addAttributes(ResponseHeaderFilter.INSTANCE.getAttributes())
+                                ).addChild(
+                                        builder(GzipFilter.INSTANCE)
+                                                .addAttributes(GzipFilter.INSTANCE.getAttributes())
                                 )
 
                 )

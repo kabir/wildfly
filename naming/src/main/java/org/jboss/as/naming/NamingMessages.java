@@ -195,7 +195,7 @@ public interface NamingMessages {
      * @return a {@link NamingException} for the error.
      */
     @Message(id = 11843, value = "Failed instantiate %s %s from classloader %s")
-    NamingException failedToInstantiate(String description, String className, ClassLoader classLoader);
+    NamingException failedToInstantiate(@Cause Throwable cause, String description, String className, ClassLoader classLoader);
 
     /**
      * A message indicating the context entries could not be read from the binding name represented by the
@@ -458,7 +458,7 @@ public interface NamingMessages {
     String failedToTransformObjectFactoryWithEnvironmentNameBindingAddOperation(String modelVersion);
 
     /**
-     * A external context binding add operation was failed by the operation transformer.
+     * An external context binding add operation was failed by the operation transformer.
      * @param modelVersion the model version related with the transformer.
      * @return
      */
@@ -486,4 +486,14 @@ public interface NamingMessages {
 
     @Message(id = 11877, value = "Binding type %s can not take a 'cache' attribute")
     OperationFailedException cacheNotValidForBindingType(BindingType type);
+
+    /**
+     * Creates an exception indicating a lookup failure.
+     *
+     * @param name the bind name.
+     *
+     * @return a {@link NamingException} for the error.
+     */
+    @Message(id = 11878, value = "Failed to lookup %s")
+    NamingException lookupError(String name);
 }

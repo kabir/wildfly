@@ -28,9 +28,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.util.WeakHashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.jboss.as.jacorb.JacORBMessages;
 
@@ -51,68 +52,9 @@ import org.jboss.as.jacorb.JacORBMessages;
  * unfinished analysis will be returned if the same thread is already
  * working on this analysis.
  *
- * TODO: this looks like a big class loader leak waiting to happen
- *
  * @author <a href="mailto:osh@sparre.dk">Ole Husgaard</a>
  */
 class WorkCacheManager {
-
-    /**
-     * Create a new work cache manager.
-     *
-     * @param cls The class of the analysis type we cache here.
-     */
-    WorkCacheManager(final Class cls) {
-        // Find the constructor and initializer.
-        try {
-            constructor = cls.getDeclaredConstructor(new Class[]{Class.class});
-            initializer = cls.getDeclaredMethod("doAnalyze");
-        } catch (NoSuchMethodException ex) {
-            throw JacORBMessages.MESSAGES.unexpectedException(ex);
-        }
-
-        workDone = new WeakHashMap();
-        workInProgress = new HashMap();
-    }
-
-    /**
-     * Returns an analysis.
-     * If the calling thread is currently doing an analysis of this
-     * class, an unfinished analysis is returned.
-     */
-    ContainerAnalysis getAnalysis(final Class cls) throws RMIIIOPViolationException {
-        ContainerAnalysis ret;
-
-        synchronized (this) {
-            ret = lookupDone(cls);
-            if (ret != null)
-                return ret;
-
-            // is it work-in-progress?
-            final InProgress inProgress = (InProgress) workInProgress.get(cls);
-            if (inProgress != null) {
-                if (inProgress.thread == Thread.currentThread())
-                    return inProgress.analysis; // return unfinished
-
-                // Do not wait for the other thread: We may deadlock
-                // Double work is better that deadlock...
-            }
-
-            ret = createWorkInProgress(cls);
-        }
-
-        // Do the work
-        doTheWork(cls, ret);
-
-        // We did it
-        synchronized (this) {
-            workInProgress.remove(cls);
-            workDone.put(cls, new SoftReference(ret));
-            notifyAll();
-        }
-
-        return ret;
-    }
 
     /**
      * The analysis constructor of our analysis class.
@@ -130,13 +72,92 @@ class WorkCacheManager {
      * This maps the classes of completely done analyses to soft
      * references of their analysis.
      */
-    private final Map workDone;
+    private final Map<Class, SoftReference<ContainerAnalysis>> workDone;
 
     /**
      * This maps the classes of analyses in progress to their
      * analysis.
      */
-    private final Map workInProgress;
+    private final Map<InProgressKey, ContainerAnalysis> workInProgress;
+
+    private final Map<ClassLoader, Set<Class<?>>> classesByLoader;
+
+    /**
+     * Create a new work cache manager.
+     *
+     * @param cls The class of the analysis type we cache here.
+     */
+    WorkCacheManager(final Class cls) {
+        // Find the constructor and initializer.
+        try {
+            constructor = cls.getDeclaredConstructor(new Class[]{Class.class});
+            initializer = cls.getDeclaredMethod("doAnalyze");
+        } catch (NoSuchMethodException ex) {
+            throw JacORBMessages.MESSAGES.unexpectedException(ex);
+        }
+        workDone = new HashMap<Class, SoftReference<ContainerAnalysis>>();
+        workInProgress = new HashMap<InProgressKey, ContainerAnalysis>();
+        classesByLoader = new HashMap<ClassLoader, Set<Class<?>>>();
+    }
+
+    public void clearClassLoader(final ClassLoader cl) {
+        Set<Class<?>> classes = classesByLoader.remove(cl);
+        if(classes != null) {
+            for(Class<?> clazz : classes) {
+                workDone.remove(clazz);
+            }
+        }
+    }
+
+    /**
+     * Returns an analysis.
+     * If the calling thread is currently doing an analysis of this
+     * class, an unfinished analysis is returned.
+     */
+    ContainerAnalysis getAnalysis(final Class cls) throws RMIIIOPViolationException {
+        ContainerAnalysis ret = null;
+        boolean created = false;
+        try {
+            synchronized (this) {
+                ret = lookupDone(cls);
+                if (ret != null) {
+                    return ret;
+                }
+
+                // is it work-in-progress?
+                final ContainerAnalysis inProgress = workInProgress.get(new InProgressKey(cls, Thread.currentThread()));
+                if (inProgress != null) {
+                        return inProgress; // return unfinished
+
+                    // Do not wait for the other thread: We may deadlock
+                    // Double work is better that deadlock...
+                }
+
+                ret = createWorkInProgress(cls);
+            }
+            created = true;
+            // Do the work
+            doTheWork(cls, ret);
+        } finally {
+            // We did it
+            synchronized (this) {
+                if(created) {
+                    workInProgress.remove(new InProgressKey(cls, Thread.currentThread()));
+                    workDone.put(cls, new SoftReference<ContainerAnalysis>(ret));
+                    ClassLoader classLoader = cls.getClassLoader();
+                    if (classLoader != null) {
+                        Set<Class<?>> classes = classesByLoader.get(classLoader);
+                        if (classes == null) {
+                            classesByLoader.put(classLoader, classes = new HashSet<Class<?>>());
+                        }
+                        classes.add(cls);
+                    }
+                }
+                notifyAll();
+            }
+        }
+        return ret;
+    }
 
     /**
      * Lookup an analysis in the fully done map.
@@ -166,7 +187,7 @@ class WorkCacheManager {
             throw new RuntimeException(ex.toString());
         }
 
-        workInProgress.put(cls, new InProgress(analysis, Thread.currentThread()));
+        workInProgress.put(new InProgressKey(cls, Thread.currentThread()), analysis);
 
         return analysis;
     }
@@ -177,7 +198,7 @@ class WorkCacheManager {
             initializer.invoke(ret);
         } catch (Throwable t) {
             synchronized (this) {
-                workInProgress.remove(cls);
+                workInProgress.remove(new InProgressKey(cls, Thread.currentThread()));
             }
             if (t instanceof InvocationTargetException) // unwrap
                 t = ((InvocationTargetException) t).getTargetException();
@@ -192,16 +213,33 @@ class WorkCacheManager {
         }
     }
 
-    /**
-     * A simple aggregate of work-in-progress, and the thread doing the work.
-     */
-    private static class InProgress {
-        ContainerAnalysis analysis;
-        Thread thread;
+    private static class InProgressKey {
+        final Class<?> clazz;
+        final Thread thread;
 
-        InProgress(final ContainerAnalysis analysis, final Thread thread) {
-            this.analysis = analysis;
+        private InProgressKey(Class<?> clazz, Thread thread) {
+            this.clazz = clazz;
             this.thread = thread;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            InProgressKey that = (InProgressKey) o;
+
+            if (clazz != null ? !clazz.equals(that.clazz) : that.clazz != null) return false;
+            if (thread != null ? !thread.equals(that.thread) : that.thread != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = clazz != null ? clazz.hashCode() : 0;
+            result = 31 * result + (thread != null ? thread.hashCode() : 0);
+            return result;
         }
     }
 }

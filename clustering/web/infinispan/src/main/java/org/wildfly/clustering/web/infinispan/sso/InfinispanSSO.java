@@ -18,28 +18,27 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- **/
+ */
 package org.wildfly.clustering.web.infinispan.sso;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jboss.as.clustering.infinispan.invoker.Remover;
 import org.wildfly.clustering.web.LocalContextFactory;
-import org.wildfly.clustering.web.sso.Credentials;
 import org.wildfly.clustering.web.sso.SSO;
 import org.wildfly.clustering.web.sso.Sessions;
 
-public class InfinispanSSO<L> implements SSO<L> {
+public class InfinispanSSO<A, D, L> implements SSO<A, D, L> {
     private final String id;
-    private final Credentials credentials;
-    private final Sessions sessions;
+    private final A authentication;
+    private final Sessions<D> sessions;
     private final AtomicReference<L> localContext;
     private final LocalContextFactory<L> localContextFactory;
     private final Remover<String> remover;
 
-    public InfinispanSSO(String id, Credentials credentials, Sessions sessions, AtomicReference<L> localContext, LocalContextFactory<L> localContextFactory, Remover<String> remover) {
+    public InfinispanSSO(String id, A authentication, Sessions<D> sessions, AtomicReference<L> localContext, LocalContextFactory<L> localContextFactory, Remover<String> remover) {
         this.id = id;
-        this.credentials = credentials;
+        this.authentication = authentication;
         this.sessions = sessions;
         this.localContext = localContext;
         this.localContextFactory = localContextFactory;
@@ -52,12 +51,12 @@ public class InfinispanSSO<L> implements SSO<L> {
     }
 
     @Override
-    public Credentials getCredentials() {
-        return this.credentials;
+    public A getAuthentication() {
+        return this.authentication;
     }
 
     @Override
-    public Sessions getSessions() {
+    public Sessions<D> getSessions() {
         return this.sessions;
     }
 

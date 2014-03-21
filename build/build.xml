@@ -206,6 +206,10 @@
             <maven-resource group="org.wildfly" artifact="wildfly-controller-client"/>
         </module-def>
 
+        <module-def name="org.jboss.as.core-security-api">
+            <maven-resource group="org.wildfly" artifact="wildfly-core-security-api"/>
+        </module-def>        	
+    	
         <module-def name="org.jboss.as.core-security">
             <maven-resource group="org.wildfly" artifact="wildfly-core-security"/>
         </module-def>
@@ -243,8 +247,6 @@
         </module-def>
 
         <module-def name="org.jboss.as.patching.cli" />
-
-        <module-def name="org.jboss.as.patching.generator" />
 
         <module-def name="org.jboss.as.platform-mbean">
             <maven-resource group="org.wildfly" artifact="wildfly-platform-mbean"/>
@@ -804,9 +806,15 @@
         <module-def name="org.hibernate.envers">
         </module-def>
 
-        <module-def name="org.hibernate.search">
+        <!-- Hibernate Search Engine does not depend on Hibernate ORM but is reused by several other projects -->
+        <module-def name="org.hibernate.search.engine">
             <maven-resource group="org.hibernate" artifact="hibernate-search-engine"/>
             <maven-resource group="org.hibernate" artifact="hibernate-search-infinispan"/>
+        </module-def>
+
+        <!-- Hibernate Search ORM is the module user apps will depend on when they indend to use Search with ORM directly -->
+        <module-def name="org.hibernate.search.orm">
+            <maven-resource group="org.hibernate" artifact="hibernate-search-orm"/>
         </module-def>
 
         <!-- create empty slot for Hibernate 3.x jars -->
@@ -985,10 +993,6 @@
             <maven-resource group="org.wildfly" artifact="wildfly-cmp"/>
         </module-def>
 
-        <module-def name="org.jboss.as.configadmin">
-            <maven-resource group="org.wildfly" artifact="wildfly-configadmin"/>
-        </module-def>
-
         <module-def name="org.jboss.as.connector">
             <maven-resource group="org.wildfly" artifact="wildfly-connector"/>
         </module-def>
@@ -1054,10 +1058,6 @@
             <maven-resource group="org.jipijapa" artifact="jipijapa-spi"/>
         </module-def>
 
-        <module-def name="org.jboss.as.jpa.util">
-            <maven-resource group="org.wildfly" artifact="wildfly-jpa-util"/>
-        </module-def>
-
         <module-def name="org.jboss.as.jsf">
             <maven-resource group="org.wildfly" artifact="wildfly-jsf" />
         </module-def>
@@ -1093,6 +1093,10 @@
 
         <module-def name="org.jboss.as.modcluster"/>
 
+        <module-def name="org.wildfly.extension.picketlink">
+            <maven-resource group="org.wildfly" artifact="wildfly-picketlink"/>
+        </module-def>
+
         <module-def name="org.jboss.as.pojo">
             <maven-resource group="org.wildfly" artifact="wildfly-pojo"/>
         </module-def>
@@ -1105,6 +1109,10 @@
             <maven-resource group="org.wildfly" artifact="wildfly-sar"/>
         </module-def>
 
+        <module-def name="org.jboss.as.security-api">
+            <maven-resource group="org.wildfly" artifact="wildfly-security-api"/>
+        </module-def>        	
+    	
         <module-def name="org.jboss.as.security">
             <maven-resource group="org.wildfly" artifact="wildfly-security"/>
         </module-def>
@@ -1338,8 +1346,8 @@
             <maven-resource group="org.jboss.ws.cxf" artifact="jbossws-cxf-server"/>
         </module-def>
 
-        <module-def name="org.jboss.ws.cxf.jbossws-cxf-transports-httpserver">
-            <maven-resource group="org.jboss.ws.cxf" artifact="jbossws-cxf-transports-httpserver"/>
+        <module-def name="org.jboss.ws.cxf.jbossws-cxf-transports-undertow">
+            <maven-resource group="org.jboss.ws.cxf" artifact="jbossws-cxf-transports-undertow"/>
         </module-def>
 
         <module-def name="org.jboss.ws.cxf.jbossws-cxf-transports-udp">
@@ -1348,10 +1356,11 @@
 
         <module-def name="org.jboss.ws.jaxws-client">
             <maven-resource group="org.jboss.ws.cxf" artifact="jbossws-cxf-client"/>
+            <maven-resource group="org.jboss.ws.cxf" artifact="jbossws-cxf-jaspi"/>
         </module-def>
 
-        <module-def name="org.jboss.ws.jaxws-jboss-httpserver-httpspi">
-            <maven-resource group="org.jboss.ws.projects" artifact="jaxws-jboss-httpserver-httpspi"/>
+        <module-def name="org.jboss.ws.jaxws-undertow-httpspi">
+            <maven-resource group="org.jboss.ws.projects" artifact="jaxws-undertow-httpspi"/>
         </module-def>
 
         <module-def name="org.jboss.ws.api">
@@ -1447,12 +1456,12 @@
             <maven-resource group="org.picketlink" artifact="picketlink-impl"/>
         </module-def>
 
-        <module-def name="org.picketlink.federation.bindings">
-            <maven-resource group="org.picketlink.distribution" artifact="picketlink-jbas7"/>
-        </module-def>
-
         <module-def name="org.picketlink.federation">
             <maven-resource group="org.picketlink" artifact="picketlink-federation"/>
+        </module-def>
+
+        <module-def name="org.picketlink.federation.bindings">
+            <maven-resource group="org.picketlink.distribution" artifact="picketlink-wildfly8"/>
         </module-def>
 
         <module-def name="org.picketlink.idm.api">
@@ -1461,6 +1470,10 @@
 
         <module-def name="org.picketlink.idm">
             <maven-resource group="org.picketlink" artifact="picketlink-idm-impl"/>
+        </module-def>
+
+        <module-def name="org.picketlink.idm.schema">
+            <maven-resource group="org.picketlink" artifact="picketlink-idm-simple-schema"/>
         </module-def>
 
         <module-def name="org.picketbox">

@@ -82,7 +82,7 @@ public class ManagedBeanAnnotationProcessor implements DeploymentUnitProcessor {
         final EEResourceReferenceProcessorRegistry registry = deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.RESOURCE_REFERENCE_PROCESSOR_REGISTRY);
         final EEModuleDescription moduleDescription = deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.EE_MODULE_DESCRIPTION);
         final CompositeIndex compositeIndex = deploymentUnit.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);
-        final boolean replacement = deploymentUnit.getAttachment(org.jboss.as.ee.structure.Attachments.EJB_ANNOTATION_PROPERTY_REPLACEMENT);
+        final boolean replacement = deploymentUnit.getAttachment(org.jboss.as.ee.structure.Attachments.ANNOTATION_PROPERTY_REPLACEMENT);
         final PropertyReplacer replacer = EJBAnnotationPropertyReplacement.propertyReplacer(deploymentUnit);
         if(compositeIndex == null) {
             return;
@@ -125,7 +125,7 @@ public class ManagedBeanAnnotationProcessor implements DeploymentUnitProcessor {
             componentDescription.getViews().add(viewDescription);
             moduleDescription.addComponent(componentDescription);
 
-            // register a EEResourceReferenceProcessor which can process @Resource references to this managed bean.
+            // register an EEResourceReferenceProcessor which can process @Resource references to this managed bean.
             registry.registerResourceReferenceProcessor(new ManagedBeanResourceReferenceProcessor(beanClassName));
         }
     }
@@ -144,7 +144,7 @@ public class ManagedBeanAnnotationProcessor implements DeploymentUnitProcessor {
     private static boolean assertManagedBeanClassValidity(final ClassInfo managedBeanClass) {
         final short flags = managedBeanClass.flags();
         final String className = managedBeanClass.name().toString();
-        // must *not* be a interface
+        // must *not* be an interface
         if (Modifier.isInterface(flags)) {
             ROOT_LOGGER.invalidManagedBeanInterface("MB.2.1.1", className);
             return false;

@@ -267,7 +267,7 @@ public interface LoggingMessages {
     String invalidPath(String relativeTo, String path);
 
     /**
-     * A message indicating an suffix is invalid.
+     * A message indicating a suffix is invalid.
      *
      * @param suffix the suffix.
      *
@@ -611,7 +611,7 @@ public interface LoggingMessages {
     IllegalArgumentException truncatedFilterExpression();
 
     /**
-     * Creates an exception indicating the an invalid escape was found in the filter expression string.
+     * Creates an exception indicating an invalid escape was found in the filter expression string.
      *
      * @return an {@link IllegalArgumentException} for the error
      */
@@ -717,11 +717,10 @@ public interface LoggingMessages {
     /**
      * Creates an exception indicating the user cannot read the file.
      *
-     * @param name              the name of the file that was not allowed to be read
-     * @param directoryProperty the name of the property used to resolved the log directory
+     * @param name the name of the file that was not allowed to be read
      *
      * @return an {@link OperationFailedException} for the error
      */
-    @Message(id = 11595, value = "Permission was denied to read file '%s' in the %s directory property.")
-    OperationFailedException readPermissionDenied(String name, String directoryProperty);
+    @Message(id = 11595, value = "File '%s' is not allowed to be read.")
+    OperationFailedException readNotAllowed(String name);
 }

@@ -34,7 +34,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.InitialDirContext;
+import javax.naming.ldap.InitialLdapContext;
 import javax.naming.spi.NamingManager;
 import javax.naming.spi.ObjectFactory;
 
@@ -47,7 +47,7 @@ import static org.jboss.as.naming.NamingMessages.MESSAGES;
  * @author Eduardo Martins
  * @author John Bailey
  */
-public class InitialContext extends InitialDirContext {
+public class InitialContext extends InitialLdapContext {
 
     /**
      * Map of any additional naming schemes
@@ -87,7 +87,7 @@ public class InitialContext extends InitialDirContext {
     }
 
     public InitialContext(Hashtable environment) throws NamingException {
-        super(environment);
+        super(environment, null);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class InitialContext extends InitialDirContext {
     @Override
     protected Context getDefaultInitCtx() throws NamingException {
         if (!gotDefault) {
-            // if there is a initial context factory prop in the env use it to create the default ctx
+            // if there is an initial context factory prop in the env use it to create the default ctx
             final String factoryClassName = myProps != null ? (String) myProps.get(Context.INITIAL_CONTEXT_FACTORY) : null;
             if(factoryClassName == null || InitialContextFactory.class.getName().equals(factoryClassName)) {
                 defaultInitCtx = new DefaultInitialContext(myProps);
@@ -113,7 +113,7 @@ public class InitialContext extends InitialDirContext {
                     final Class<?> factoryClass = Class.forName(factoryClassName, true, classLoader);
                     defaultInitCtx = ((javax.naming.spi.InitialContextFactory)factoryClass.newInstance()).getInitialContext(myProps);
                 } catch (Exception e) {
-                    throw MESSAGES.failedToInstantiate("InitialContextFactory", factoryClassName, classLoader);
+                    throw MESSAGES.failedToInstantiate(e, "InitialContextFactory", factoryClassName, classLoader);
                 }
             }
             gotDefault = true;

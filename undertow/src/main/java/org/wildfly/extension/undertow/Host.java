@@ -25,11 +25,16 @@ package org.wildfly.extension.undertow;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import io.undertow.Handlers;
+import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.servlet.api.Deployment;
@@ -39,7 +44,7 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-import org.wildfly.extension.undertow.filters.FilterService;
+import org.wildfly.extension.undertow.filters.FilterRef;
 
 /**
  * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2013 Red Hat Inc.
@@ -54,8 +59,9 @@ public class Host implements Service<Host> {
     private final InjectedValue<Server> server = new InjectedValue<>();
     private final InjectedValue<UndertowService> undertowService = new InjectedValue<>();
     private final InjectedValue<AccessLogService> accessLogService = new InjectedValue<>();
-    private final List<InjectedValue<FilterService>> injectedFilters = new CopyOnWriteArrayList<>();
+    private final List<InjectedValue<FilterRef>> filters = new CopyOnWriteArrayList<>();
     private final Set<Deployment> deployments = new CopyOnWriteArraySet<>();
+    private final Map<String, AuthenticationMechanism> additionalAuthenticationMechanisms = new ConcurrentHashMap<>();
 
     protected Host(String name, List<String> aliases, String defaultWebModule) {
         this.name = name;
@@ -82,13 +88,19 @@ public class Host implements Service<Host> {
         if (logService != null) {
             rootHandler = logService.configureAccessLogHandler(pathHandler);
         }
-        ArrayList<FilterService> filters = new ArrayList<>(injectedFilters.size());
-        for (InjectedValue<FilterService> injectedFilter : injectedFilters) {
+        ArrayList<FilterRef> filters = new ArrayList<>(this.filters.size());
+        for (InjectedValue<FilterRef> injectedFilter : this.filters) {
             filters.add(injectedFilter.getValue());
         }
+
+        //handle requests that use the Expect: 100-continue header
+        rootHandler = Handlers.httpContinueRead(rootHandler);
+        //we always need to add date header
+        //commented out for now as it causes issues with restEasy
+        //rootHandler = Handlers.date(rootHandler);
         Collections.reverse(filters);
         HttpHandler handler = rootHandler;
-        for (FilterService filter : filters) {
+        for (FilterRef filter : filters) {
             handler = filter.createHttpHandler(handler);
         }
         return handler;
@@ -155,23 +167,23 @@ public class Host implements Service<Host> {
     public void unregisterDeployment(final Deployment deployment) {
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
         String path = getDeployedContextPath(deploymentInfo);
-        unregisterHandler(path);
-        deployments.remove(deployment);
-        UndertowLogger.ROOT_LOGGER.unregisterWebapp(path);
         undertowService.getValue().fireEvent(new EventInvoker() {
             @Override
             public void invoke(UndertowEventListener listener) {
                 listener.onDeploymentStop(deployment, Host.this);
             }
         });
+        unregisterHandler(path);
+        deployments.remove(deployment);
+        UndertowLogger.ROOT_LOGGER.unregisterWebapp(path);
     }
 
     public void registerHandler(String path, HttpHandler handler) {
-        pathHandler.addPath(path, handler);
+        pathHandler.addPrefixPath(path, handler);
     }
 
     public void unregisterHandler(String path) {
-        pathHandler.removePath(path);
+        pathHandler.removePrefixPath(path);
     }
 
     /**
@@ -181,7 +193,19 @@ public class Host implements Service<Host> {
         return Collections.unmodifiableSet(deployments);
     }
 
-    public List<InjectedValue<FilterService>> getInjectedFilters() {
-        return injectedFilters;
+    List<InjectedValue<FilterRef>> getFilters() {
+        return filters;
+    }
+
+    void registerAdditionalAuthenticationMechanism(String name, AuthenticationMechanism authenticationMechanism){
+        additionalAuthenticationMechanisms.put(name, authenticationMechanism);
+    }
+
+    void unregisterAdditionalAuthenticationMechanism(String name){
+        additionalAuthenticationMechanisms.remove(name);
+    }
+
+    public Map<String, AuthenticationMechanism> getAdditionalAuthenticationMechanisms() {
+        return new LinkedHashMap<>(additionalAuthenticationMechanisms);
     }
 }

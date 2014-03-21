@@ -36,14 +36,23 @@ import org.jboss.security.RunAsIdentity;
 import org.jboss.security.SecurityContext;
 import org.wildfly.extension.undertow.UndertowLogger;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 
-import static org.wildfly.extension.undertow.security.SecurityActions.setRunAsIdentity;
+import javax.servlet.ServletRequest;
 
 public class SecurityContextAssociationHandler implements HttpHandler {
 
     private final Map<String, RunAsIdentityMetaData> runAsIdentityMetaDataMap;
     private final HttpHandler next;
+
+    private static final PrivilegedAction<ServletRequestContext> CURRENT_CONTEXT = new PrivilegedAction<ServletRequestContext>() {
+        @Override
+        public ServletRequestContext run() {
+            return ServletRequestContext.current();
+        }
+    };
 
     public SecurityContextAssociationHandler(final Map<String, RunAsIdentityMetaData> runAsIdentityMetaDataMap, final HttpHandler next) {
         this.runAsIdentityMetaDataMap = runAsIdentityMetaDataMap;
@@ -53,7 +62,6 @@ public class SecurityContextAssociationHandler implements HttpHandler {
     @Override
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
         SecurityContext sc = exchange.getAttachment(UndertowSecurityAttachments.SECURITY_CONTEXT_ATTACHMENT);
-        String previousContextID = null;
         RunAsIdentityMetaData identity = null;
         RunAs old = null;
         try {
@@ -64,13 +72,13 @@ public class SecurityContextAssociationHandler implements HttpHandler {
                 UndertowLogger.ROOT_LOGGER.tracef("%s, runAs: %s", servlet.getManagedServlet().getServletInfo().getName(), identity);
                 runAsIdentity = new RunAsIdentity(identity.getRoleName(), identity.getPrincipalName(), identity.getRunAsRoles());
             }
-            old = setRunAsIdentity(runAsIdentity, sc);
+            old = SecurityActions.setRunAsIdentity(runAsIdentity, sc);
 
             // Perform the request
             next.handleRequest(exchange);
         } finally {
             if (identity != null) {
-                setRunAsIdentity(old, sc);
+                SecurityActions.setRunAsIdentity(old, sc);
             }
         }
     }
@@ -83,5 +91,18 @@ public class SecurityContextAssociationHandler implements HttpHandler {
                 return new PredicateHandler(Predicates.or(DispatcherTypePredicate.REQUEST, DispatcherTypePredicate.ASYNC), new SecurityContextAssociationHandler(runAsIdentityMetaDataMap, handler), handler);
             }
         };
+    }
+
+    public static ServletRequest getActiveRequest() {
+        ServletRequestContext current;
+        if(System.getSecurityManager() == null) {
+            current = ServletRequestContext.current();
+        } else {
+            current = AccessController.doPrivileged(CURRENT_CONTEXT);
+        }
+        if(current == null) {
+            return null;
+        }
+        return current.getServletRequest();
     }
 }

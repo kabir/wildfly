@@ -111,7 +111,7 @@ public class SessionBeanComponentDescriptionFactory extends EJBComponentDescript
 
         final EjbJarDescription ejbJarDescription = getEjbJarDescription(deploymentUnit);
         final ServiceName deploymentUnitServiceName = deploymentUnit.getServiceName();
-        final boolean replacement = deploymentUnit.getAttachment(Attachments.EJB_ANNOTATION_PROPERTY_REPLACEMENT);
+        final boolean replacement = deploymentUnit.getAttachment(Attachments.ANNOTATION_PROPERTY_REPLACEMENT);
 
         // process these session bean annotations and create component descriptions out of it
         for (final AnnotationInstance sessionBeanAnnotation : sessionBeanAnnotations) {
@@ -198,7 +198,7 @@ public class SessionBeanComponentDescriptionFactory extends EJBComponentDescript
     private static boolean assertSessionBeanClassValidity(final ClassInfo sessionBeanClass) {
         final short flags = sessionBeanClass.flags();
         final String className = sessionBeanClass.name().toString();
-        // must *not* be a interface
+        // must *not* be an interface
         if (Modifier.isInterface(flags)) {
             EjbLogger.EJB3_LOGGER.sessionBeanClassCannotBeAnInterface(className);
             return false;

@@ -102,7 +102,7 @@ class XTSSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     /**
      * a collection of all the context and associated endpoint information for the XTS JaxWS endpoints.
-     * this is the bits of the variosu web.xml files whcih are necessary to deploy via the endpoint
+     * this is the bits of the variosu web.xml files which are necessary to deploy via the endpoint
      * publisher API rather than via war files containing web.xml descriptors
      */
     private static final ContextInfo[] contextDefinitions = {
@@ -177,7 +177,7 @@ class XTSSubsystemAdd extends AbstractBoottimeAddStepHandler {
         // endpoints specific to client, coordinator or participant and then deploy
         // and redeploy the relevant endpoints as needed/ the same switches can be used
         // byte the XTS service to decide whether to perfomr client, coordinator or
-        // participant initialisation. we shoudl also provide config switches which
+        // participant initialisation. we should also provide config switches which
         // decide whether to initialise classes and deploy services for AT, BA or both.
         // for now we will just deploy all the endpoints and always do client, coordinator
         // and participant init for both AT and BA.
@@ -200,9 +200,11 @@ class XTSSubsystemAdd extends AbstractBoottimeAddStepHandler {
                     .install());
         }
 
+        XTSHandlersService.install(target, isDefaultContextPropagation);
+
         // add an XTS service which depends on all the WS endpoints
 
-        final XTSManagerService xtsService = new XTSManagerService(coordinatorURL, isDefaultContextPropagation);
+        final XTSManagerService xtsService = new XTSManagerService(coordinatorURL);
 
         // this service needs to depend on the transaction recovery service
         // because it can only initialise XTS recovery once the transaction recovery
@@ -213,8 +215,8 @@ class XTSSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .addDependency(TxnServices.JBOSS_TXN_ARJUNA_TRANSACTION_MANAGER);
 
         // this service needs to depend on JBossWS Config Service to be notified of the JBoss WS config (bind address, port etc)
-        xtsServiceBuilder.addDependency(WSServices.CLIENT_CONFIG_SERVICE.append("Standard-Client-Config"));
         xtsServiceBuilder.addDependency(WSServices.CONFIG_SERVICE, ServerConfig.class, xtsService.getWSServerConfig());
+        xtsServiceBuilder.addDependency(WSServices.XTS_CLIENT_INTEGRATION_SERVICE);
 
         // the service also needs to depend on the endpoint services
         for (ServiceController<Context> controller : controllers) {

@@ -102,7 +102,7 @@ public class DsXmlDeploymentInstallProcessor implements DeploymentUnitProcessor 
 
     /**
      * Process a deployment for standard ra deployment files. Will parse the xml
-     * file and attach an configuration discovered during processing.
+     * file and attach a configuration discovered during processing.
      *
      * @param phaseContext the deployment unit context
      * @throws org.jboss.as.server.deployment.DeploymentUnitProcessingException
@@ -290,10 +290,13 @@ public class DsXmlDeploymentInstallProcessor implements DeploymentUnitProcessor 
                         dataSourceService.getDriverRegistryInjector()).addDependency(NamingService.SERVICE_NAME);
 
         //Register an empty override model regardless of we're enabled or not - the statistics listener will add the relevant childresources
-        if (registration.isAllowsOverride() && registration.getOverrideModel(managementName) == null) {
-            registration.registerOverrideModel(managementName, DataSourcesSubsystemProviders.OVERRIDE_DS_DESC);
-        }
-        dataSourceServiceBuilder.addListener(new DataSourceStatisticsListener(registration, resource, managementName));
+        if (registration.isAllowsOverride()) {
+            ManagementResourceRegistration overrideRegistration = registration.getOverrideModel(managementName);
+            if (overrideRegistration == null || overrideRegistration.isAllowsOverride()) {
+                overrideRegistration = registration.registerOverrideModel(managementName, DataSourcesSubsystemProviders.OVERRIDE_DS_DESC);
+            }
+            dataSourceServiceBuilder.addListener(new DataSourceStatisticsListener(overrideRegistration, resource, managementName));
+        } // else should probably throw an ISE or something
 
         final ServiceName driverServiceName = ServiceName.JBOSS.append("jdbc-driver", driverName.replaceAll("\\.", "_"));
         if (driverServiceName != null) {

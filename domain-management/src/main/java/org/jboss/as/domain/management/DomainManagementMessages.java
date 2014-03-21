@@ -172,7 +172,7 @@ public interface DomainManagementMessages {
      * @return an {@link IOException} for the error.
      */
     @Message(id = 15231, value = "User '%s' not found in directory.")
-    IOException userNotFoundInDirectory(String username);
+    NamingException userNotFoundInDirectory(String username);
 
     /**
      * Creates an exception indicating that no java.io.Console is available.
@@ -505,7 +505,7 @@ public interface DomainManagementMessages {
      *
      * @return a {@link String} for the message.
      */
-    @Message(id = Message.NONE, value = "User '%s' already exits and is enabled, would you like to... %n a) Update the existing user password and roles %n b) Disable the existing user %n c) Type a new username")
+    @Message(id = Message.NONE, value = "User '%s' already exists and is enabled, would you like to... %n a) Update the existing user password and roles %n b) Disable the existing user %n c) Type a new username")
     String aboutToUpdateEnabledUser(String user);
 
     /**
@@ -515,7 +515,7 @@ public interface DomainManagementMessages {
      *
      * @return a {@link String} for the message.
      */
-    @Message(id = Message.NONE, value = "User '%s' already exits and is disabled, would you like to... %n a) Update the existing user password and roles %n b) Enable the existing user %n c) Type a new username")
+    @Message(id = Message.NONE, value = "User '%s' already exists and is disabled, would you like to... %n a) Update the existing user password and roles %n b) Enable the existing user %n c) Type a new username")
     String aboutToUpdateDisabledUser(String user);
 
     /**
@@ -896,6 +896,27 @@ public interface DomainManagementMessages {
      */
     @Message(id = 21002, value = "The KeyStore can not be found at %s")
     StartException keyStoreNotFound(String path);
+
+    /**
+     * Error message if more than one cache is defined.
+     *
+     * @param realmName the name of the security realm
+     * @param configurations the set of configurations .
+     *
+     * @return an {@link OperationFailedException} for the error.
+     */
+    @Message(id = 21003, value = "Configuration for security realm '%s' includes multiple cache definitions at the same position in the hierarchy. Only one is allowed")
+    OperationFailedException multipleCacheConfigurationsDefined(String realmName);
+
+    /**
+     * Creates an exception indicating that is was not possible to load a username for the supplied username.
+     *
+     * @param name the supplied username.
+     *
+     * @return a {@link NamingException} for the error.
+     */
+    @Message(id = 21004, value = "Unable to load username for supplied username '%s'")
+    NamingException usernameNotLoaded(String name);
 
     /*
      * Logging IDs 15200-15299 and 21000-21099 are reserved for domain management

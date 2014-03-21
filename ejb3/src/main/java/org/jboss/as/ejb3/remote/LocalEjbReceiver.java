@@ -89,7 +89,7 @@ import static org.jboss.as.ejb3.EjbMessages.MESSAGES;
 
 /**
  * {@link EJBReceiver} for local same-VM invocations. This handles all invocations on remote interfaces
- * withing the server JVM.
+ * within the server JVM.
  *
  * @author Stuart Douglas
  */
@@ -244,7 +244,7 @@ public class LocalEjbReceiver extends EJBReceiver implements Service<LocalEjbRec
             } catch (Exception e) {
                 //we even have to clone the exception type
                 //to make sure it matches
-                throw (Exception) clone(resultCloner, e);
+                throw (Exception) clone(Exception.class, resultCloner, e, allowPassByReference);
             }
             //we do not marshal the return type unless we have to, the spec only says we have to
             //pass parameters by reference

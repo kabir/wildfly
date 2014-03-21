@@ -1,3 +1,24 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.wildfly.extension.undertow.deployment;
 
 import io.undertow.UndertowLogger;
@@ -29,10 +50,12 @@ import java.util.List;
  */
 public class VirtualFileResource implements Resource {
 
+    private final File resourceManagerRoot;
     private final VirtualFile file;
     private final String path;
 
-    public VirtualFileResource(final VirtualFile file, String path) {
+    public VirtualFileResource(File resourceManagerRoot, final VirtualFile file, String path) {
+        this.resourceManagerRoot = resourceManagerRoot;
         this.file = file;
         this.path = path;
     }
@@ -75,7 +98,7 @@ public class VirtualFileResource implements Resource {
     public List<Resource> list() {
         final List<Resource> resources = new ArrayList<Resource>();
         for (VirtualFile child : file.getChildren()) {
-            resources.add(new VirtualFileResource(child, path));
+            resources.add(new VirtualFileResource(resourceManagerRoot, child, path));
         }
         return resources;
     }
@@ -226,7 +249,7 @@ public class VirtualFileResource implements Resource {
 
     @Override
     public File getResourceManagerRoot() {
-        return null;
+        return resourceManagerRoot;
     }
 
     @Override

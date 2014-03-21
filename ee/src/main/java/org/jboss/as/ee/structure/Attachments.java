@@ -56,7 +56,7 @@ public final class Attachments {
     public static final AttachmentKey<VirtualFile> ALTERNATE_CONNECTOR_DEPLOYMENT_DESCRIPTOR = AttachmentKey.create(VirtualFile.class);
 
     /**
-     * A Marker that identifies the a type of deployment
+     * A Marker that identifies the type of deployment
      */
     public static final AttachmentKey<DeploymentType> DEPLOYMENT_TYPE = AttachmentKey.create(DeploymentType.class);
 
@@ -73,7 +73,7 @@ public final class Attachments {
     /**
      * If this is set to true property replacement will be enabled for EJB annotations
      */
-    public static final AttachmentKey<Boolean> EJB_ANNOTATION_PROPERTY_REPLACEMENT = AttachmentKey.create(Boolean.class);
+    public static final AttachmentKey<Boolean> ANNOTATION_PROPERTY_REPLACEMENT = AttachmentKey.create(Boolean.class);
 
     private Attachments() {
     }

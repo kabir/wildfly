@@ -101,8 +101,12 @@ public abstract class AbstractTaskTestCase {
     }
 
     protected PatchingResult rollback(String patchId, final boolean rollbackTo) throws IOException, PatchingException {
+        return rollback(patchId, rollbackTo, ContentVerificationPolicy.STRICT);
+    }
+
+    protected PatchingResult rollback(String patchId, boolean rollbackTo, ContentVerificationPolicy policy) throws IOException, PatchingException {
         final PatchTool tool = newPatchTool();
-        final PatchingResult result = tool.rollback(patchId, ContentVerificationPolicy.STRICT, rollbackTo, true);
+        final PatchingResult result = tool.rollback(patchId, policy, rollbackTo, true);
         result.commit();
         return result;
     }

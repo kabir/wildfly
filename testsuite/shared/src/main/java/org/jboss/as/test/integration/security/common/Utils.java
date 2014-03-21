@@ -21,9 +21,12 @@
  */
 package org.jboss.as.test.integration.security.common;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -34,9 +37,11 @@ import java.security.MessageDigest;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.Subject;
@@ -45,7 +50,10 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.directory.server.annotations.CreateTransport;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
@@ -55,6 +63,7 @@ import org.apache.http.ProtocolException;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -341,23 +350,23 @@ public class Utils {
 
     /**
      * Returns "secondary.test.address" system property if such exists. If not found, then there is a fallback to
-     * {@link ManagementClient#getMgmtAddress()}. Returned value can be converted to cannonical hostname if
-     * useCannonicalHost==true. Returned value is not formatted for URLs (i.e. square brackets are not placed around IPv6 addr -
+     * {@link ManagementClient#getMgmtAddress()}. Returned value can be converted to canonical hostname if
+     * useCanonicalHost==true. Returned value is not formatted for URLs (i.e. square brackets are not placed around IPv6 addr -
      * for instance "::1")
      *
      * @param mgmtClient management client instance (may be <code>null</code>)
-     * @param useCannonicalHost
+     * @param useCanonicalHost
      * @return
      */
-    public static String getSecondaryTestAddress(final ManagementClient mgmtClient, final boolean useCannonicalHost) {
+    public static String getSecondaryTestAddress(final ManagementClient mgmtClient, final boolean useCanonicalHost) {
         String address = System.getProperty("secondary.test.address");
         if (StringUtils.isBlank(address) && mgmtClient != null) {
             address = mgmtClient.getMgmtAddress();
         }
-        if (useCannonicalHost) {
+        if (useCanonicalHost) {
             address = getCannonicalHost(address);
         }
-        return address;
+        return stripSquareBrackets(address);
     }
 
     /**
@@ -373,6 +382,37 @@ public class Utils {
     }
 
     /**
+     * Requests given URL and checks if the returned HTTP status code is the
+     * expected one. Returns HTTP response body
+     *
+     * @param URL url to which the request should be made
+     * @param DefaultHttpClient httpClient to test multiple access
+     * @param expectedStatusCode expected status code returned from the requested server
+     * @return HTTP response body
+     * @throws ClientProtocolException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static String makeCallWithHttpClient(URL url, HttpClient httpClient, int expectedStatusCode)
+            throws IOException, URISyntaxException {
+
+        String httpResponseBody = null;
+        HttpGet httpGet = new HttpGet(url.toURI());
+        HttpResponse response = httpClient.execute(httpGet);
+        int statusCode = response.getStatusLine().getStatusCode();
+        LOGGER.info("Request to: " + url + " responds: " + statusCode);
+
+        assertEquals("Unexpected status code", expectedStatusCode, statusCode);
+
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
+            httpResponseBody = EntityUtils.toString(response.getEntity());
+            EntityUtils.consume(entity);
+        }
+        return httpResponseBody;
+    }
+
+    /**
      * Returns response body for the given URL request as a String. It also checks if the returned HTTP status code is the
      * expected one. If the server returns {@link HttpServletResponse#SC_UNAUTHORIZED} and username is provided, then a new
      * request is created with the provided credentials (basic authentication).
@@ -385,8 +425,8 @@ public class Utils {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static String makeCallWithBasicAuthn(URL url, String user, String pass, int expectedStatusCode)
-            throws IOException, URISyntaxException {
+    public static String makeCallWithBasicAuthn(URL url, String user, String pass, int expectedStatusCode) throws IOException,
+            URISyntaxException {
         LOGGER.info("Requesting URL " + url);
         final DefaultHttpClient httpClient = new DefaultHttpClient();
         try {
@@ -435,8 +475,7 @@ public class Utils {
      * @throws LoginException
      */
     public static String makeCallWithKerberosAuthn(final URI uri, final String user, final String pass,
-            final int expectedStatusCode) throws IOException, URISyntaxException,
-            PrivilegedActionException, LoginException {
+            final int expectedStatusCode) throws IOException, URISyntaxException, PrivilegedActionException, LoginException {
         LOGGER.info("Requesting URI: " + uri);
         final DefaultHttpClient httpClient = new DefaultHttpClient();
         try {
@@ -506,8 +545,8 @@ public class Utils {
      * @throws LoginException
      */
     public static String makeHttpCallWithFallback(final String contextUrl, final String page, final String user,
-            final String pass, final int expectedStatusCode) throws IOException, URISyntaxException,
-            PrivilegedActionException, LoginException {
+            final String pass, final int expectedStatusCode) throws IOException, URISyntaxException, PrivilegedActionException,
+            LoginException {
         final String strippedContextUrl = StringUtils.stripEnd(contextUrl, "/");
         final String url = strippedContextUrl + page;
         LOGGER.info("Requesting URL: " + url);
@@ -590,8 +629,7 @@ public class Utils {
      * @throws LoginException
      */
     public static String makeHttpCallWoSPNEGO(final String contextUrl, final String page, final String user, final String pass,
-            final int expectedStatusCode) throws IOException, URISyntaxException,
-            PrivilegedActionException, LoginException {
+            final int expectedStatusCode) throws IOException, URISyntaxException, PrivilegedActionException, LoginException {
         final String strippedContextUrl = StringUtils.stripEnd(contextUrl, "/");
         final String url = strippedContextUrl + page;
         LOGGER.info("Requesting URL: " + url);
@@ -659,11 +697,11 @@ public class Utils {
      * @return
      */
     public static final String getHost(final ManagementClient managementClient) {
-        return StringUtils.strip(managementClient.getMgmtAddress(), "[]");
+        return stripSquareBrackets(managementClient.getMgmtAddress());
     }
 
     /**
-     * Returns cannonical hostname retrieved from management address of the givem {@link ManagementClient}.
+     * Returns canonical hostname retrieved from management address of the givem {@link ManagementClient}.
      *
      * @param managementClient
      * @return
@@ -673,17 +711,17 @@ public class Utils {
     }
 
     /**
-     * Returns cannonical hostname form of the given address.
+     * Returns canonical hostname form of the given address.
      *
      * @param address hosname or IP address
      * @return
      */
     public static final String getCannonicalHost(final String address) {
-        String host = StringUtils.strip(address, "[]");
+        String host = stripSquareBrackets(address);
         try {
             host = InetAddress.getByName(host).getCanonicalHostName();
         } catch (UnknownHostException e) {
-            LOGGER.warn("Unable to get cannonical host name", e);
+            LOGGER.warn("Unable to get canonical host name", e);
         }
         return host.toLowerCase(Locale.ENGLISH);
     }
@@ -711,21 +749,21 @@ public class Utils {
      * @param webAppURL web application context URL (e.g. injected by Arquillian)
      * @param servletPath Servlet path starting with slash (must be not-<code>null</code>)
      * @param mgmtClient Management Client (may be null)
-     * @param useCannonicalHost flag which says if host in URI should be replaced by the cannonical host.
+     * @param useCanonicalHost flag which says if host in URI should be replaced by the canonical host.
      * @return
      * @throws URISyntaxException
      */
     public static final URI getServletURI(final URL webAppURL, final String servletPath, final ManagementClient mgmtClient,
-            boolean useCannonicalHost) throws URISyntaxException {
+            boolean useCanonicalHost) throws URISyntaxException {
         URI resultURI = new URI(webAppURL.toExternalForm() + servletPath.substring(1));
-        if (useCannonicalHost) {
+        if (useCanonicalHost) {
             resultURI = replaceHost(resultURI, getCannonicalHost(mgmtClient));
         }
         return resultURI;
     }
 
     /**
-     * Generates content of jboss-ejb3.xml file as an ShrinkWrap asset with the given security domain name.
+     * Generates content of jboss-ejb3.xml file as a ShrinkWrap asset with the given security domain name.
      *
      * @param securityDomain security domain name
      * @return Asset instance
@@ -746,36 +784,30 @@ public class Utils {
     }
 
     /**
-     * Generates content of jboss-web.xml file as an ShrinkWrap asset with the given security domain name and given valve class.
+     * Generates content of jboss-web.xml file as a ShrinkWrap asset with the given security domain name and given valve class.
      *
      * @param securityDomain security domain name (not-<code>null</code>)
-     * @param valveClassName valve class (e.g. an Authenticator) which should be added to jboss-web file (may be
+     * @param valveClassNames valve class (e.g. an Authenticator) which should be added to jboss-web file (may be
      *        <code>null</code>)
      * @return Asset instance
      */
-    public static Asset getJBossWebXmlAsset(final String securityDomain, final String valveClassName) {
+    public static Asset getJBossWebXmlAsset(final String securityDomain, final String... valveClassNames) {
         final StringBuilder sb = new StringBuilder();
         sb.append("<jboss-web>");
         sb.append("\n\t<security-domain>").append(securityDomain).append("</security-domain>");
-        if (StringUtils.isNotEmpty(valveClassName)) {
-            sb.append("\n\t<valve><class-name>").append(valveClassName).append("</class-name></valve>");
+        if (valveClassNames != null) {
+            for (String valveClassName : valveClassNames) {
+                if (StringUtils.isNotEmpty(valveClassName)) {
+                    sb.append("\n\t<valve><class-name>").append(valveClassName).append("</class-name></valve>");
+                }
+            }
         }
         sb.append("\n</jboss-web>");
         return new StringAsset(sb.toString());
     }
 
     /**
-     * Generates content of jboss-web.xml file as an ShrinkWrap asset with the given security domain name.
-     *
-     * @param securityDomain security domain name
-     * @return Asset instance
-     */
-    public static Asset getJBossWebXmlAsset(final String securityDomain) {
-        return getJBossWebXmlAsset(securityDomain, null);
-    }
-
-    /**
-     * Generates content of the jboss-deployment-structure.xml deployment descriptor as an ShrinkWrap asset. It fills the given
+     * Generates content of the jboss-deployment-structure.xml deployment descriptor as a ShrinkWrap asset. It fills the given
      * dependencies (module names) into it.
      *
      * @param dependencies AS module names
@@ -816,5 +848,132 @@ public class Utils {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Strips square brackets - '[' and ']' from the given string. It can be used for instance to remove the square brackets
+     * around IPv6 address in a URL.
+     *
+     * @param str string to strip
+     * @return str without square brackets in it
+     */
+    public static String stripSquareBrackets(final String str) {
+        return StringUtils.strip(str, "[]");
+    }
+
+    /**
+     * Fixes/replaces LDAP bind address in the CreateTransport annotation of ApacheDS.
+     *
+     * @param createLdapServer
+     * @param address
+     */
+    public static void fixApacheDSTransportAddress(ManagedCreateLdapServer createLdapServer, String address) {
+        final CreateTransport[] createTransports = createLdapServer.transports();
+        for (int i = 0; i < createTransports.length; i++) {
+            final ManagedCreateTransport mgCreateTransport = new ManagedCreateTransport(createTransports[i]);
+            // localhost is a default used in original CreateTransport annotation. We use it as a fallback.
+            mgCreateTransport.setAddress(address != null ? address : "localhost");
+            createTransports[i] = mgCreateTransport;
+        }
+    }
+
+    /**
+     * Copies server and clients keystores and truststores from this package to
+     * the given folder. Server truststore has accepted certificate from client keystore and vice-versa
+     *
+     * @param workingFolder folder to which key material should be copied
+     * @throws IOException copying of keystores fails
+     * @throws IllegalArgumentException workingFolder is null or it's not a directory
+     */
+    public static void createKeyMaterial(final File workingFolder) throws IOException, IllegalArgumentException {
+        if (workingFolder == null || !workingFolder.isDirectory()) {
+            throw new IllegalArgumentException("Provide an existing folder as the method parameter.");
+        }
+        createTestResource(new File(workingFolder, SecurityTestConstants.SERVER_KEYSTORE));
+        createTestResource(new File(workingFolder, SecurityTestConstants.SERVER_TRUSTSTORE));
+        createTestResource(new File(workingFolder, SecurityTestConstants.SERVER_CRT));
+        createTestResource(new File(workingFolder, SecurityTestConstants.CLIENT_KEYSTORE));
+        createTestResource(new File(workingFolder, SecurityTestConstants.CLIENT_TRUSTSTORE));
+        createTestResource(new File(workingFolder, SecurityTestConstants.CLIENT_CRT));
+        createTestResource(new File(workingFolder, SecurityTestConstants.UNTRUSTED_KEYSTORE));
+        createTestResource(new File(workingFolder, SecurityTestConstants.UNTRUSTED_CRT));
+        LOGGER.info("Key material created in " + workingFolder.getAbsolutePath());
+    }
+
+    /**
+     * Copies a resource file from current package to location denoted by given
+     * {@link File} instance.
+     *
+     * @param file
+     *
+     * @throws IOException
+     */
+    private static void createTestResource(File file) throws IOException {
+        FileOutputStream fos = null;
+        LOGGER.info("Creating test file " + file.getAbsolutePath());
+        try {
+            fos = new FileOutputStream(file);
+            IOUtils.copy(Utils.class.getResourceAsStream(file.getName()), fos);
+        } finally {
+            IOUtils.closeQuietly(fos);
+        }
+    }
+
+    public static String propertiesReplacer(String originalFile, File keystoreFile, File trustStoreFile, String keystorePassword) {
+        return propertiesReplacer(originalFile, keystoreFile.getAbsolutePath(), trustStoreFile.getAbsolutePath(), keystorePassword, null);
+    }
+
+    public static String propertiesReplacer(String originalFile, File keystoreFile, File trustStoreFile, String keystorePassword,
+            File vaultConfig) {
+        return propertiesReplacer(originalFile, keystoreFile.getAbsolutePath(), trustStoreFile.getAbsolutePath(), keystorePassword,
+                vaultConfig.getAbsolutePath());
+    }
+
+    /**
+     * Replace keystore paths and passwords variables in original configuration file with given values
+     * and set ${hostname} variable from system property: node0
+     *
+     * @param String originalFile
+     * @param File keystoreFile
+     * @param File trustStoreFile
+     * @param String keystorePassword
+     * @param String vaultConfigPath - path to vault settings
+     * @return String content
+     */
+    public static String propertiesReplacer(String originalFile, String keystoreFile, String trustStoreFile, String keystorePassword,
+            String vaultConfigPath) {
+        String hostname = System.getProperty("node0");
+
+        // expand possible IPv6 address
+        try {
+            hostname = NetworkUtils.formatPossibleIpv6Address(InetAddress.getByName(hostname).getHostAddress());
+        } catch (UnknownHostException ex) {
+            String message = "Cannot resolve host address: " + hostname + " , error : " + ex.getMessage();
+            LOGGER.error(message);
+            throw new RuntimeException(ex);
+        }
+
+        final Map<String, String> map = new HashMap<String, String>();
+        String content = "";
+        if (vaultConfigPath == null) {
+            map.put("vaultConfig", "");
+        } else {
+            map.put("vaultConfig", "<vault file=\"" + vaultConfigPath + "\"/>");
+        }
+        map.put("hostname", hostname);
+        map.put("keystore", keystoreFile);
+        map.put("truststore", trustStoreFile);
+        map.put("password", keystorePassword);
+
+        try {
+            content = StrSubstitutor.replace(
+                    IOUtils.toString(Utils.class.getResourceAsStream(originalFile), "UTF-8"), map);
+        } catch (IOException ex) {
+            String message = "Cannot find or modify configuration file " + originalFile + " , error : " + ex.getMessage();
+            LOGGER.error(message);
+            throw new RuntimeException(ex);
+        }
+
+        return content;
     }
 }

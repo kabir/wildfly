@@ -23,17 +23,22 @@
 package org.wildfly.extension.undertow;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import javax.security.jacc.PolicyContext;
+import javax.security.jacc.PolicyContextException;
 
 import io.undertow.Version;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+import org.jboss.security.SecurityConstants;
+import org.wildfly.extension.undertow.security.jacc.HttpServletRequestPolicyContextHandler;
 
 /**
  * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2013 Red Hat Inc.
@@ -57,14 +62,16 @@ public class UndertowService implements Service<UndertowService> {
     private final String defaultServer;
     private final String defaultVirtualHost;
     private final Set<Server> registeredServers = new CopyOnWriteArraySet<>();
-    private final List<UndertowEventListener> listeners = new CopyOnWriteArrayList<>();
+    private final List<UndertowEventListener> listeners = Collections.synchronizedList(new LinkedList<UndertowEventListener>());
     private volatile String instanceId;//todo this should be final and no setter should be exposed, currently mod cluster "wants it", this needs to change
+    private final boolean statistics;
 
-    protected UndertowService(String defaultContainer, String defaultServer, String defaultVirtualHost, String instanceId) {
+    protected UndertowService(String defaultContainer, String defaultServer, String defaultVirtualHost, String instanceId, boolean statistics) {
         this.defaultContainer = defaultContainer;
         this.defaultServer = defaultServer;
         this.defaultVirtualHost = defaultVirtualHost;
         this.instanceId = instanceId;
+        this.statistics = statistics;
     }
 
     public static ServiceName deploymentServiceName(final String serverName, final String virtualHost, final String contextPath) {
@@ -78,25 +85,78 @@ public class UndertowService implements Service<UndertowService> {
     public static ServiceName locationServiceName(final String server, final String virtualHost, final String locationName) {
         return virtualHostName(server, virtualHost).append(Constants.LOCATION, locationName);
     }
+
     public static ServiceName accessLogServiceName(final String server, final String virtualHost) {
         return virtualHostName(server, virtualHost).append(Constants.ACCESS_LOG);
+    }
+
+    public static ServiceName ssoServiceName(final String server, final String virtualHost) {
+        return virtualHostName(server, virtualHost).append("single-sign-on");
     }
 
     public static ServiceName consoleRedirectServiceName(final String server, final String virtualHost) {
         return virtualHostName(server, virtualHost).append("console", "redirect");
     }
 
-    public static ServiceName listenerName(String listenerName){
+    public static ServiceName filterRefName(final String server, final String virtualHost, final String locationName, final String filterName) {
+        return virtualHostName(server, virtualHost).append(Constants.LOCATION, locationName).append("filter-ref").append(filterName);
+    }
+
+    public static ServiceName filterRefName(final String server, final String virtualHost, final String filterName) {
+        return SERVER.append(server).append(virtualHost).append("filter-ref").append(filterName);
+    }
+
+    public static ServiceName getFilterRefServiceName(final PathAddress address, String name) {
+        final PathAddress oneUp = address.subAddress(0, address.size() - 1);
+        final PathAddress twoUp = oneUp.subAddress(0, oneUp.size() - 1);
+        final PathAddress threeUp = twoUp.subAddress(0, twoUp.size() - 1);
+        ServiceName serviceName;
+        if (address.getLastElement().getKey().equals(Constants.FILTER_REF)) {
+            if (oneUp.getLastElement().getKey().equals(Constants.HOST)) { //adding reference
+                String host = oneUp.getLastElement().getValue();
+                String server = twoUp.getLastElement().getValue();
+                serviceName = UndertowService.filterRefName(server, host, name);
+            } else {
+                String location = oneUp.getLastElement().getValue();
+                String host = twoUp.getLastElement().getValue();
+                String server = threeUp.getLastElement().getValue();
+                serviceName = UndertowService.filterRefName(server, host, location, name);
+            }
+        } else if (address.getLastElement().getKey().equals(Constants.HOST)) {
+            String host = address.getLastElement().getValue();
+            String server = oneUp.getLastElement().getValue();
+            serviceName = UndertowService.filterRefName(server, host, name);
+        } else {
+            String location = address.getLastElement().getValue();
+            String host = oneUp.getLastElement().getValue();
+            String server = twoUp.getLastElement().getValue();
+            serviceName = UndertowService.filterRefName(server, host, location, name);
+        }
+        return serviceName;
+    }
+
+    public static ServiceName listenerName(String listenerName) {
         return UNDERTOW.append(Constants.LISTENER).append(listenerName);
     }
 
     @Override
     public void start(StartContext context) throws StartException {
         UndertowLogger.ROOT_LOGGER.serverStarting(Version.getVersionString());
+        // Register the active request PolicyContextHandler
+        try {
+            PolicyContext.registerHandler(SecurityConstants.WEB_REQUEST_KEY,
+                    new HttpServletRequestPolicyContextHandler(), true);
+        } catch (PolicyContextException pce) {
+            UndertowLogger.ROOT_LOGGER.failedToRegisterPolicyContextHandler(SecurityConstants.WEB_REQUEST_KEY, pce);
+        }
     }
 
     @Override
     public void stop(StopContext context) {
+        // Remove PolicyContextHandler
+        Set handlerKeys = PolicyContext.getHandlerKeys();
+        handlerKeys.remove(SecurityConstants.WEB_REQUEST_KEY);
+
         UndertowLogger.ROOT_LOGGER.serverStopping(Version.getVersionString());
 
         fireEvent(new EventInvoker() {
@@ -156,6 +216,10 @@ public class UndertowService implements Service<UndertowService> {
         this.instanceId = instanceId;
     }
 
+    public boolean statisticsEnabled() {
+        return statistics;
+    }
+
     /**
      * Registers custom Event listener to server
      *
@@ -170,8 +234,10 @@ public class UndertowService implements Service<UndertowService> {
     }
 
     protected void fireEvent(EventInvoker invoker) {
-        for (UndertowEventListener listener : listeners) {
-            invoker.invoke(listener);
+        synchronized (listeners) {
+            for (UndertowEventListener listener : listeners) {
+                invoker.invoke(listener);
+            }
         }
     }
 }

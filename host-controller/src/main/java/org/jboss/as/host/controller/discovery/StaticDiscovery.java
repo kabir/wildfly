@@ -28,7 +28,6 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.POR
 import java.util.Map;
 
 import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.host.controller.operations.RemoteDomainControllerAddHandler;
 import org.jboss.dmr.ModelNode;
 
 /**
@@ -39,10 +38,10 @@ import org.jboss.dmr.ModelNode;
 public class StaticDiscovery implements DiscoveryOption {
 
     // The host name of the domain controller
-    private String remoteDcHost;
+    private final String remoteDcHost;
 
     // The port number of the domain controller
-    private int remoteDcPort;
+    private final int remoteDcPort;
 
     /**
      * Create the StaticDiscovery option.
@@ -66,10 +65,10 @@ public class StaticDiscovery implements DiscoveryOption {
     public void discover() {
         // Validate the host and port
         try {
-            RemoteDomainControllerAddHandler.HOST.getValidator()
-                .validateParameter(RemoteDomainControllerAddHandler.HOST.getName(), new ModelNode(remoteDcHost));
-            RemoteDomainControllerAddHandler.PORT.getValidator()
-                .validateParameter(RemoteDomainControllerAddHandler.PORT.getName(), new ModelNode(remoteDcPort));
+            StaticDiscoveryResourceDefinition.HOST.getValidator()
+                .validateParameter(StaticDiscoveryResourceDefinition.HOST.getName(), new ModelNode(remoteDcHost));
+            StaticDiscoveryResourceDefinition.PORT.getValidator()
+                .validateParameter(StaticDiscoveryResourceDefinition.PORT.getName(), new ModelNode(remoteDcPort));
         } catch (OperationFailedException e) {
             throw new IllegalStateException(e.getFailureDescription().asString());
         }
@@ -88,5 +87,10 @@ public class StaticDiscovery implements DiscoveryOption {
     @Override
     public int getRemoteDomainControllerPort() {
         return remoteDcPort;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{host=" + remoteDcHost + ",port=" + remoteDcPort + '}';
     }
 }
