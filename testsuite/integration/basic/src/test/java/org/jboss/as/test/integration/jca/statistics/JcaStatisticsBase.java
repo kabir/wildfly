@@ -66,7 +66,6 @@ public abstract class JcaStatisticsBase extends JcaMgmtBase {
      */
     protected void testStatisticsDouble(ModelNode connectionNode) throws Exception {
         ModelNode statisticsNode = translateFromConnectionToStatistics(connectionNode);
-        writeAttribute(statisticsNode, "statistics-enabled", "true");
         executeOnNode(connectionNode, "flush-all-connection-in-pool");
         executeOnNode(connectionNode, "test-connection-in-pool");
         executeOnNode(connectionNode, "test-connection-in-pool");
@@ -82,10 +81,12 @@ public abstract class JcaStatisticsBase extends JcaMgmtBase {
      * @throws Exception
      */
     protected void testInterference(ModelNode node1, ModelNode node2) throws Exception {
+        ModelNode statisticsNode = translateFromConnectionToStatistics(node2);
         executeOnNode(node1, "flush-all-connection-in-pool");
         executeOnNode(node2, "flush-all-connection-in-pool");
+        writeAttribute(statisticsNode, "statistics-enabled", "true");
         executeOnNode(node1, "test-connection-in-pool");
-        assertStatisticsShouldBeSet(translateFromConnectionToStatistics(node2), false);
+        assertStatisticsShouldBeSet(statisticsNode, false);
     }
 
     /**
@@ -103,8 +104,8 @@ public abstract class JcaStatisticsBase extends JcaMgmtBase {
                 + maxUsed + "\n");
         assertTrue(avail > 0);
         if (yes) {
-            assertTrue(active > 0);
-            assertTrue(maxUsed > 0);
+            assertTrue("active==" + active, active > 0);
+            assertTrue("maxused==" + maxUsed,maxUsed > 0);
         } else {
             assertEquals(active, 0);
             assertEquals(maxUsed, 0);
