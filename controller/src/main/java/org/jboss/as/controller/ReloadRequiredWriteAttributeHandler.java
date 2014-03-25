@@ -45,7 +45,13 @@ public class ReloadRequiredWriteAttributeHandler extends AbstractWriteAttributeH
 
     @Override
     protected boolean applyUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode resolvedValue, ModelNode currentValue, HandbackHolder<Void> voidHandback) throws OperationFailedException {
-        return true;
+//      Some might ask why we are comparing a resolvedValue with the currentValuewhich is not resolved.
+//      Well the issue is that the context that would permit to resolve the currentValue might have changed thus
+//      the resolved value for the currentValue wouldn't be correct.
+//      In fact we just can't resolve the currentValue without any doubt. When in doubt reload, so we will return true in this case.
+//      For example if the currentValue is ${foo} and that for some reason foo has changed in between, then we should reload even if now ${foo} resolves
+//      as resolvedValue.
+        return !resolvedValue.equals(currentValue);
     }
 
     @Override
