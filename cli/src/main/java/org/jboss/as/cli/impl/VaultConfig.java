@@ -47,6 +47,8 @@ import org.jboss.staxmapper.XMLMapper;
  */
 class VaultConfig {
 
+    private String code;
+    private String module;
     private final Map<String, Object> options = new HashMap<String, Object>();
 
     static VaultConfig load(File f) throws XMLStreamException {
@@ -82,6 +84,14 @@ class VaultConfig {
         return options;
     }
 
+    String getCode() {
+        return code;
+    }
+
+    String getModule() {
+        return module;
+    }
+
     void addOption(String name, String value) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
@@ -97,6 +107,8 @@ class VaultConfig {
         static final String NAME = "name";
         static final String VALUE = "value";
         static final String VAULT = "vault";
+        static final String CODE = "code";
+        static final String MODULE = "module";
         static final String VAULT_OPTION = "vault-option";
 
         @Override
@@ -105,6 +117,40 @@ class VaultConfig {
             String rootName = reader.getLocalName();
             if (VAULT.equals(rootName) == false) {
                 throw new XMLStreamException("Unexpected element: " + rootName);
+            }
+
+            final boolean allowOverrideImpl;
+            final Namespace ns = Namespace.forUri(reader.getNamespaceURI());
+            switch (ns) {
+                case CLI_1_0:
+                case CLI_1_1:
+                case CLI_1_2:
+                case CLI_2_0:
+                    allowOverrideImpl = false;
+                    break;
+                default:
+                    allowOverrideImpl = true;
+            }
+            final int count = reader.getAttributeCount();
+            for (int i = 0; i < count; i++) {
+                final String value = reader.getAttributeValue(i);
+                if (!allowOverrideImpl){
+                    unexpectedVaultAttribute(reader.getAttributeLocalName(i), reader);
+                } else {
+                    String name = reader.getAttributeLocalName(i);
+                    if (name.equals(CODE)){
+                        config.code = value;
+                    } else if (name.equals(MODULE)){
+                        config.module = value;
+                    } else {
+                        unexpectedVaultAttribute(reader.getAttributeLocalName(i), reader);
+                    }
+                }
+            }
+            if (config.code == null && config.module != null){
+                throw new XMLStreamException("Attribute 'module' was specified without a 'module' " +
+                        " for element '" +
+                        VAULT_OPTION + "' at " + reader.getLocation());
             }
 
             boolean done = false;
@@ -137,6 +183,13 @@ class VaultConfig {
                     }
                 }
             }
+        }
+
+        private void unexpectedVaultAttribute(String attribute, XMLStreamReader reader) throws XMLStreamException {
+            throw new XMLStreamException("Attribute '" + attribute +
+                    "' is unknown for element '" +
+                    VAULT_OPTION + "' at " + reader.getLocation());
+
         }
     }
 }
