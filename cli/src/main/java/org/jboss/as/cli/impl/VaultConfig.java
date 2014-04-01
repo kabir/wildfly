@@ -148,9 +148,8 @@ class VaultConfig {
                 }
             }
             if (config.code == null && config.module != null){
-                throw new XMLStreamException("Attribute 'module' was specified without a 'module' " +
-                        " for element '" +
-                        VAULT_OPTION + "' at " + reader.getLocation());
+                throw new XMLStreamException("Attribute 'module' was specified without an attribute"
+                        + " 'code' for element '" + VAULT + "' at " + reader.getLocation());
             }
 
             boolean done = false;
