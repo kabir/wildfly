@@ -924,9 +924,9 @@ public class Utils {
     }
 
     public static String propertiesReplacer(String originalFile, File keystoreFile, File trustStoreFile, String keystorePassword,
-            File vaultConfig) {
+            String vaultConfig) {
         return propertiesReplacer(originalFile, keystoreFile.getAbsolutePath(), trustStoreFile.getAbsolutePath(), keystorePassword,
-                vaultConfig.getAbsolutePath());
+                vaultConfig);
     }
 
     /**
@@ -941,7 +941,7 @@ public class Utils {
      * @return String content
      */
     public static String propertiesReplacer(String originalFile, String keystoreFile, String trustStoreFile, String keystorePassword,
-            String vaultConfigPath) {
+            String vaultConfig) {
         String hostname = System.getProperty("node0");
 
         // expand possible IPv6 address
@@ -955,10 +955,10 @@ public class Utils {
 
         final Map<String, String> map = new HashMap<String, String>();
         String content = "";
-        if (vaultConfigPath == null) {
+        if (vaultConfig == null) {
             map.put("vaultConfig", "");
         } else {
-            map.put("vaultConfig", "<vault file=\"" + vaultConfigPath + "\"/>");
+            map.put("vaultConfig", vaultConfig);
         }
         map.put("hostname", hostname);
         map.put("keystore", keystoreFile);
