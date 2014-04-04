@@ -65,7 +65,6 @@ public class CustomVaultInCLITestCase {
     private static final String WRONG_PASSWORD = "someRandomWrongPass";
 
     private static final File MODULE_FILE = new File(WORK_DIR, "module.xml");
-    private static final File VAULT_CONFIG_FILE = new File(WORK_DIR, "vault-config.xml");
 
     private static final String JBOSS_CLI_FILE = "jboss-cli.xml";
     private static final File RIGHT_VAULT_PASSWORD_FILE = new File(WORK_DIR, "right-vault-pass.xml");
@@ -178,21 +177,23 @@ public class CustomVaultInCLITestCase {
                 "<vault-option name=\""+ rightBlock +"\" value=\"" + RIGHT_PASSWORD + "\"/>" +
                 "<vault-option name=\""+ wrongBlock +"\" value=\"" + WRONG_PASSWORD + "\"/>" +       
             "</vault>";
-        
-        FileUtils.write(VAULT_CONFIG_FILE, vaultConfig);
-        
+
         //passwords are defined above and are retrieved depending only on vault block
         String vaultPasswordString = "VAULT::" + rightBlock + "::good::1";
         String wrongVaultPasswordString = "VAULT::" + wrongBlock + "::wrong::1";
         String nonExistingVaultPasswordString = "VAULT::nonExistingBlock::non::1";
         
-        // create jboss-cli configuration file with vaulted passwords 
-        FileUtils.write(RIGHT_VAULT_PASSWORD_FILE, Utils.propertiesReplacer(JBOSS_CLI_FILE, CLIENT_KEYSTORE_FILE, CLIENT_TRUSTSTORE_FILE,
-                vaultPasswordString, VAULT_CONFIG_FILE));
-        FileUtils.write(WRONG_VAULT_PASSWORD_FILE, Utils.propertiesReplacer(JBOSS_CLI_FILE, CLIENT_KEYSTORE_FILE, CLIENT_TRUSTSTORE_FILE,
-                wrongVaultPasswordString, VAULT_CONFIG_FILE));
-        FileUtils.write(NON_EXISTING_VAULT_PASSWORD_FILE, Utils.propertiesReplacer(JBOSS_CLI_FILE, CLIENT_KEYSTORE_FILE, CLIENT_TRUSTSTORE_FILE,
-                nonExistingVaultPasswordString, VAULT_CONFIG_FILE));
+        // create jboss-cli configuration file with vaulted passwords and change xsd to 3.0
+        String rightVaultPassConfig = Utils.propertiesReplacer(JBOSS_CLI_FILE, CLIENT_KEYSTORE_FILE, CLIENT_TRUSTSTORE_FILE,
+                vaultPasswordString, vaultConfig).replaceAll("urn:jboss:cli:2.0", "urn:jboss:cli:3.0");
+        String wrongVaultPassConfig = Utils.propertiesReplacer(JBOSS_CLI_FILE, CLIENT_KEYSTORE_FILE, CLIENT_TRUSTSTORE_FILE,
+                wrongVaultPasswordString, vaultConfig).replaceAll("urn:jboss:cli:2.0", "urn:jboss:cli:3.0");
+        String nonVaultPassConfig = Utils.propertiesReplacer(JBOSS_CLI_FILE, CLIENT_KEYSTORE_FILE, CLIENT_TRUSTSTORE_FILE,
+                nonExistingVaultPasswordString, vaultConfig).replaceAll("urn:jboss:cli:2.0", "urn:jboss:cli:3.0");
+        
+        FileUtils.write(RIGHT_VAULT_PASSWORD_FILE, rightVaultPassConfig);
+        FileUtils.write(WRONG_VAULT_PASSWORD_FILE, wrongVaultPassConfig);
+        FileUtils.write(NON_EXISTING_VAULT_PASSWORD_FILE, nonVaultPassConfig);
         
     }
 
