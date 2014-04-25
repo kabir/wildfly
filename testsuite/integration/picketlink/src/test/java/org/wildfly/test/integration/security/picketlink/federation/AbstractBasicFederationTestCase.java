@@ -33,6 +33,7 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.test.integration.security.common.AbstractSecurityDomainsServerSetupTask;
 import org.jboss.as.test.integration.security.common.config.SecurityDomain;
 import org.jboss.as.test.integration.security.common.config.SecurityModule;
+import org.jboss.logging.Logger;
 import org.junit.Test;
 import org.picketlink.identity.federation.bindings.wildfly.SAML2LoginModule;
 
@@ -61,14 +62,21 @@ public abstract class AbstractBasicFederationTestCase {
     @ArquillianResource
     @OperateOnDeployment("service-provider-2")
     private URL serviceProvider2;
-
+    
+    public static final String GLOBAL_LOGOUT_URL_PARAM = "?GLO=true"; 
+    public static final String LOCAL_LOGOUT_URL_PARAM = "?LLO=true"; 
+    private static Logger LOGGER = Logger.getLogger(AbstractBasicFederationTestCase.class);
+    
+    
     @Test
-    public void testFederation() throws Exception {
+    public void testFederationWithGlobalLogout() throws Exception {
         WebConversation conversation = new WebConversation();
         HttpUnitOptions.setLoggingHttpHeaders(true);
+        LOGGER.trace("REQEST: " +formatUrl(this.serviceProvider1));
         WebRequest request = new GetMethodWebRequest(formatUrl(this.serviceProvider1));
         WebResponse response = conversation.getResponse(request);
-
+        LOGGER.trace("RESPONSE: " + response.getText());
+        
         assertTrue(response.getURL().getPath().startsWith("/idp"));
         assertEquals(1, response.getForms().length);
 
@@ -81,23 +89,100 @@ public abstract class AbstractBasicFederationTestCase {
 
         response = conversation.getCurrentPage();
 
-        assertTrue(response.getText().contains("Welcome to " + formatContextPath(this.serviceProvider1)));
+        assertTrue("cannot reach protected content at " + formatUrl(this.serviceProvider1),
+          response.getText().contains("Welcome to " + formatContextPath(this.serviceProvider1)));
 
+        LOGGER.trace("REQEST: " +formatUrl(this.serviceProvider2));
         request = new GetMethodWebRequest(formatUrl(this.serviceProvider2));
 
         response = conversation.getResponse(request);
+        LOGGER.trace("RESPONSE: " + response.getText());
 
-        assertTrue(response.getText().contains("Welcome to " + formatContextPath(this.serviceProvider2)));
+        assertTrue("cannot reach protected content at " + formatUrl(this.serviceProvider2),
+                response.getText().contains("Welcome to " + formatContextPath(this.serviceProvider2)));
+        
+        if (performGlobalLogout()) {
+            // global logout from serviceProvider2 
+            LOGGER.trace("REQEST: " + formatUrl(this.serviceProvider2) + GLOBAL_LOGOUT_URL_PARAM);
+            response = conversation.getResponse(formatUrl(this.serviceProvider2) + GLOBAL_LOGOUT_URL_PARAM);
+            LOGGER.trace("GLO response(" + this.serviceProvider2 +
+                    "):" + response.getText());
+            assertTrue("cannot reach logged out page", response.getText().contains("Logout"));
+    
+            // check if GLO was successful, so serviceProvider1 is requesting IDP login form
+            LOGGER.trace("REQEST: " +formatUrl(this.serviceProvider1));
+            request = new GetMethodWebRequest(formatUrl(this.serviceProvider1));
+            response = conversation.getResponse(request);
+            LOGGER.trace("RESPONSE: " + response.getText());
+    
+            assertTrue("cannot reach IDP", response.getURL().getPath().startsWith("/idp"));
+            assertEquals("no form present on supposed IDP login page", 1, response.getForms().length);
+        }
+    }
+    
+    @Test
+    public void testFederationWithLocalLogout() throws Exception {
+        WebConversation conversation = new WebConversation();
+        HttpUnitOptions.setLoggingHttpHeaders(true);
+        LOGGER.trace("REQEST: " +formatUrl(this.serviceProvider1));
+        WebRequest request = new GetMethodWebRequest(formatUrl(this.serviceProvider1));
+        WebResponse response = conversation.getResponse(request);
+        LOGGER.trace("RESPONSE: " + response.getText());
+        
+        assertTrue(response.getURL().getPath().startsWith("/idp"));
+        assertEquals(1, response.getForms().length);
+
+        WebForm webForm = response.getForms()[0];
+
+        webForm.setParameter("j_username", "tomcat");
+        webForm.setParameter("j_password", "tomcat");
+
+        webForm.getSubmitButtons()[0].click();
+
+        response = conversation.getCurrentPage();
+
+        assertTrue("cannot reach protected content at " + formatUrl(this.serviceProvider1),
+                response.getText().contains("Welcome to " + formatContextPath(this.serviceProvider1)));
+
+        LOGGER.trace("REQEST: " +formatUrl(this.serviceProvider2));
+        request = new GetMethodWebRequest(formatUrl(this.serviceProvider2));
+
+        response = conversation.getResponse(request);
+        LOGGER.trace("RESPONSE: " + response.getText());
+
+        assertTrue("cannot reach protected content at " + formatUrl(this.serviceProvider2),
+                response.getText().contains("Welcome to " + formatContextPath(this.serviceProvider2)));
+        
+        // local logout from serviceProvider2 
+        LOGGER.trace("REQEST: " + formatUrl(this.serviceProvider2) + LOCAL_LOGOUT_URL_PARAM);
+        response = conversation.getResponse(formatUrl(this.serviceProvider2) + LOCAL_LOGOUT_URL_PARAM);
+        LOGGER.trace("LLO response(" + this.serviceProvider2 +
+                "):" + response.getText());
+        assertTrue("cannot reach locally logged out page", response.getText().contains("Logout"));
+
+        // check if it was really LLO
+        LOGGER.trace("REQEST: " +formatUrl(this.serviceProvider1));
+        request = new GetMethodWebRequest(formatUrl(this.serviceProvider1));
+        response = conversation.getResponse(request);
+        LOGGER.trace("RESPONSE: " + response.getText());
+        assertTrue("cannot reach protected content at " + formatUrl(this.serviceProvider1),
+                response.getText().contains("Welcome to " + formatContextPath(this.serviceProvider1)));
+
+        // LLO from serviceProvider1
+        LOGGER.trace("REQEST: " + formatUrl(this.serviceProvider1) + LOCAL_LOGOUT_URL_PARAM);
+        response = conversation.getResponse(formatUrl(this.serviceProvider1) + LOCAL_LOGOUT_URL_PARAM);
+        LOGGER.trace("LLO response(" + this.serviceProvider1 +
+                "):" + response.getText());
+        assertTrue("cannot reach locally logged out page", response.getText().contains("Logout"));
+
     }
 
+    public boolean performGlobalLogout() {
+        return true;
+    }
+    
     private String formatUrl(URL url) {
-        String stringUrl = url.toString();
-
-        if (stringUrl.contains("127.0.0.1")) {
-            return stringUrl.replace("127.0.0.1", "localhost");
-        }
-
-        return stringUrl;
+        return url.toString();
     }
 
     private String formatContextPath(URL url) {
