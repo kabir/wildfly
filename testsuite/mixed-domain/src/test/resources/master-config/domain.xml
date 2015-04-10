@@ -250,9 +250,6 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
             <subsystem xmlns="urn:jboss:domain:jgroups:3.0">
-                <channels default="ee">
-                    <channel name="ee"/>
-                </channels>
                 <stacks default="udp">
                     <stack name="udp">
                         <transport type="UDP" socket-binding="jgroups-udp"/>
@@ -707,9 +704,6 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
             <subsystem xmlns="urn:jboss:domain:jgroups:3.0">
-                <channels default="ee">
-                    <channel name="ee"/>
-                </channels>
                 <stacks default="udp">
                     <stack name="udp">
                         <transport type="UDP" socket-binding="jgroups-udp"/>
@@ -1200,12 +1194,6 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
             <subsystem xmlns="urn:jboss:domain:jgroups:3.0">
-                <!--
-                default-channel is not understood on 7.2.x
-                <channels default="ee">
-                    <channel name="ee"/>
-                </channels>
-                -->
                 <stacks default="udp">
                     <stack name="udp">
                         <transport type="UDP" socket-binding="jgroups-udp"/>
