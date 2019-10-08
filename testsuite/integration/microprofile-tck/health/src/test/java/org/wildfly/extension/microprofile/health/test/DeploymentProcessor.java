@@ -46,7 +46,6 @@ public class DeploymentProcessor implements ApplicationArchiveProcessor {
             extensionsJar.addPackage(HttpUriRequest.class.getPackage());
             extensionsJar.addPackage(HttpRequest.class.getPackage());
 
-
             WebArchive war = WebArchive.class.cast(archive);
             war.addAsLibraries(extensionsJar);
         }

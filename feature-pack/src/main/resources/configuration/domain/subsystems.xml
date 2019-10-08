@@ -108,6 +108,7 @@
         <subsystem>microprofile-config-smallrye.xml</subsystem>
         <subsystem>microprofile-context-propagation-smallrye.xml</subsystem>
         <subsystem>microprofile-opentracing-smallrye.xml</subsystem>
+        <subsystem>microprofile-reactive-streams-operators-smallrye.xml</subsystem>
         <subsystem>naming.xml</subsystem>
         <subsystem>pojo.xml</subsystem>
         <subsystem>remoting.xml</subsystem>
@@ -150,6 +151,7 @@
         <subsystem>microprofile-config-smallrye.xml</subsystem>
         <subsystem>microprofile-context-propagation-smallrye.xml</subsystem>
         <subsystem>microprofile-opentracing-smallrye.xml</subsystem>
+        <subsystem>microprofile-reactive-streams-operators-smallrye.xml</subsystem>
         <subsystem supplement="${mod_cluster.supplement}">mod_cluster.xml</subsystem>
         <subsystem>naming.xml</subsystem>
         <subsystem>pojo.xml</subsystem>
