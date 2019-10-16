@@ -92,6 +92,7 @@
                 <extension>org.wildfly.extension.ee-security</extension>
                 <extension>org.wildfly.extension.messaging-activemq</extension>
                 <extension>org.wildfly.extension.microprofile.config-smallrye</extension>
+                <extension>org.wildfly.extension.microprofile.context-propagation-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.health-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.metrics-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.opentracing-smallrye</extension>
@@ -124,6 +125,7 @@
                 <extension>org.wildfly.extension.ee-security</extension>
                 <extension>org.wildfly.extension.messaging-activemq</extension>
                 <extension>org.wildfly.extension.microprofile.config-smallrye</extension>
+                <extension>org.wildfly.extension.microprofile.context-propagation-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.health-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.metrics-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.opentracing-smallrye</extension>

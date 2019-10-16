@@ -43,6 +43,7 @@
 
     <modules>
         <module>config-smallrye</module>
+        <module>context-propagation-smallrye</module>
         <module>health-smallrye</module>
         <module>metrics-smallrye</module>
         <module>opentracing-extension</module>
