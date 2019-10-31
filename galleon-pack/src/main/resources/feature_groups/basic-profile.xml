@@ -90,6 +90,7 @@
     <feature spec="subsystem.microprofile-config-smallrye"/>
     <feature spec="subsystem.microprofile-context-propagation-smallrye"/>
     <feature spec="subsystem.microprofile-opentracing-smallrye"/>
+    <feature spec="subsystem.microprofile-reactive-messaging-smallrye" />
     <feature spec="subsystem.microprofile-reactive-streams-operators-smallrye" />
     <feature spec="subsystem.pojo"/>
     <feature spec="subsystem.sar"/>
