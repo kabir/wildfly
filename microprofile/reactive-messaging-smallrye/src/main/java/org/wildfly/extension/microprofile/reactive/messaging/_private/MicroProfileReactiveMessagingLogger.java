@@ -24,6 +24,7 @@ package org.wildfly.extension.microprofile.reactive.messaging._private;
 
 import static org.jboss.logging.Logger.Level.INFO;
 
+import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.LogMessage;
@@ -46,4 +47,12 @@ public interface MicroProfileReactiveMessagingLogger extends BasicLogger {
     @LogMessage(level = INFO)
     @Message(id = 1, value = "Activating Eclipse MicroProfile Reactive Messaging Subsystem")
     void activatingSubsystem();
+
+
+    @Message(id = 2, value = "Deployment %s requires use of the '%s' capability but it is not currently registered")
+    DeploymentUnitProcessingException deploymentRequiresCapability(String deploymentName, String capabilityName);
+
+    @LogMessage(level = INFO)
+    @Message(id = 3, value = "Intermediate module %s is not present. Skipping recursively adding modules from it")
+    void intermediateModuleNotPresent(String intermediateModuleName);
 }

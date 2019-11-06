@@ -28,8 +28,12 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.server.deployment.module.ModuleDependency;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
+import org.jboss.modules.DependencySpec;
 import org.jboss.modules.Module;
+import org.jboss.modules.ModuleDependencySpec;
+import org.jboss.modules.ModuleLoadException;
 import org.jboss.modules.ModuleLoader;
+import org.wildfly.extension.microprofile.reactive.messaging._private.MicroProfileReactiveMessagingLogger;
 
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
@@ -55,10 +59,35 @@ public class ReactiveMessagingDependencyProcessor implements DeploymentUnitProce
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.messaging", false, false, true, false));
 
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.config", false, false, true, false));
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.eclipse.microprofile.config.api", false, false, true, false));
 
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.eclipse.microprofile.reactive-streams-operators.core", false, false, true, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.eclipse.microprofile.reactive-streams-operators.api", false, false, true, false));
+
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.reactivestreams", false, false, true, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.streams-operators", false, false, true, false));
+
+        // These are optional über modules that export all the independent connectors/clients. However, it seems
+        // to confuse the ExternalBeanArchiveProcessor which provides the modules to scan for beans, so we
+        // load them and list them all individually instead
+        //moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.reactive-messaging.connector", true, false, true, false));
+        addDependenciesForIntermediateModule(moduleSpecification, moduleLoader, "io.smallrye.reactive.messaging.connector");
+
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.vertx.client", true, false, true, false));
+    }
+
+    private void addDependenciesForIntermediateModule(ModuleSpecification moduleSpecification, ModuleLoader moduleLoader, String intermediateModuleName) {
+        try {
+            Module module = moduleLoader.loadModule(intermediateModuleName);
+            for (DependencySpec dep : module.getDependencies()) {
+                if (dep instanceof ModuleDependencySpec) {
+                    ModuleDependencySpec mds = (ModuleDependencySpec) dep;
+                    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, mds.getName(), mds.isOptional(), false, true, false));
+                }
+            }
+        } catch (ModuleLoadException e) {
+            // The module was not provisioned
+            MicroProfileReactiveMessagingLogger.LOGGER.intermediateModuleNotPresent(intermediateModuleName);
+        }
     }
 }

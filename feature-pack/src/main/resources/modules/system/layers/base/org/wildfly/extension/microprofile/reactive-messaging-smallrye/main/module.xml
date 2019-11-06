@@ -36,17 +36,17 @@
         <module name="javax.annotation.api" />
         <module name="javax.enterprise.api" />
         <module name="javax.json.api" />
-        <module name="org.eclipse.microprofile.config.api"/>
-        <module name="org.eclipse.microprofile.reactive-streams-operators.api"/>
-        <module name="org.eclipse.microprofile.reactive-streams-operators.core"/>
-        <module name="org.eclipse.microprofile.reactive-messaging.api"/>
         <module name="org.jboss.as.controller"/>
         <module name="org.jboss.as.server"/>
         <module name="org.jboss.as.weld.common"/>
         <module name="org.jboss.logging"/>
         <module name="org.jboss.modules"/>
         <module name="org.jboss.staxmapper"/>
-        <module name="org.reactivestreams"/>
         <module name="org.wildfly.security.manager"/>
+        <module name="org.eclipse.microprofile.config.api"/>
+        <module name="org.eclipse.microprofile.reactive-streams-operators.api"/>
+        <module name="org.eclipse.microprofile.reactive-streams-operators.core"/>
+        <module name="org.eclipse.microprofile.reactive-messaging.api"/>
+        <module name="org.reactivestreams"/>
     </dependencies>
 </module>
