@@ -39,6 +39,9 @@
         <module name="org.eclipse.microprofile.reactive-streams-operators.api"/>
         <module name="org.eclipse.microprofile.reactive-streams-operators.core" services="import"/>
         <module name="org.eclipse.microprofile.config.api"/>
+        <module name="org.jboss.weld.api"/>
+        <module name="org.jboss.weld.core"/>
+        <module name="org.jboss.weld.spi"/>
         <module name="io.smallrye.config" services="import"/>
         <module name="io.smallrye.reactive.messaging"/>
         <module name="io.smallrye.reactive.streams-operators"/>

@@ -70,7 +70,6 @@ public class ReactiveMessagingDependencyProcessor implements DeploymentUnitProce
         // These are optional über modules that export all the independent connectors/clients. However, it seems
         // to confuse the ExternalBeanArchiveProcessor which provides the modules to scan for beans, so we
         // load them and list them all individually instead
-        //moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.reactive-messaging.connector", true, false, true, false));
         addDependenciesForIntermediateModule(moduleSpecification, moduleLoader, "io.smallrye.reactive.messaging.connector");
 
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.vertx.client", true, false, true, false));
