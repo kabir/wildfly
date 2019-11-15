@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!--
   ~ JBoss, Home of Professional Open Source.
   ~ Copyright 2019, Red Hat, Inc., and individual contributors
@@ -22,14 +20,17 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.8" name="io.smallrye.reactive.messaging.connector">
+<module xmlns="urn:jboss:module:1.8" name="io.vertx.client.mqtt">
     <properties>
         <property name="jboss.api" value="private"/>
     </properties>
 
+    <resources>
+        <artifact name="${io.vertx:vertx-mqtt}"/>
+    </resources>
+
     <dependencies>
-        <module name="io.smallrye.reactive.messaging.connector.amqp" optional="true" export="true" services="export"/>
-        <module name="io.smallrye.reactive.messaging.connector.kafka" optional="true" export="true" services="export"/>
-        <module name="io.smallrye.reactive.messaging.connector.mqtt" optional="true" export="true" services="export"/>
+        <module name="io.netty"/>
+        <module name="io.vertx.core"/>
     </dependencies>
 </module>

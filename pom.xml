@@ -1858,6 +1858,18 @@
 
             <dependency>
                 <groupId>io.smallrye.reactive</groupId>
+                <artifactId>smallrye-reactive-messaging-mqtt</artifactId>
+                <version>${version.io.smallrye.smallrye-reactive-messaging}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
                 <artifactId>smallrye-reactive-messaging-provider</artifactId>
                 <version>${version.io.smallrye.smallrye-reactive-messaging}</version>
                 <exclusions>
@@ -1965,6 +1977,18 @@
             <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-kafka-client</artifactId>
+                <version>${version.io.vertx}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-mqtt</artifactId>
                 <version>${version.io.vertx}</version>
                 <exclusions>
                     <exclusion>
