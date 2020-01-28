@@ -1,158 +1,110 @@
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd is good
+# rework the generator to ignore fields starting with x-
+x-checkout: &checkout-step
+  uses: actions/checkout@v2
+
+x-cache-maven-repo: &cache-maven-repo-step
+  uses: actions/cache@v1
+  with:
+    path: ~/.m2/repository
+    key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+    restore-keys: |
+      ${{ runner.os }}-maven-
+
+x-jdk-setup: &jdk-setup-step
+  name: Set up JDK 1.8
+  uses: actions/setup-java@v1
+  with:
+    java-version: 1.8
+
+x-testsuite-maven-command: &testsuite-maven-command
+  name: Build with Maven
+  run: |
+    mvn -B install -pl build,dist -DskipTests
+    mvn -B install ${MAVEN_TEST_PARAMS} ${TEST_MODULES} -rf ${RESUME_MODULE}
+
+x-zip-testsuite-artifacts: &zip-testsuite-artifacts
+  name: Zip Artifacts
+  run: zip -R artifacts.zip 'server.log' 'surefire-reports/*.txt' 'surefire-reports/*.xml'
+
+x-upload-testsuite-artifact: &upload-testsuite-artifacts
+  uses: actions/upload-artifact@v1
+  with:
+    name: ${{env.ARTIFACT_NAME}}
+    path: artifacts.zip
+
 name: Java CI
-
-on: 
+# On needs quoting, or it gets changed into a Boolean.TRUE
+"on":
   - push
-
+env:
+  MAVEN_OPTS: "-Xms756M -Xmx1g"
+  MAVEN_TEST_PARAMS: "-Dmaven.test.failure.ignore=true -DfailIfNoTests=false -Dipv6 -Djboss.test.transformers.eap -Dci-cleanup=true -fae"
 jobs:
   build:
-    name: Build Server 
+    name: Build Server
     runs-on: ubuntu-latest
     env:
-      MAVEN_OPTS: "-Xms756M -Xmx1g"
+      # Here we skip the tests for quick building in the 'Build' step
       MAVEN_BUILD_PARAMS: "-DskipTests -Dmaven.test.failure.ignore=true -DfailIfNoTests=false -Djboss.test.transformers.eap -Dci-cleanup=true -DlegacyBuild -DlegacyRelease -fae"
-      MAVEN_TEST_PARAMS: "-Dmaven.test.failure.ignore=true -DfailIfNoTests=false -Dipv6 -Djboss.test.transformers.eap -Dci-cleanup=true -fae"
-    
     steps:
-    - uses: actions/checkout@v2
+      - <<: *checkout-step
+      - <<: *cache-maven-repo-step
+      - <<: *jdk-setup-step
+      - name: Build with Maven
+        run: |
+          mvn -B install ${MAVEN_BUILD_PARAMS}
+          # Build everything so it is cached
+          mvn -B install -DallTests -rf testsuite -DskipTests
 
-    - uses: actions/cache@v1
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-
-    - name: Build with Maven
-      run: |
-        mvn -B install ${MAVEN_BUILD_PARAMS}
-        # Build everything so it is cached
-        mvn -B install -DallTests -rf testsuite -DskipTests
-
-# Since we are using -DskipTests temporarily this fails since we have no tests
-#     - name: Zip Artifacts
-#       run: zip -R artifacts.zip 'server.log' 'surefire-reports/*.txt' 'surefire-reports/*.xml'
-#     - uses: actions/upload-artifact@v1
-#       with:
-#         # Expressions in the name don't seem to get resolved
-#         #name: ci-artifacts-galleon-template-raw-{{job.container.id}}
-#         name: ci-artifacts-build
-#         path: artifacts.zip
-        
-  #TODO remove this one eventually since this should be tested by the Build Server job      
   ts-smoke:
     name: Unit and Smoke Tests
     runs-on: ubuntu-latest
     needs: [build]
     env:
       TEST_MODULES: -rf testsuite/integration/smoke -Dts.integ.group.smoke
+      ARTIFACT_NAME: ci-artifacts-unit-smoke
     steps:
-    - uses: actions/checkout@v2
-      
-    - uses: actions/cache@v1
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-           
-      
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
+      - <<: *checkout-step
+      - <<: *cache-maven-repo-step
+      - <<: *jdk-setup-step
+      # This is different from the other testsuite build steps in that we want to build everything up to the smoke tests
+      # so we run the unit tests and smoke tests
+      - name: Build with Maven
+        run: mvn -B package ${MAVEN_TEST_PARAMS}
+      - <<: *zip-testsuite-artifacts
+      - <<: *upload-testsuite-artifacts
 
-    - name: Build with Maven
-      run: mvn -B package ${MAVEN_TEST_PARAMS} ${TEST_MODULES}
-
-    - name: Zip Artifacts
-      run: zip -R artifacts.zip 'server.log' 'surefire-reports/*.txt' 'surefire-reports/*.xml'
-
-    - uses: actions/upload-artifact@v1
-      with:
-        # Expressions in the name don't seem to get resolved
-        #name: ci-artifacts-galleon-template-raw-{{job.container.id}}
-        name: ci-artifacts-smoke
-        path: artifacts.zip
-        
 
   ts-microprofile:
-    name: Testsuite Microprofile 
+    name: Testsuite Microprofile
     runs-on: ubuntu-latest
     needs: [build]
     env:
-      RESUME_MODULE: "testsuite/integration/microprofile" 
+      RESUME_MODULE: "testsuite/integration/microprofile"
       TEST_MODULES: "-Dinteg.module -Dts.microprofile"
       ARTIFACT_NAME: ci-artifacts-microprofile
-  
     steps:
-    - uses: actions/checkout@v2
-      
-    - uses: actions/cache@v1
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-          
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
+      - <<: *checkout-step
+      - <<: *cache-maven-repo-step
+      - <<: *jdk-setup-step
+      - <<: *testsuite-maven-command
+      - <<: *zip-testsuite-artifacts
+      - <<: *upload-testsuite-artifacts
 
-    - name: Build with Maven
-      run: |
-        mvn -B install -pl build,dist -DskipTests
-        # mvn -B install -DskipTests -rf testsuite ${TEST_MODULES} -pl {RESUME_MODULE} -am
-        mvn -B install ${MAVEN_TEST_PARAMS} ${TEST_MODULES} -rf ${RESUME_MODULE}
+  ts-domain:
+    name: Testsuite Domain
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      RESUME_MODULE: "testsuite/domain"
+      TEST_MODULES: "-Dts.domain"
+      ARTIFACT_NAME: ci-artifacts-domain
+    steps:
+      - <<: *checkout-step
+      - <<: *cache-maven-repo-step
+      - <<: *jdk-setup-step
+      - <<: *testsuite-maven-command
+      - <<: *zip-testsuite-artifacts
+      - <<: *upload-testsuite-artifacts
 
-    - name: Zip Artifacts
-      run: zip -R artifacts.zip 'server.log' 'surefire-reports/*.txt' 'surefire-reports/*.xml'
-
-    - uses: actions/upload-artifact@v1
-      with:
-        # Expressions in the name don't seem to get resolved
-        name: ${ARTIFACT_NAME}
-        path: artifacts.zip
-      
-#   ts-domain:
-#     name: Testsuite Domain 
-#     runs-on: ubuntu-latest
-#     needs: [build]
-#     env:
-#       RESUME_MODULE: testsuite/domain 
-#       TEST_MODULES: -Ddomain.module
-  
-#     steps:
-#     - uses: actions/checkout@v2
-
-      
-#     - uses: actions/cache@v1
-#       with:
-#         path: ~/.m2/repository
-#         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-#         restore-keys: |
-#           ${{ runner.os }}-maven-
-
-#     - name: Set up JDK 1.8
-#       uses: actions/setup-java@v1
-#       with:
-#         java-version: 1.8
-
-#     - name: Build with Maven
-#       run:  |
-#         # mvn -B install -DskipTests -rf testsuite ${TEST_MODULES} -pl {RESUME_MODULE} -am
-#         mvn -B install ${MAVEN_TEST_PARAMS} ${TEST_MODULES} -rf ${RESUME_MODULE}
-        
-#     - name: Zip Artifacts
-#       run: zip -R artifacts.zip 'server.log' 'surefire-reports/*.txt' 'surefire-reports/*.xml'
-
-#     - uses: actions/upload-artifact@v1
-#       with:
-#         # Expressions in the name don't seem to get resolved
-#         #name: ci-artifacts-galleon-template-raw-{{job.container.id}}
-#         name: ci-artifacts-smoke
-#         path: artifacts.zip
