@@ -21,7 +21,7 @@ x-testsuite-maven-command: &testsuite-maven-command
   name: Build with Maven
   run: |
     mvn -B install -pl build,dist -DskipTests
-    mvn -B install ${MAVEN_TEST_PARAMS} ${TEST_MODULES} -rf ${RESUME_MODULE}
+    mvn -B install ${MAVEN_TEST_PARAMS} ${TEST_MODULE_PARAMS}
 
 x-zip-testsuite-artifacts: &zip-testsuite-artifacts
   name: Zip Artifacts
@@ -71,7 +71,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     env:
-      TEST_MODULES: -rf testsuite/integration/smoke -Dts.integ.group.smoke
       ARTIFACT_NAME: ci-artifacts-unit-smoke
     steps:
       - <<: *checkout-step
@@ -85,14 +84,22 @@ jobs:
       - <<: *upload-testsuite-artifacts
 
 
-  ts-microprofile:
-    name: Testsuite Microprofile
+  ts-basic:
+    name: Testsuite Basic
     runs-on: ubuntu-latest
     needs: [build]
     env:
-      RESUME_MODULE: "testsuite/integration/microprofile"
-      TEST_MODULES: "-Dinteg.module -Dts.microprofile"
-      ARTIFACT_NAME: ci-artifacts-microprofile
+      TEST_MODULE_PARAMS: "-Dts.basic -pl testsuite/integration/basic/,testsuite/integration/ws/"
+      ARTIFACT_NAME: ci-artifacts-basic
+    <<: *run-testsuite-section
+
+  ts-clustering:
+    name: Testsuite Clustering
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.clustering -rf testsuite/integration/clustering/"
+      ARTIFACT_NAME: ci-artifacts-clustering
     <<: *run-testsuite-section
 
   ts-domain:
@@ -100,8 +107,119 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     env:
-      RESUME_MODULE: "testsuite/domain"
-      TEST_MODULES: "-Dts.domain"
+      TEST_MODULE_PARAMS: "-Dts.domain -rf testsuite/domain"
       ARTIFACT_NAME: ci-artifacts-domain
     <<: *run-testsuite-section
+
+  ts-elytron:
+    name: Testsuite Elytron
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dinteg.module -Dts.elytron -rf testsuite/integration/elytron"
+      ARTIFACT_NAME: ci-artifacts-elytron
+    <<: *run-testsuite-section
+
+  ts-iiop:
+    name: Testsuite IIOP
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.iiop -rf testsuite/integration/iiop"
+      ARTIFACT_NAME: ci-artifacts-iiop
+    <<: *run-testsuite-section
+
+  ts-legacy:
+    name: Testsuite Legacy
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.legacy -rf testsuite/integration/legacy"
+      ARTIFACT_NAME: ci-artifacts-legacy
+    <<: *run-testsuite-section
+
+  ts-legacy-ejb-client:
+    name: Testsuite Legacy EJB Client
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.legacy.ejb.client -rf testsuite/integration/legacy-ejb-client"
+      ARTIFACT_NAME: ci-artifacts-legacy-ejb-client
+    <<: *run-testsuite-section
+
+  ts-manualmode:
+    name: Testsuite ManualMode
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.manualmode -rf testsuite/integration/manualmode/"
+      ARTIFACT_NAME: ci-artifacts-manualmode
+    <<: *run-testsuite-section
+
+  ts-microprofile:
+    name: Testsuite Microprofile
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dinteg.module -Dts.microprofile -rf testsuite/integration/microprofile"
+      ARTIFACT_NAME: ci-artifacts-microprofile
+    <<: *run-testsuite-section
+
+  ts-multimode:
+    name: Testsuite MultiNode
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.multinode -rf testsuite/integration/multinode"
+      ARTIFACT_NAME: ci-artifacts-multinode
+    <<: *run-testsuite-section
+
+  ts-rbac:
+    name: Testsuite MultiNode
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.rbac -rf testsuite/integration/rbac"
+      ARTIFACT_NAME: ci-artifacts-rbac
+    <<: *run-testsuite-section
+
+  ts-rts:
+    name: Testsuite RTS
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.rts -rf testsuite/integration/rts"
+      ARTIFACT_NAME: ci-artifacts-rts
+    <<: *run-testsuite-section
+
+  ts-secman:
+    name: Testsuite SecMan
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.secman -rf testsuite/integration/secman"
+      ARTIFACT_NAME: ci-artifacts-secman
+    <<: *run-testsuite-section
+
+  ts-vdx:
+    name: Testsuite VDX
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.vdx -rf testsuite/integration/vdx"
+      ARTIFACT_NAME: ci-artifacts-vdx
+    <<: *run-testsuite-section
+
+  ts-xts:
+    name: Testsuite XTS
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      TEST_MODULE_PARAMS: "-Dts.xts -rf testsuite/integration/xts"
+      ARTIFACT_NAME: ci-artifacts-xts
+    <<: *run-testsuite-section
+
+
+
+
 
