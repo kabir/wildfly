@@ -33,6 +33,15 @@ x-upload-testsuite-artifact: &upload-testsuite-artifacts
     name: ${{env.ARTIFACT_NAME}}
     path: artifacts.zip
 
+x-run-testsuite-section: &run-testsuite-section
+  steps:
+    - <<: *checkout-step
+    - <<: *cache-maven-repo-step
+    - <<: *jdk-setup-step
+    - <<: *testsuite-maven-command
+    - <<: *zip-testsuite-artifacts
+    - <<: *upload-testsuite-artifacts
+
 name: Java CI
 # On needs quoting, or it gets changed into a Boolean.TRUE
 "on":
@@ -84,13 +93,7 @@ jobs:
       RESUME_MODULE: "testsuite/integration/microprofile"
       TEST_MODULES: "-Dinteg.module -Dts.microprofile"
       ARTIFACT_NAME: ci-artifacts-microprofile
-    steps:
-      - <<: *checkout-step
-      - <<: *cache-maven-repo-step
-      - <<: *jdk-setup-step
-      - <<: *testsuite-maven-command
-      - <<: *zip-testsuite-artifacts
-      - <<: *upload-testsuite-artifacts
+    <<: *run-testsuite-section
 
   ts-domain:
     name: Testsuite Domain
@@ -100,11 +103,5 @@ jobs:
       RESUME_MODULE: "testsuite/domain"
       TEST_MODULES: "-Dts.domain"
       ARTIFACT_NAME: ci-artifacts-domain
-    steps:
-      - <<: *checkout-step
-      - <<: *cache-maven-repo-step
-      - <<: *jdk-setup-step
-      - <<: *testsuite-maven-command
-      - <<: *zip-testsuite-artifacts
-      - <<: *upload-testsuite-artifacts
+    <<: *run-testsuite-section
 
