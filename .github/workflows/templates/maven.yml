@@ -201,14 +201,15 @@ jobs:
       ARTIFACT_NAME: ci-artifacts-secman
     <<: *run-testsuite-section
 
-  ts-vdx:
-    name: Testsuite VDX
-    runs-on: ubuntu-latest
-    needs: [build]
-    env:
-      TEST_MODULE_PARAMS: "-Dts.vdx -rf testsuite/integration/vdx"
-      ARTIFACT_NAME: ci-artifacts-vdx
-    <<: *run-testsuite-section
+# No property for this
+#  ts-vdx:
+#    name: Testsuite VDX
+#    runs-on: ubuntu-latest
+#    needs: [build]
+#    env:
+#      TEST_MODULE_PARAMS: "-Dts.vdx -rf testsuite/integration/vdx"
+#      ARTIFACT_NAME: ci-artifacts-vdx
+#    <<: *run-testsuite-section
 
   ts-xts:
     name: Testsuite XTS
