@@ -87,6 +87,7 @@
         <module>mail</module>
         <module>messaging-activemq</module>
         <module>microprofile</module>
+        <module>microprofile-installer</module>
         <module>mod_cluster</module>
         <module>naming</module>
         <module>picketlink</module>

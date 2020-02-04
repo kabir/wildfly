@@ -1,0 +1,6 @@
+org/wildfly/extension/microprofile/config-smallrye/main
+org/wildfly/extension/microprofile/health-smallrye/main
+org/wildfly/extension/microprofile/metrics-smallrye/main
+org/wildfly/extension/microprofile/opentracing-smallrye/main
+
+# TODO Add everything else
