@@ -140,7 +140,7 @@ public class InstallerContentPreparer {
     }
 
     private static Path createInstallerModulesDir(Path srcDir) throws Exception {
-        Path path = srcDir.resolve("target/installer/modules");
+        Path path = srcDir.resolve("target/classes/modules");
         if (Files.exists(path)) {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override

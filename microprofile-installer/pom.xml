@@ -48,11 +48,13 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>wildfly-galleon-pack</artifactId>
            <type>pom</type>
+           <scope>provided</scope>
         </dependency>
          <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wildfly-dist</artifactId>
              <type>pom</type>
+             <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -75,6 +77,31 @@
                                     <value>wildfly-19.0.0.Beta2-SNAPSHOT</value>
                                 </systemProperty>
                             </systemProperties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        org.wildfly.microprofile.installer.MicroProfileInstaller
+                                    </mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
                         </configuration>
                     </execution>
                 </executions>
