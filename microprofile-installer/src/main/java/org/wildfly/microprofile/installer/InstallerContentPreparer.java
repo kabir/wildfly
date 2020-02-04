@@ -1,23 +1,23 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2020, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ *  JBoss, Home of Professional Open Source.
+ *  Copyright 2020, Red Hat, Inc., and individual contributors
+ *  as indicated by the @author tags. See the copyright.txt file in the
+ *  distribution for a full listing of individual contributors.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
+ *  This is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation; either version 2.1 of
+ *  the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *  This software is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this software; if not, write to the Free
+ *  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ *  02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.wildfly.microprofile.installer;
@@ -142,55 +142,23 @@ public class InstallerContentPreparer {
     private static Path createInstallerModulesDir(Path srcDir) throws Exception {
         Path path = srcDir.resolve("target/classes/modules");
         if (Files.exists(path)) {
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+            Files.walkFileTree(path, new FileVisitors.DeleteDirectory());
         }
 
         return Files.createDirectories(path);
     }
 
     private static void copyModulesToInstaller(Path distModulesDir, Path installerModulesDir, List<Path> relativeModules) throws Exception {
+        Files.walkFileTree(installerModulesDir, new FileVisitors.DeleteDirectory());
+        Files.createDirectories(installerModulesDir);
+
         for (Path relative : relativeModules) {
             Path fromDir = distModulesDir.resolve(relative);
             Path toDir = installerModulesDir.resolve(relative);
 
-            Files.walkFileTree(fromDir, new CopyFilesVisitor(fromDir, toDir));
+            Files.walkFileTree(fromDir, new FileVisitors.CopyDirectory(fromDir, toDir));
 
         }
     }
 
-    private static class CopyFilesVisitor extends SimpleFileVisitor<Path> {
-        private final Path src;
-        private final Path dest;
-
-        private CopyFilesVisitor(Path src, Path dest) {
-            this.src = src;
-            this.dest = dest;
-        }
-
-        @Override
-        public FileVisitResult preVisitDirectory(final Path dir,
-                                                 final BasicFileAttributes attrs) throws IOException {
-            Files.createDirectories(dest.resolve(src.relativize(dir)));
-            return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFile(final Path file,
-                                         final BasicFileAttributes attrs) throws IOException {
-            Files.copy(file, dest.resolve(src.relativize(file)));
-            return FileVisitResult.CONTINUE;
-        }
-    }
 }

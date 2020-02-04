@@ -98,6 +98,10 @@
                                         org.wildfly.microprofile.installer.MicroProfileInstaller
                                     </mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <!-- For EAP this should be 'microprofile' -->
+                                    <wildfly-target-layer>base</wildfly-target-layer>
+                                </manifestEntries>
                             </archive>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
