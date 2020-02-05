@@ -1,6 +1,42 @@
-org/wildfly/extension/microprofile/config-smallrye/main
-org/wildfly/extension/microprofile/health-smallrye/main
-org/wildfly/extension/microprofile/metrics-smallrye/main
-org/wildfly/extension/microprofile/opentracing-smallrye/main
+# Modules from the observability layer. These already exist in the base installation
+# so they won't be picked out by the diff of the built servers in the xxx-dist maven modules.
 
-# TODO Add everything else
+# MP config modules
+org/wildfly/extension/microprofile/config-smallrye/main
+io/smallrye/config/main
+org/eclipse/microprofile/config/api
+
+# MP Health modules
+org/wildfly/extension/microprofile/health-smallrye/main
+io/smallrye/health/main
+org/eclipse/microprofile/health/api/main
+
+# MP Metrics modules
+org/wildfly/extension/microprofile/metrics-smallrye/main
+io/smallrye/metrics/main
+org/eclipse/microprofile/metrics/api/main
+
+# MP OpenTracing modules
+org/wildfly/extension/microprofile/opentracing-smallrye/main
+org/eclipse/microprofile/opentracing/main
+io/smallrye/opentracing/main
+io/opentracing/opentracing-api/main
+io/opentracing/opentracing-noop/main
+io/opentracing/opentracing-util/main
+org/wildfly/microprofile/opentracing-smallrye/main
+io/jaegertracing/jaeger/main
+io/opentracing/contrib/opentracing-concurrent/main
+io/opentracing/contrib/opentracing-jaxrs2/main
+io/opentracing/contrib/opentracing-web-servlet-filter/main
+io/opentracing/contrib/opentracing-interceptors/main
+io/opentracing/contrib/opentracing-tracerresolver/main
+com/google/code/gson/main
+com/squareup/okhttp3/main
+org/apache/thrift/main
+#
+# Unsure about these rest dependencies
+#
+# Used by io.smallrye.opentracing and the subsystem
+# org/eclipse/microprofile/restclient/main
+# Used by org.wildfly.microprofile.opentracing-smallrye
+# org/jboss/resteasy/resteasy-jaxrs/main
