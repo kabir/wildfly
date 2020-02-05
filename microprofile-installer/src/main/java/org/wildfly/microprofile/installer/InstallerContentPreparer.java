@@ -31,31 +31,35 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Kabir Khan
  */
 public class InstallerContentPreparer {
     public static void main(String[] args) throws Exception {
-        Path srcDir = getThisModuleDirectory();
-        Path galleonPackModulesDir = getGalleonPackModulesDirectory(srcDir);
+        Path srcDir = getThisMavenModuleDirectory();
 
-        // Names of all directories in the MP Galleon Pack that contain a module.xml
-        List<Path> mpModules = discoverMicroProfileModules(galleonPackModulesDir);
+        // The dist module contains the MP modules. In EAP they are in a separate 'microprofile' layer
+        Path distModulesDirectory = getMavenModuleTargetServerDirectory("dist", srcDir, true);
+        // The ee-dist module does not contain the MP modules
+        Path eedistModulesDirectory = getMavenModuleTargetServerDirectory("ee-dist", srcDir, false);
+
+        List<Path> mpModules = diffModulesDirectories(eedistModulesDirectory, distModulesDirectory);
 
         // overrides.txt contains names of modules used by the observability layer which should override those modules
         // in older target distributions
         List<Path> overrides = loadOverrides();
         mpModules.addAll(overrides);
 
-        Path distModulesDirectory = getDistModulesDirectory(srcDir);
         Path installerModulesDir = createInstallerModulesDir(srcDir);
         copyModulesToInstaller(distModulesDirectory, installerModulesDir, mpModules);
     }
 
-    private static Path getThisModuleDirectory() throws Exception {
+    private static Path getThisMavenModuleDirectory() throws Exception {
         URL url = InstallerContentPreparer.class.getProtectionDomain().getCodeSource().getLocation();
         Path path = Paths.get(url.toURI());
         Path tmp = path.getRoot();
@@ -78,25 +82,6 @@ public class InstallerContentPreparer {
         return srcDir;
     }
 
-    private static Path getGalleonPackModulesDirectory(Path srcDir) {
-        Path path = srcDir.resolveSibling("galleon-pack/src/main/resources/modules/system/layers");
-
-        if (!Files.exists(path)) {
-            throw new IllegalStateException("Could not find " + path.toFile().getAbsoluteFile());
-        }
-
-        Path modulesRoot = path.resolve("microprofile").normalize();
-        if (!Files.exists(modulesRoot)) {
-            Path mRoot = path.resolve("base").normalize();
-            if (Files.exists(mRoot)) {
-                modulesRoot = mRoot;
-            } else {
-                throw new IllegalStateException("Could not find " + modulesRoot.toFile().getAbsoluteFile() + " or "  + mRoot.toFile().getAbsoluteFile());
-            }
-        }
-        return modulesRoot;
-    }
-
     private static List<Path> loadOverrides() throws Exception {
         URL url = InstallerContentPreparer.class.getResource("overrides.txt");
         List<String> lines = Files.readAllLines(Paths.get(url.toURI()));
@@ -111,32 +96,57 @@ public class InstallerContentPreparer {
         return paths;
     }
 
-    private static Path getDistModulesDirectory(Path srcDir) throws Exception {
+    private static Path getMavenModuleTargetServerDirectory(String mavenModule, Path srcDir, boolean checkMicroProfileLayer) throws Exception {
         String distName = System.getProperty("mp.installer.dist.name");
         if (distName == null) {
             throw new IllegalStateException("-Dmp.installer.dist.name not set");
         }
-        Path path = srcDir.resolveSibling("dist/target/" + distName + "/modules/system/layers/base");
+        List<Path> paths = new ArrayList<>();
+        if (checkMicroProfileLayer) {
+            paths.add(srcDir.resolveSibling(mavenModule + "/target/" + distName + "/modules/system/layers/microprofile"));
+        }
+        paths.add(srcDir.resolveSibling(mavenModule + "/target/" + distName + "/modules/system/layers/base"));
 
-        if (!Files.exists(path)) {
-            throw new IllegalStateException("Could not find " + path.toFile().getAbsoluteFile());
+        Path path = null;
+        for (Path curr : paths) {
+            if (Files.exists(curr)) {
+                return curr;
+            }
         }
 
-        return path;
+        throw new IllegalStateException("Could not find any of the following paths: " + paths);
     }
 
-    private static List<Path> discoverMicroProfileModules(Path modulesDir) throws Exception {
-        List<Path> paths = new ArrayList<>();
+    private static List<Path> diffModulesDirectories(Path nonMPModulesDir, Path mpModulesDir) throws Exception {
+        Map<Path, ModuleInfo> nonMPModules = loadModuleInfos(nonMPModulesDir);
+        Map<Path, ModuleInfo> mpModules = loadModuleInfos(mpModulesDir);
+        List<Path> result = new ArrayList<>();
 
+        for (Map.Entry<Path, ModuleInfo> entry : mpModules.entrySet()) {
+            ModuleInfo nonMp = nonMPModules.get(entry.getKey());
+            if (nonMp == null) {
+                result.add(entry.getKey());
+                continue;
+            }
+            if (!nonMp.equals(entry.getValue())) {
+                result.add(entry.getKey());
+            }
+        }
+        return result;
+    }
+
+    private static Map<Path, ModuleInfo> loadModuleInfos(Path modulesDir) throws Exception {
+        Map<Path, ModuleInfo> infos = new HashMap<>();
         Files.walkFileTree(modulesDir, new SimpleFileVisitor<Path>() {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if (file.getFileName().toString().equals("module.xml")) {
-                    paths.add(modulesDir.relativize(file.getParent()));
+                    ModuleInfo info = ModuleInfo.create(modulesDir, file);
+                    infos.put(info.getRelativePath(), info);
                 }
                 return FileVisitResult.CONTINUE;
             }
         });
-        return paths;
+        return infos;
     }
 
     private static Path createInstallerModulesDir(Path srcDir) throws Exception {
@@ -160,5 +170,7 @@ public class InstallerContentPreparer {
 
         }
     }
+
+
 
 }

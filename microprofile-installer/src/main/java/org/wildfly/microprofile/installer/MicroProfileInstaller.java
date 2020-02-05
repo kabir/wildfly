@@ -58,7 +58,6 @@ public class MicroProfileInstaller {
 
         Path tempDir = Files.createTempDirectory("wildflY-mp-installer");
         try {
-            System.out.println(tempDir);
             Path srcModulesDir = unzipSelfToTemp(url, tempDir);
             String layer = readTargetLayerFromManifest();
             Path destLayerDir = setupLayerRoot(parser, layer);
@@ -197,6 +196,7 @@ public class MicroProfileInstaller {
     private static void copyModules(Path srcDir, Path targetDir) throws Exception {
         System.out.println("Copying modules from " + srcDir + " to " + targetDir);
         Files.walkFileTree(srcDir, new FileVisitors.CopyDirectory(srcDir, targetDir));
+        System.out.println("Copying done");
     }
 
     private static class ArgsParser {
@@ -237,8 +237,7 @@ public class MicroProfileInstaller {
                 }
                 this.modulesDir = Paths.get(jbossHome, "modules");
             }
-            System.out.println(jbossHome);
-            System.out.println(modulesDir);
+
             if (!Files.exists(this.modulesDir)) {
                 throw new IllegalStateException("The determined modules base directory " + this.modulesDir + " does not exist");
             }
