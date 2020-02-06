@@ -175,7 +175,7 @@ jobs:
     <<: *run-testsuite-section
 
   ts-rbac:
-    name: Testsuite MultiNode
+    name: Testsuite RBAC
     runs-on: ubuntu-latest
     needs: [build]
     env:
