@@ -7,14 +7,14 @@ name: Java CI
 - push
 env:
   MAVEN_OPTS: -Xms756M -Xmx1g
-  MAVEN_TEST_PARAMS: -Dmaven.test.failure.ignore=true -DfailIfNoTests=false -Dipv6
-    -Djboss.test.transformers.eap -Dci-cleanup=true -fae
+  #MAVEN_TEST_PARAMS: -Dmaven.test.failure.ignore=true -DfailIfNoTests=false -Dipv6 -Djboss.test.transformers.eap -Dci-cleanup=true -fae
+  MAVEN_TEST_PARAMS: -DfailIfNoTests=false -Dipv6 -Djboss.test.transformers.eap -Dci-cleanup=true -fae
 jobs:
   build:
     name: Build Server
     runs-on: ubuntu-latest
     env:
-      MAVEN_BUILD_PARAMS: -DskipTests -Dmaven.test.failure.ignore=true -DfailIfNoTests=false
+      MAVEN_BUILD_PARAMS: -DskipTests -DfailIfNoTests=false
         -Djboss.test.transformers.eap -Dci-cleanup=true -DlegacyBuild -DlegacyRelease
         -fae
     steps:
