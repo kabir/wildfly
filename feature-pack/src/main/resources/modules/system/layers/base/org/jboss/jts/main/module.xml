@@ -56,5 +56,6 @@
         <module name="org.eclipse.microprofile.reactive-streams-operators.api" optional="true" />
         <module name="org.reactivestreams" optional="true"/>
         <module name="io.smallrye.reactive.streams-operators" optional="true"/>
+        <module name="io.smallrye.reactive.converters.api" optional="true"/>
     </dependencies>
 </module>
