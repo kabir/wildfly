@@ -9,6 +9,16 @@
         <include name="microprofile-openapi"/>
         <include name="undertow-legacy-https"/>
         <exclude name="management-security-realm"/>
+
+        <!--
+            TODO Currently here for debugging the build of the server.
+            We should either remove them, or if we decide to keep them,
+            we need to add them to other places (and put in alphabetical order)
+        -->
+        <include name="microprofile-context-propagation"/>
+        <include name="microprofile-context-propagation-jta"/>
+        <include name="microprofile-reactive-messaging"/>
+        <include name="microprofile-reactive-streams-operators"/>
     </layers>
     <!-- TODO WFLY-13150 encapsulate these in a layer -->
     <feature-group name="distributable-web"/>
