@@ -42,6 +42,7 @@
     <name>WildFly: MicroProfile modules</name>
 
     <modules>
+        <module>context-propagation-smallrye</module>
         <module>config-smallrye</module>
         <module>fault-tolerance-smallrye</module>
         <module>health-smallrye</module>
@@ -50,6 +51,8 @@
         <module>openapi-smallrye</module>
         <module>opentracing-extension</module>
         <module>opentracing-smallrye</module>
+        <module>reactive-messaging-smallrye</module>
+        <module>reactive-streams-operators-smallrye</module>
     </modules>
 
     <!-- DO NOT PLACE CONFIGURATION IN THIS POM EXPECTING IT TO BE INHERITED BY SUB MODULES.
