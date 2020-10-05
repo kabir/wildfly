@@ -45,6 +45,7 @@
 
     <modules>
         <module>config</module>
+        <module>context-propagation</module>
         <module>fault-tolerance</module>
         <module>health</module>
         <module>jwt</module>
@@ -52,6 +53,8 @@
         <module>openapi</module>
         <module>opentracing</module>
         <module>rest-client</module>
+        <module>reactive-messaging</module>
+        <module>reactive-streams-operators</module>
     </modules>
 
     <profiles>
