@@ -346,6 +346,7 @@
         <version.org.apache.ws.security>2.2.5</version.org.apache.ws.security>
         <version.org.apache.ws.xmlschema>2.2.5</version.org.apache.ws.xmlschema>
         <version.org.apache.xalan>2.7.1.jbossorg-4</version.org.apache.xalan>
+        <version.org.awaitility.awaitility>4.0.2</version.org.awaitility.awaitility>
         <version.org.bitbucket.jose4j>0.7.0</version.org.bitbucket.jose4j>
         <version.org.bouncycastle>1.65</version.org.bouncycastle>
         <version.org.bytebuddy>1.9.11</version.org.bytebuddy>
@@ -9264,6 +9265,13 @@
                 <groupId>org.apache.openjpa</groupId>
                 <artifactId>openjpa-all</artifactId>
                 <version>${version.org.apache.openjpa}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${version.org.awaitility.awaitility}</version>
                 <scope>test</scope>
             </dependency>
 

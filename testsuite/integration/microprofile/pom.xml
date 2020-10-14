@@ -57,6 +57,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.microprofile.context-propagation</groupId>
+            <artifactId>microprofile-context-propagation-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.microprofile.health</groupId>
             <artifactId>microprofile-health-api</artifactId>
             <scope>test</scope>
@@ -74,6 +79,16 @@
         <dependency>
             <groupId>org.eclipse.microprofile.opentracing</groupId>
             <artifactId>microprofile-opentracing-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
+            <artifactId>microprofile-reactive-messaging-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.reactive-streams-operators</groupId>
+            <artifactId>microprofile-reactive-streams-operators-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -122,6 +137,23 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Other test dependencies -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -186,6 +218,10 @@
                             <systemPropertyVariables>
                                 <jboss.server.config.file.name>standalone.xml</jboss.server.config.file.name>
                             </systemPropertyVariables>
+                            <excludes>
+                                <!-- The enable-microprofile.cli script does not enable the reactive extensions/subsystems -->
+                                <exclude>org/wildfly/test/integration/microprofile/reactive/**</exclude>
+                            </excludes>
                         </configuration>
                         <id>standalone-enabled-microprofile-test</id>
                         <goals>
@@ -277,6 +313,12 @@
                                                 <layer>cloud-server</layer>
                                                 <layer>microprofile-platform</layer>
                                                 <layer>ejb</layer>
+                                                <!-- TODO - keep the reactive ones here or put in own execution? -->
+                                                <!-- All these are needed for the reactive tests -->
+                                                <layer>microprofile-context-propagation-jta</layer>
+                                                <layer>microprofile-reactive-messaging</layer>
+                                                <!-- ...and the reactive Tx tests need this -->
+                                                <layer>h2-default-datasource</layer>
                                             </layers>
                                         </config>
                                     </configurations>
