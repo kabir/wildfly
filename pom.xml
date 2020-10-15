@@ -1201,6 +1201,12 @@
 
             <dependency>
                 <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-reactive-messaging-assembly-hook</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
                 <artifactId>wildfly-microprofile-reactive-streams-operators</artifactId>
                 <version>${project.version}</version>
             </dependency>

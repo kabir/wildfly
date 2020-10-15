@@ -414,6 +414,17 @@
       </licenses>
     </dependency>
     <dependency>
+      <groupId>${full.maven.groupId}</groupId>
+      <artifactId>wildfly-microprofile-reactive-messaging-assembly-hook</artifactId>
+      <licenses>
+        <license>
+          <name>GNU Lesser General Public License v2.1 or later</name>
+          <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1-standalone.html</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
       <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron-jwt</artifactId>
       <licenses>
