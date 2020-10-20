@@ -299,7 +299,8 @@
         <version.io.smallrye.reactive-utils>1.2.1</version.io.smallrye.reactive-utils>
         <version.io.smallrye.smallrye-config>1.6.2</version.io.smallrye.smallrye-config>
         <version.io.smallrye.smallrye-context-propagation>1.0.18</version.io.smallrye.smallrye-context-propagation>
-        <version.io.smallrye.smallrye-mutiny>0.9.0</version.io.smallrye.smallrye-mutiny>
+        <!-- Built from my https://github.com/kabir/smallrye-mutiny/tree/pluggable-thread-context -->
+        <version.io.smallrye.smallrye-mutiny>999-SNAPSHOT</version.io.smallrye.smallrye-mutiny>
         <version.io.smallrye.smallrye-fault-tolerance>4.3.0</version.io.smallrye.smallrye-fault-tolerance>
         <version.io.smallrye.smallrye-health>2.2.0</version.io.smallrye.smallrye-health>
         <version.io.smallrye.smallrye-jwt>2.0.13</version.io.smallrye.smallrye-jwt>
