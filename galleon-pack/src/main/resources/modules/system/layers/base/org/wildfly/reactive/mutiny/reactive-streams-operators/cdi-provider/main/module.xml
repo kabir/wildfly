@@ -25,7 +25,7 @@
     </resources>
 
     <dependencies>
-        <module name="io.smallrye.reactive.mutiny.reactive-streams-operators"/>
+        <module name="io.smallrye.context-propagation.api"/>
         <module name="javax.enterprise.api" />
         <module name="org.eclipse.microprofile.reactive-streams-operators.api"/>
     </dependencies>

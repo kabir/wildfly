@@ -504,6 +504,18 @@
 
         <dependency>
             <groupId>${full.maven.groupId}</groupId>
+            <artifactId>wildfly-microprofile-context-propagation-mutiny-integration</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${full.maven.groupId}</groupId>
             <artifactId>wildfly-microprofile-fault-tolerance-smallrye-extension</artifactId>
             <exclusions>
                 <exclusion>

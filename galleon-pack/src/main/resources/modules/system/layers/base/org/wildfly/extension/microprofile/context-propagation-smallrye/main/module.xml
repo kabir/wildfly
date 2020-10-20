@@ -37,6 +37,7 @@
         <module name="io.smallrye.context-propagation"/>
         <module name="io.undertow.servlet"/>
         <module name="org.eclipse.microprofile.context-propagation.api"/>
+        <module name="org.wildfly.context-propagation.mutiny-integration"/>
         <module name="org.wildfly.security.manager"/>
     </dependencies>
 </module>

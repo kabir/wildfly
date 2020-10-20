@@ -30,6 +30,7 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.modules.Module;
+import org.wildfly.extension.microprofile.context.propagation.mutiny.ThreadContextRegistry;
 import org.wildfly.security.manager.WildFlySecurityManager;
 
 import io.smallrye.context.SmallRyeContextManagerProvider;
@@ -72,5 +73,8 @@ public class ContextPropagationDeploymentProcessor implements DeploymentUnitProc
             WildFlySecurityManager.setCurrentContextClassLoaderPrivileged(oldTccl);
         }
 
+        // Clean up cached thread contexts used by the Mutiny interceptors
+        ThreadContextRegistry tcr = ThreadContextRegistry.INSTANCE;
+        tcr.cleanup(classLoader);
     }
 }
