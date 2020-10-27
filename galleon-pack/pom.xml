@@ -170,6 +170,30 @@
         </dependency>
 
         <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-context-prop</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>io.smallrye</groupId>
             <artifactId>smallrye-context-propagation</artifactId>
             <exclusions>
@@ -336,6 +360,18 @@
 
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
+            <artifactId>smallrye-mutiny-vertx-kafka-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-runtime</artifactId>
             <exclusions>
                 <exclusion>
@@ -372,6 +408,18 @@
 
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
+            <artifactId>smallrye-reactive-messaging-kafka</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-reactive-messaging-provider</artifactId>
             <exclusions>
                 <exclusion>
@@ -395,8 +443,32 @@
         </dependency>
 
         <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-kafka-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.bitbucket.b_c</groupId>
             <artifactId>jose4j</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -565,6 +637,18 @@
         <dependency>
             <groupId>${full.maven.groupId}</groupId>
             <artifactId>wildfly-microprofile-reactive-messaging</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${full.maven.groupId}</groupId>
+            <artifactId>wildfly-microprofile-reactive-messaging-kafka-config</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
