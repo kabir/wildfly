@@ -317,6 +317,8 @@
                                                 <!-- All these are needed for the reactive tests -->
                                                 <layer>microprofile-context-propagation-jta</layer>
                                                 <layer>microprofile-reactive-messaging</layer>
+                                                <!-- Need the Kafka connector too -->
+                                                <layer>microprofile-reactive-messaging-kafka</layer>
                                                 <!-- ...and the reactive Tx tests need this -->
                                                 <layer>h2-default-datasource</layer>
                                             </layers>
