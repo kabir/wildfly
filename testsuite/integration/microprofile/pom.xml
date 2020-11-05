@@ -57,11 +57,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.microprofile.context-propagation</groupId>
-            <artifactId>microprofile-context-propagation-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.microprofile.health</groupId>
             <artifactId>microprofile-health-api</artifactId>
             <scope>test</scope>
@@ -314,8 +309,7 @@
                                                 <layer>microprofile-platform</layer>
                                                 <layer>ejb</layer>
                                                 <!-- TODO - keep the reactive ones here or put in own execution? -->
-                                                <!-- All these are needed for the reactive tests -->
-                                                <layer>microprofile-context-propagation-jta</layer>
+                                                <!-- Needed for the reactive tests -->
                                                 <layer>microprofile-reactive-messaging</layer>
                                                 <!-- Need the Kafka connector too -->
                                                 <layer>microprofile-reactive-messaging-kafka</layer>

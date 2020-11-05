@@ -20,7 +20,7 @@
         <layer name="cdi"/>
     </dependencies>
 
-    <feature-group name="reactive-streams-operators"/>
+    <feature spec="subsystem.microprofile-reactive-streams-operators-smallrye"/>
 
     <packages>
         <package name="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>

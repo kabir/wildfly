@@ -42,7 +42,6 @@
     <name>WildFly: MicroProfile modules</name>
 
     <modules>
-        <module>context-propagation-smallrye</module>
         <module>config-smallrye</module>
         <module>fault-tolerance-smallrye</module>
         <module>health-smallrye</module>

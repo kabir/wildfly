@@ -20,11 +20,13 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
@@ -39,10 +41,14 @@ public class Bean {
     private StringBuilder phrase = new StringBuilder();
 
     @Inject
-    ManagedExecutor executor;
-
-    @Inject
     TransactionalBean txBean;
+
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    @PreDestroy
+    public void stop() throws Exception {
+        executorService.shutdown();
+    }
 
     public CountDownLatch getLatch() {
         return latch;
@@ -57,20 +63,20 @@ public class Bean {
     @Incoming("source")
     @Outgoing("sink")
     public CompletionStage<String> store(String payload) {
-        // Use the executor to make sure it is on a separate thread
-        CompletableFuture<String> ret = executor.completedFuture(payload);
-        return ret.thenApplyAsync(v -> {
-            if (v.equals("reactive")) {
+        // Make sure it is on a separate thread. If Context Propagation was enabled, I'd use
+        // a ManagedExecutor
+        return CompletableFuture.supplyAsync(() -> {
+            if (payload.equals("reactive")) {
                 // Add a sleep here to make sure the calling method has returned
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e){
                     throw new RuntimeException(e);
                 }
-                txBean.storeValue(v);
+                txBean.storeValue(payload);
             }
-            return v;
-        });
+            return payload;
+        }, executorService);
     }
 
     @Incoming("sink")

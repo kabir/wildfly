@@ -23,7 +23,7 @@
         <layer name="transactions" optional="true"/>
     </dependencies>
 
-    <feature-group name="reactive-messaging"/>
+    <feature spec="subsystem.microprofile-reactive-messaging-smallrye"/>
 
     <packages>
         <package name="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
