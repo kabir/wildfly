@@ -54,11 +54,13 @@ public class LoggingTestCase extends TestBase {
                                   "                <level name=\"WARN\"/>\n" +
                                   "            </logger>")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
-        assertContains(errorLog, "^^^^ 'logger' with a name of 'sun.rmi' can't appear more than once");
-        assertContains(errorLog, "An element of this type named 'sun.rmi' has");
-        assertContains(errorLog, "WFLYCTL0073");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
+            assertContains(errorLog, "^^^^ 'logger' with a name of 'sun.rmi' can't appear more than once");
+            assertContains(errorLog, "An element of this type named 'sun.rmi' has");
+            assertContains(errorLog, "WFLYCTL0073");
+        });
     }
 
     /*
@@ -74,10 +76,12 @@ public class LoggingTestCase extends TestBase {
                                 "                <level name=\"WARN\"/>\n" +
                                 "            </logger>")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
-        assertContains(errorLog, "^^^^ '' isn't a valid value for the 'category' attribute");
-        assertContains(errorLog, "WFLYCTL0106: Invalid value '' for attribute 'category'");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
+            assertContains(errorLog, "^^^^ '' isn't a valid value for the 'category' attribute");
+            assertContains(errorLog, "WFLYCTL0106: Invalid value '' for attribute 'category'");
+        });
     }
 
     /*
@@ -93,10 +97,12 @@ public class LoggingTestCase extends TestBase {
                                 "                <level name=\"WARN\"/>\n" +
                                 "            </logger>")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
-        assertContains(errorLog, "^^^^ 'logger' is missing one or more required attributes");
-        assertContains(errorLog, "All of the following are required: category ");
-        assertContains(errorLog, "WFLYCTL0133: Missing required attribute(s): CATEGORY");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
+            assertContains(errorLog, "^^^^ 'logger' is missing one or more required attributes");
+            assertContains(errorLog, "All of the following are required: category ");
+            assertContains(errorLog, "WFLYCTL0133: Missing required attribute(s): CATEGORY");
+        });
     }
 }

@@ -45,15 +45,16 @@ public class ElytronTestCase extends TestBase {
     public void misplacedAttributeForPropertiesRealm()throws Exception {
         container().tryStartAndWaitForFail();
 
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
-        assertContains(errorLog, "^^^^ 'plain-text' isn't an allowed attribute for the 'properties-realm'");
-        assertContains(errorLog, "Attributes allowed here are: groups-attribute, groups-properties");
-        assertContains(errorLog, "name, users-properties");
-        assertContains(errorLog, "'plain-text' is allowed on elements:");
-        assertContains(errorLog, "server > management > security-realms > security-realm > authentication > properties");
-        assertContains(errorLog, "server > profile > {urn:wildfly:elytron");
-        assertContains(errorLog, "subsystem > security-realms > properties-realm > users-properties");
-
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone.xml");
+            assertContains(errorLog, "^^^^ 'plain-text' isn't an allowed attribute for the 'properties-realm'");
+            assertContains(errorLog, "Attributes allowed here are: groups-attribute, groups-properties");
+            assertContains(errorLog, "name, users-properties");
+            assertContains(errorLog, "'plain-text' is allowed on elements:");
+            assertContains(errorLog, "server > management > security-realms > security-realm > authentication > properties");
+            assertContains(errorLog, "server > profile > {urn:wildfly:elytron");
+            assertContains(errorLog, "subsystem > security-realms > properties-realm > users-properties");
+        });
     }
 }

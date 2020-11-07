@@ -49,10 +49,12 @@ public class MessagingDomainTestCase extends TestBase {
             subtreeName = "messaging", subsystemName = "messaging-activemq", profileName = "full-ha")
     public void testInvalidEnumValueInAddressSettingsFullPolicy() throws Exception {
         container().tryStartAndWaitForFail();
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "^^^^ Invalid value PAGES for address-full-policy; legal values are [BLOCK");
-        assertContains(errorLog, "PAGE, FAIL, DROP]");
-        assertContains(errorLog, "\"WFLYCTL0248: Invalid value PAGES for address-full-policy");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "^^^^ Invalid value PAGES for address-full-policy; legal values are [BLOCK");
+            assertContains(errorLog, "PAGE, FAIL, DROP]");
+            assertContains(errorLog, "\"WFLYCTL0248: Invalid value PAGES for address-full-policy");
+        });
     }
 
     /*
@@ -67,11 +69,13 @@ public class MessagingDomainTestCase extends TestBase {
                         .subtree("messaging", Subtree.subsystemInProfile("full-ha", "messaging-activemq"))
                         .parameter("parameter", "not-int-value")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in domain.xml ---------------------------");
-        assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"not-int-value\"/>");
-        assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
-        assertContains(errorLog, "convert \\\"not-int-value\\\" to [INT]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in domain.xml ---------------------------");
+            assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"not-int-value\"/>");
+            assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
+            assertContains(errorLog, "convert \\\"not-int-value\\\" to [INT]");
+        });
     }
 
     /*
@@ -86,11 +90,13 @@ public class MessagingDomainTestCase extends TestBase {
                         .subtree("messaging", Subtree.subsystemInProfile("full-ha", "messaging-activemq"))
                         .parameter("parameter", "214748364700")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in domain.xml ---------------------------");
-        assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"214748364700\"/>");
-        assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
-        assertContains(errorLog, "convert \\\"214748364700\\\" to [INT]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in domain.xml ---------------------------");
+            assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"214748364700\"/>");
+            assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
+            assertContains(errorLog, "convert \\\"214748364700\\\" to [INT]");
+        });
     }
 
     /*
@@ -105,15 +111,17 @@ public class MessagingDomainTestCase extends TestBase {
                         .subtree("messaging", Subtree.subsystemInProfile("full-ha", "messaging-activemq"))
                         .parameter("parameter", "1048576000000000000000000000000000000000")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in domain.xml");
-        assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
-                "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"1048576000000000000000000000000000000000\" " +
-                "page-size-bytes=\"2097152\" message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" " +
-                "address-full-policy=\"PAGE\"/>");
-        assertContains(errorLog, " ^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
-        assertContains(errorLog, "Couldn't convert \\\"1048576000000000000000000000000000000000\\\" to");
-        assertContains(errorLog, "[LONG]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in domain.xml");
+            assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
+                    "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"1048576000000000000000000000000000000000\" " +
+                    "page-size-bytes=\"2097152\" message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" " +
+                    "address-full-policy=\"PAGE\"/>");
+            assertContains(errorLog, " ^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
+            assertContains(errorLog, "Couldn't convert \\\"1048576000000000000000000000000000000000\\\" to");
+            assertContains(errorLog, "[LONG]");
+        });
     }
 
     /*
@@ -127,12 +135,14 @@ public class MessagingDomainTestCase extends TestBase {
                         "messaging/InvalidValueForMaxSizeBytesInAddressSettings.groovy")
                         .subtree("messaging", Subtree.subsystemInProfile("full-ha", "messaging-activemq")).parameter("parameter", "0.12345678")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in domain.xml ---------------------------");
-        assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
-                "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"0.12345678\" page-size-bytes=\"2097152\" " +
-                "message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" address-full-policy=\"PAGE\"/>");
-        assertContains(errorLog, "^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
-        assertContains(errorLog, "Couldn't convert \\\"0.12345678\\\" to [LONG]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in domain.xml ---------------------------");
+            assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
+                    "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"0.12345678\" page-size-bytes=\"2097152\" " +
+                    "message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" address-full-policy=\"PAGE\"/>");
+            assertContains(errorLog, "^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
+            assertContains(errorLog, "Couldn't convert \\\"0.12345678\\\" to [LONG]");
+        });
     }
 }

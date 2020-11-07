@@ -49,9 +49,11 @@ public class HostXmlSmokeTestCase extends TestBase {
     public void addManagementAuditLogElement() throws Exception {
         container().tryStartAndWaitForFail();
 
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "^^^^ 'foo' isn't an allowed element here");
-        assertContains(errorLog, "Elements allowed here are: formatters, handlers, logger, server-logger");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "^^^^ 'foo' isn't an allowed element here");
+            assertContains(errorLog, "Elements allowed here are: formatters, handlers, logger, server-logger");
+        });
     }
 
     @Test
@@ -59,9 +61,11 @@ public class HostXmlSmokeTestCase extends TestBase {
     public void emptyManagementInterfaces() throws Exception {
         container().tryStartAndWaitForFail();
 
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "^^^^ 'management-interfaces' is missing a required child element");
-        assertContains(errorLog, "One of the following is required: http-interface, native-interface");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "^^^^ 'management-interfaces' is missing a required child element");
+            assertContains(errorLog, "One of the following is required: http-interface, native-interface");
+        });
     }
 
     @Test
@@ -70,11 +74,12 @@ public class HostXmlSmokeTestCase extends TestBase {
         container().tryStartAndWaitForFail(
                 (OfflineCommand) ctx -> ctx.client.apply(GroovyXmlTransform.of(DoNothing.class, "RemoveElement.groovy")
                         .subtree("path", Subtree.management()).build()));
-
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "^^^^ 'domain-controller' is missing one or more required child elements");
-        assertContains(errorLog, "All of the following are required: management");
-        assertContains(errorLog, "WFLYCTL0134: Missing required element(s): MANAGEMENT");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "^^^^ 'domain-controller' is missing one or more required child elements");
+            assertContains(errorLog, "All of the following are required: management");
+            assertContains(errorLog, "WFLYCTL0134: Missing required element(s): MANAGEMENT");
+        });
     }
 
     private String addElementAndStart(Subtree subtree, String elementXml) throws Exception {
@@ -83,9 +88,11 @@ public class HostXmlSmokeTestCase extends TestBase {
                         .subtree("path", subtree).parameter("elementXml", elementXml)
                         .build()));
 
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "^^^^ '" + simpleXmlElement + "' isn't an allowed element here");
-        return errorLog;
+        return checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "^^^^ '" + simpleXmlElement + "' isn't an allowed element here");
+            return errorLog;
+        });
     }
 
     @Test
@@ -138,7 +145,4 @@ public class HostXmlSmokeTestCase extends TestBase {
         String errorLog = addElementAndStart( Subtree.systemProperties(), simpleXml);
         assertContains(errorLog, "Elements allowed here are: property");
     }
-
-
-
 }

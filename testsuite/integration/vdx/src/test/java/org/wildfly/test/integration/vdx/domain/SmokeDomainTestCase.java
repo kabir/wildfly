@@ -42,14 +42,18 @@ public class SmokeDomainTestCase extends TestBase {
     @ServerConfig(configuration = "duplicate-attribute.xml")
     public void testWithExistingConfigInResources() throws Exception {
         container().tryStartAndWaitForFail();
-        ensureDuplicateAttribute(container().getErrorMessageFromServerStart());
+        checkLog(() -> {
+            ensureDuplicateAttribute(container().getErrorMessageFromServerStart());
+        });
     }
 
     @Test
     @ServerConfig(configuration = "domain-to-damage.xml", xmlTransformationGroovy = "TypoInExtensions.groovy")
     public void typoInExtensionsWithConfigInResources() throws Exception {
         container().tryStartAndWaitForFail();
-        ensureTypoInExtensions(container().getErrorMessageFromServerStart());
+        checkLog(() -> {
+            ensureTypoInExtensions(container().getErrorMessageFromServerStart());
+        });
     }
 
     @Test
@@ -57,22 +61,28 @@ public class SmokeDomainTestCase extends TestBase {
             subtreeName = "messaging", subsystemName = "messaging-activemq", profileName = "full-ha")
     public void addNonExistingElementToMessagingSubsystem() throws Exception {
         container().tryStartAndWaitForFail();
-        ensureNonExistingElementToMessagingSubsystem(container().getErrorMessageFromServerStart());
+        checkLog(() -> {
+            ensureNonExistingElementToMessagingSubsystem(container().getErrorMessageFromServerStart());
+        });
     }
 
     @Test
     @ServerConfig(configuration = "empty.xml")
     public void emptyDCConfigFile() throws Exception {
         container().tryStartAndWaitForFail();
-        assertContains( String.join("\n", Files.readAllLines(container().getServerLogPath())),
-                "OPVDX004: Failed to pretty print validation error: empty.xml has no content");
+        checkLog(() -> {
+            assertContains(String.join("\n", Files.readAllLines(container().getServerLogPath())),
+                    "OPVDX004: Failed to pretty print validation error: empty.xml has no content");
+        });
     }
 
     @Test
     @ServerConfig(configuration = "domain.xml", hostConfig = "empty.xml")
     public void emptyHCConfigFile() throws Exception {
         container().tryStartAndWaitForFail();
-        assertContains( String.join("\n", Files.readAllLines(container().getServerLogPath())),
-                "OPVDX004: Failed to pretty print validation error: empty.xml has no content");
+        checkLog(() -> {
+            assertContains(String.join("\n", Files.readAllLines(container().getServerLogPath())),
+                    "OPVDX004: Failed to pretty print validation error: empty.xml has no content");
+        });
     }
 }

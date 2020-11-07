@@ -42,10 +42,12 @@ public class JBossWSDomainTestCase extends TestBase {
     private void startAndCheckLogsForWsdlAddressElementWithNoValue() throws Exception {
         container().tryStartAndWaitForFail();
 
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "<modify-wsdl-address/>");
-        assertContains(errorLog, " ^^^^ Wrong type for 'modify-wsdl-address'. Expected [BOOLEAN] but was");
-        assertContains(errorLog, "STRING");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "<modify-wsdl-address/>");
+            assertContains(errorLog, " ^^^^ Wrong type for 'modify-wsdl-address'. Expected [BOOLEAN] but was");
+            assertContains(errorLog, "STRING");
+        });
     }
 
     @Test
@@ -82,11 +84,13 @@ public class JBossWSDomainTestCase extends TestBase {
     private void startAndCheckLogsForIncorrectlyNamedWsdlAddressElementWithNoValue() throws Exception {
         container().tryStartAndWaitForFail();
 
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "<mmodify-wsdl-address>true</mmodify-wsdl-address>");
-        assertContains(errorLog, "^^^^ 'mmodify-wsdl-address' isn't an allowed element here");
-        assertContains(errorLog, " Did you mean 'modify-wsdl-address'?");
-        assertContains(errorLog, "Elements allowed here are:");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "<mmodify-wsdl-address>true</mmodify-wsdl-address>");
+            assertContains(errorLog, "^^^^ 'mmodify-wsdl-address' isn't an allowed element here");
+            assertContains(errorLog, " Did you mean 'modify-wsdl-address'?");
+            assertContains(errorLog, "Elements allowed here are:");
+        });
     }
 
     @Test

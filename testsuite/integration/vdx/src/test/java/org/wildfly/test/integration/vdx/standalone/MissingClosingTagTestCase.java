@@ -127,11 +127,12 @@ public class MissingClosingTagTestCase extends TestBase {
     @ServerConfig(configuration = STANDALONE_MISSING_CLOSING_TAG_XML)
     public void missingClosingTag()throws Exception {
         container().tryStartAndWaitForFail();
-
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "XMLStreamException:");
-        assertContains(errorLog, "WFLYCTL0198: Unexpected element '{urn:jboss:domain:weld:");
-        assertContains(errorLog, "WFLYCTL0085: Failed to parse configuration");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "XMLStreamException:");
+            assertContains(errorLog, "WFLYCTL0198: Unexpected element '{urn:jboss:domain:weld:");
+            assertContains(errorLog, "WFLYCTL0085: Failed to parse configuration");
+        });
     }
 
     /*
@@ -141,11 +142,12 @@ public class MissingClosingTagTestCase extends TestBase {
     @ServerConfig(configuration = STANDALONE_COMMENT_IS_NOT_CLOSED_XML)
     public void commentIsNotClosed()throws Exception {
         container().tryStartAndWaitForFail();
-
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in " + STANDALONE_COMMENT_IS_NOT_CLOSED_XML);
-        assertContains(errorLog, "^^^^ Unexpected end of input block in comment");
-        assertContains(errorLog, "WFLYCTL0085: Failed to parse configuration");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in " + STANDALONE_COMMENT_IS_NOT_CLOSED_XML);
+            assertContains(errorLog, "^^^^ Unexpected end of input block in comment");
+            assertContains(errorLog, "WFLYCTL0085: Failed to parse configuration");
+        });
     }
 
     /*
@@ -155,11 +157,12 @@ public class MissingClosingTagTestCase extends TestBase {
     @ServerConfig(configuration = STANDALONE_NOT_EXPECTED_CLOSING_TAG_XML)
     public void notExpectedClosingTag()throws Exception {
         container().tryStartAndWaitForFail();
-
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-notExpectedClosingTag.xml");
-        assertContains(errorLog, "^^^^ 'wsdl-host' isn't an allowed element here");
-        assertContains(errorLog, "WFLYCTL0198: Unexpected element");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone-notExpectedClosingTag.xml");
+            assertContains(errorLog, "^^^^ 'wsdl-host' isn't an allowed element here");
+            assertContains(errorLog, "WFLYCTL0198: Unexpected element");
+        });
     }
 
 }

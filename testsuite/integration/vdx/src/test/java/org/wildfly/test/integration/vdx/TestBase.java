@@ -17,23 +17,25 @@
 
 package org.wildfly.test.integration.vdx;
 
-import org.jboss.arquillian.container.test.api.ContainerController;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.logging.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.wildfly.test.integration.vdx.utils.server.ServerBase;
-import org.wildfly.test.integration.vdx.utils.server.Server;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.Callable;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.jboss.arquillian.container.test.api.ContainerController;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.as.test.shared.TimeoutUtil;
+import org.jboss.logging.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
+import org.wildfly.test.integration.vdx.utils.server.Server;
+import org.wildfly.test.integration.vdx.utils.server.ServerBase;
 
 /**
  * Do not inherit from this class as it's common for standalone and domain tests! For standalone tests inherit from
@@ -97,5 +99,36 @@ public class TestBase {
             Files.createDirectories(testArchiveDirectory);
         }
         container().setTestArchiveDirectory(testArchiveDirectory);
+    }
+
+    protected static void checkLog(RunnableWithException runnable) throws Exception {
+        checkLog(() -> {
+            runnable.run();
+            return null;
+        });
+    }
+
+    protected static <T> T checkLog(Callable<T> callable) throws Exception {
+        try {
+            ServerBase.setCheckLogs();
+            long end = System.currentTimeMillis() + TimeoutUtil.adjust(3000);
+            while (true) {
+                try {
+                    return callable.call();
+                } catch (AssertionError e) {
+                    if (System.currentTimeMillis() > end) {
+                        throw e;
+                    }
+                    Thread.sleep(200);
+                }
+            }
+        } finally {
+            ServerBase.clearCheckLogs();
+        }
+    }
+
+    @FunctionalInterface
+    public interface RunnableWithException {
+        void run() throws Exception;
     }
 }

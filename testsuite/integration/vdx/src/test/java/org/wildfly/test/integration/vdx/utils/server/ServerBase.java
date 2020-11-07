@@ -43,6 +43,17 @@ public abstract class ServerBase implements Server {
     private OfflineManagementClient managementClient;
     static final Logger log = Logger.getLogger(ServerBase.class);
 
+    protected static final ThreadLocal<Boolean> calledFromCheckLogs = new ThreadLocal<>();
+
+    public static void setCheckLogs() {
+        calledFromCheckLogs.set(true);
+    }
+
+    public static void clearCheckLogs() {
+        calledFromCheckLogs.remove();
+    }
+
+
     @Override
     public void tryStartAndWaitForFail(OfflineCommand... offlineCommands) throws Exception {
 
@@ -127,6 +138,7 @@ public abstract class ServerBase implements Server {
 
     @Override
     public String getErrorMessageFromServerStart() throws Exception {
+        Assert.assertTrue("This method should not be called directly. Call via TestBase.checkLog()", calledFromCheckLogs.get() != null && calledFromCheckLogs.get());
         return String.join("\n", Files.readAllLines(Paths.get(ERRORS_LOG_FILE_NAME), Charset.forName(System.getProperty("file.encoding", "UTF-8"))));
     }
 

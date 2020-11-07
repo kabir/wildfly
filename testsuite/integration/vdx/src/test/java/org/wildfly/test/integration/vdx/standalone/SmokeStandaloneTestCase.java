@@ -40,9 +40,11 @@ public class SmokeStandaloneTestCase extends TestBase {
     @ServerConfig(configuration = "duplicate-attribute.xml")
     public void testWithExistingConfigInResources() throws Exception {
         container().tryStartAndWaitForFail();
-        ensureDuplicateAttribute(container().getErrorMessageFromServerStart());
+        checkLog(() -> {
+            ensureDuplicateAttribute(container().getErrorMessageFromServerStart());
+        });
     }
-    public static void ensureDuplicateAttribute(String errorMessages) {
+    public static void ensureDuplicateAttribute(String errorMessages) throws Exception {
         assertContains(errorMessages, "OPVDX001: Validation error in duplicate-attribute.xml");
         assertContains(errorMessages, "<jdbc data-source=\"foo\"");
         assertContains(errorMessages, "data-source=\"bar\"/>");
@@ -54,7 +56,9 @@ public class SmokeStandaloneTestCase extends TestBase {
     @ServerConfig(configuration = "standalone-full-ha-to-damage.xml", xmlTransformationGroovy = "TypoInExtensions.groovy")
     public void typoInExtensionsWithConfigInResources() throws Exception {
         container().tryStartAndWaitForFail();
-        ensureTypoInExtensions(container().getErrorMessageFromServerStart());
+        checkLog(() -> {
+            ensureTypoInExtensions(container().getErrorMessageFromServerStart());
+        });
     }
     public static void ensureTypoInExtensions(String errorMessages) {
         assertContains(errorMessages, "-to-damage.xml");
@@ -69,7 +73,9 @@ public class SmokeStandaloneTestCase extends TestBase {
         subtreeName = "messaging", subsystemName = "messaging-activemq")
     public void addNonExistingElementToMessagingSubsystem() throws Exception {
         container().tryStartAndWaitForFail();
-        ensureNonExistingElementToMessagingSubsystem(container().getErrorMessageFromServerStart());
+        checkLog(() -> {
+            ensureNonExistingElementToMessagingSubsystem(container().getErrorMessageFromServerStart());
+        });
     }
     public static void ensureNonExistingElementToMessagingSubsystem(String errorMessages) {
         assertContains(errorMessages, "<cluster id=\"3\"/>");
@@ -87,7 +93,9 @@ public class SmokeStandaloneTestCase extends TestBase {
     @ServerConfig(configuration = "empty.xml")
     public void emptyConfigFile() throws Exception {
         container().tryStartAndWaitForFail();
-        assertContains( String.join("\n", Files.readAllLines(container().getServerLogPath())),
-                "OPVDX004: Failed to pretty print validation error: empty.xml has no content");
+        checkLog(() -> {
+            assertContains(String.join("\n", Files.readAllLines(container().getServerLogPath())),
+                    "OPVDX004: Failed to pretty print validation error: empty.xml has no content");
+        });
     }
 }

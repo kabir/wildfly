@@ -79,15 +79,16 @@ public class NoSchemaTestCase extends TestBase {
             subtreeName = "webservices", subsystemName = "webservices")
     public void addWsdlAddressElementWithNoValueNoSchemaAvailable()throws Exception {
         container().tryStartAndWaitForFail();
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertDoesNotContain(errorLog, "OPVDX001: Validation error in standalone.xml");
+            assertDoesNotContain(errorLog, "<modify-wsdl-address/>");
+            assertDoesNotContain(errorLog, " ^^^^ Wrong type for 'modify-wsdl-address'. Expected [BOOLEAN] but was");
+            assertDoesNotContain(errorLog, "|                  STRING");
 
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertDoesNotContain(errorLog,"OPVDX001: Validation error in standalone.xml");
-        assertDoesNotContain(errorLog,"<modify-wsdl-address/>");
-        assertDoesNotContain(errorLog," ^^^^ Wrong type for 'modify-wsdl-address'. Expected [BOOLEAN] but was");
-        assertDoesNotContain(errorLog,"|                  STRING");
-
-        assertContains(errorLog,"WFLYCTL0097");
-        assertContains(errorLog,"Wrong type for 'modify-wsdl-address'. Expected [BOOLEAN] but was STRING");
+            assertContains(errorLog, "WFLYCTL0097");
+            assertContains(errorLog, "Wrong type for 'modify-wsdl-address'. Expected [BOOLEAN] but was STRING");
+        });
     }
 
 
@@ -100,9 +101,10 @@ public class NoSchemaTestCase extends TestBase {
             subtreeName = "webservices", subsystemName = "webservices")
     public void ensureNoSchemasAvailableMessage()throws Exception {
         container().tryStartAndWaitForFail();
-
-        String serverLog = String.join("\n", Files.readAllLines(container().getServerLogPath()));
-        assertContains(serverLog, "OPVDX003: No schemas available");
-        assertContains(serverLog, "disabling validation error pretty printing");
+        checkLog(() -> {
+            String serverLog = String.join("\n", Files.readAllLines(container().getServerLogPath()));
+            assertContains(serverLog, "OPVDX003: No schemas available");
+            assertContains(serverLog, "disabling validation error pretty printing");
+        });
     }
 }

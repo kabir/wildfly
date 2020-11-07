@@ -50,46 +50,47 @@ public class MessagingTestCase extends TestBase {
             subtreeName = "messaging", subsystemName = "messaging-activemq")
     public void modifyWsdlAddressElementWithNoValue() throws Exception {
         container().tryStartAndWaitForFail();
-
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertDoesNotContain(errorLog, "more)");  // something like '(and 24 more)' shouldn't be in the log
-        assertContains(errorLog, "<foo>bar</foo>");
-        assertContains(errorLog, "^^^^ 'foo' isn't an allowed element here");
-        assertContains(errorLog, "Elements allowed here are: ");
-        assertContains(errorLog, "acceptor");
-        assertContains(errorLog, "address-setting");
-        assertContains(errorLog, "bindings-directory");
-        assertContains(errorLog, "bridge");
-        assertContains(errorLog, "broadcast-group");
-        assertContains(errorLog, "cluster-connection");
-        assertContains(errorLog, "connection-factory");
-        assertContains(errorLog, "connector");
-        assertContains(errorLog, "connector-service");
-        assertContains(errorLog, "discovery-group");
-        assertContains(errorLog, "divert");
-        assertContains(errorLog, "grouping-handler");
-        assertContains(errorLog, "http-acceptor");
-        assertContains(errorLog, "http-connector");
-        assertContains(errorLog, "in-vm-acceptor");
-        assertContains(errorLog, "in-vm-connector");
-        assertContains(errorLog, "jms-queue");
-        assertContains(errorLog, "jms-topic");
-        assertContains(errorLog, "journal-directory");
-        assertContains(errorLog, "large-messages-directory");
-        assertContains(errorLog, "legacy-connection-factory");
-        assertContains(errorLog, "live-only");
-        assertContains(errorLog, "paging-directory");
-        assertContains(errorLog, "pooled-connection-factory");
-        assertContains(errorLog, "queue");
-        assertContains(errorLog, "remote-acceptor");
-        assertContains(errorLog, "remote-connector");
-        assertContains(errorLog, "replication-colocated");
-        assertContains(errorLog, "replication-master");
-        assertContains(errorLog, "replication-slave");
-        assertContains(errorLog, "security-setting");
-        assertContains(errorLog, "shared-store-colocated");
-        assertContains(errorLog, "shared-store-master");
-        assertContains(errorLog, "shared-store-slave");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertDoesNotContain(errorLog, "more)");  // something like '(and 24 more)' shouldn't be in the log
+            assertContains(errorLog, "<foo>bar</foo>");
+            assertContains(errorLog, "^^^^ 'foo' isn't an allowed element here");
+            assertContains(errorLog, "Elements allowed here are: ");
+            assertContains(errorLog, "acceptor");
+            assertContains(errorLog, "address-setting");
+            assertContains(errorLog, "bindings-directory");
+            assertContains(errorLog, "bridge");
+            assertContains(errorLog, "broadcast-group");
+            assertContains(errorLog, "cluster-connection");
+            assertContains(errorLog, "connection-factory");
+            assertContains(errorLog, "connector");
+            assertContains(errorLog, "connector-service");
+            assertContains(errorLog, "discovery-group");
+            assertContains(errorLog, "divert");
+            assertContains(errorLog, "grouping-handler");
+            assertContains(errorLog, "http-acceptor");
+            assertContains(errorLog, "http-connector");
+            assertContains(errorLog, "in-vm-acceptor");
+            assertContains(errorLog, "in-vm-connector");
+            assertContains(errorLog, "jms-queue");
+            assertContains(errorLog, "jms-topic");
+            assertContains(errorLog, "journal-directory");
+            assertContains(errorLog, "large-messages-directory");
+            assertContains(errorLog, "legacy-connection-factory");
+            assertContains(errorLog, "live-only");
+            assertContains(errorLog, "paging-directory");
+            assertContains(errorLog, "pooled-connection-factory");
+            assertContains(errorLog, "queue");
+            assertContains(errorLog, "remote-acceptor");
+            assertContains(errorLog, "remote-connector");
+            assertContains(errorLog, "replication-colocated");
+            assertContains(errorLog, "replication-master");
+            assertContains(errorLog, "replication-slave");
+            assertContains(errorLog, "security-setting");
+            assertContains(errorLog, "shared-store-colocated");
+            assertContains(errorLog, "shared-store-master");
+            assertContains(errorLog, "shared-store-slave");
+        });
     }
 
     /*
@@ -100,10 +101,12 @@ public class MessagingTestCase extends TestBase {
             subtreeName = "messaging", subsystemName = "messaging-activemq")
     public void testInvalidEnumValueInAddressSettingsFullPolicy() throws Exception {
         container().tryStartAndWaitForFail();
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "^^^^ Invalid value PAGES for address-full-policy; legal values are [BLOCK");
-        assertContains(errorLog, "PAGE, FAIL, DROP]");
-        assertContains(errorLog, "\"WFLYCTL0248: Invalid value PAGES for address-full-policy");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "^^^^ Invalid value PAGES for address-full-policy; legal values are [BLOCK");
+            assertContains(errorLog, "PAGE, FAIL, DROP]");
+            assertContains(errorLog, "\"WFLYCTL0248: Invalid value PAGES for address-full-policy");
+        });
     }
 
     /*
@@ -116,11 +119,13 @@ public class MessagingTestCase extends TestBase {
                 (OfflineCommand) ctx -> ctx.client.apply(GroovyXmlTransform.of(DoNothing.class, "messaging/InvalidTypeForServerIdInAcceptor.groovy")
                         .subtree("messaging", Subtree.subsystem("messaging-activemq")).parameter("parameter", "not-int-value")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
-        assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"not-int-value\"/>");
-        assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
-        assertContains(errorLog, "convert \\\"not-int-value\\\" to [INT]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
+            assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"not-int-value\"/>");
+            assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
+            assertContains(errorLog, "convert \\\"not-int-value\\\" to [INT]");
+        });
     }
 
     /*
@@ -133,11 +138,13 @@ public class MessagingTestCase extends TestBase {
                 (OfflineCommand) ctx -> ctx.client.apply(GroovyXmlTransform.of(DoNothing.class, "messaging/InvalidTypeForServerIdInAcceptor.groovy")
                         .subtree("messaging", Subtree.subsystem("messaging-activemq")).parameter("parameter", "214748364700")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
-        assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"214748364700\"/>");
-        assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
-        assertContains(errorLog, "convert \\\"214748364700\\\" to [INT]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
+            assertContains(errorLog, "<in-vm-acceptor name=\"in-vm\" server-id=\"214748364700\"/>");
+            assertContains(errorLog, "^^^^ Wrong type for 'server-id'. Expected [INT] but was STRING. Couldn't");
+            assertContains(errorLog, "convert \\\"214748364700\\\" to [INT]");
+        });
     }
 
     /*
@@ -152,15 +159,17 @@ public class MessagingTestCase extends TestBase {
                         .subtree("messaging", Subtree.subsystem("messaging-activemq"))
                         .parameter("parameter", "1048576000000000000000000000000000000000")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml");
-        assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
-                "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"1048576000000000000000000000000000000000\" " +
-                "page-size-bytes=\"2097152\" message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" " +
-                "address-full-policy=\"PAGE\"/>");
-        assertContains(errorLog, " ^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
-        assertContains(errorLog, "Couldn't convert \\\"1048576000000000000000000000000000000000\\\" to");
-        assertContains(errorLog, "[LONG]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml");
+            assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
+                    "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"1048576000000000000000000000000000000000\" " +
+                    "page-size-bytes=\"2097152\" message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" " +
+                    "address-full-policy=\"PAGE\"/>");
+            assertContains(errorLog, " ^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
+            assertContains(errorLog, "Couldn't convert \\\"1048576000000000000000000000000000000000\\\" to");
+            assertContains(errorLog, "[LONG]");
+        });
     }
 
     /*
@@ -174,13 +183,15 @@ public class MessagingTestCase extends TestBase {
                         "messaging/InvalidValueForMaxSizeBytesInAddressSettings.groovy")
                         .subtree("messaging", Subtree.subsystem("messaging-activemq")).parameter("parameter", "0.12345678")
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
-        assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
-                "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"0.12345678\" page-size-bytes=\"2097152\" " +
-                "message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" address-full-policy=\"PAGE\"/>");
-        assertContains(errorLog, "^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
-        assertContains(errorLog, "Couldn't convert \\\"0.12345678\\\" to [LONG]");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
+            assertContains(errorLog, "<address-setting name=\"#\" dead-letter-address=\"jms.queue.DLQ\" " +
+                    "expiry-address=\"jms.queue.ExpiryQueue\" max-size-bytes=\"0.12345678\" page-size-bytes=\"2097152\" " +
+                    "message-counter-history-day-limit=\"10\" redistribution-delay=\"1000\" address-full-policy=\"PAGE\"/>");
+            assertContains(errorLog, "^^^^ Wrong type for 'max-size-bytes'. Expected [LONG] but was STRING.");
+            assertContains(errorLog, "Couldn't convert \\\"0.12345678\\\" to [LONG]");
+        });
     }
 
     /*
@@ -191,32 +202,34 @@ public class MessagingTestCase extends TestBase {
             subtreeName = "messaging", subsystemName = "messaging-activemq")
     public void testWrongOrderOfElements() throws Exception {
         container().tryStartAndWaitForFail();
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
-        assertContains(errorLog, "<security enabled=\"false\"/>");
-        assertContains(errorLog, "^^^^ 'security' isn't an allowed element here");
-        assertContains(errorLog, "Elements allowed here are:");
-        assertContains(errorLog, "acceptor                   journal-directory");
-        assertContains(errorLog, "address-setting            large-messages-directory");
-        assertContains(errorLog, "bindings-directory         legacy-connection-factory");
-        assertContains(errorLog, "bridge                     live-only");
-        assertContains(errorLog, "cluster-connection         paging-directory");
-        assertContains(errorLog, "connection-factory         pooled-connection-factory");
-        assertContains(errorLog, "connector                  queue");
-        assertContains(errorLog, "connector-service          remote-acceptor");
-        assertContains(errorLog, "divert                     remote-connector");
-        assertContains(errorLog, "grouping-handler           replication-colocated");
-        assertContains(errorLog, "http-acceptor              replication-master");
-        assertContains(errorLog, "http-connector             replication-slave");
-        assertContains(errorLog, "in-vm-acceptor             security-setting");
-        assertContains(errorLog, "in-vm-connector            shared-store-colocated");
-        assertContains(errorLog, "jgroups-broadcast-group    shared-store-master");
-        assertContains(errorLog, "jgroups-discovery-group    shared-store-slave");
-        assertContains(errorLog, "jms-queue                  socket-broadcast-group");
-        assertContains(errorLog, "jms-topic                  socket-discovery-group");
-        assertContains(errorLog, "'security' is allowed in elements:");
-        assertContains(errorLog, "- server > profile > {urn:jboss:domain:messaging-activemq:");
-        assertContains(errorLog, "subsystem > server");
+            checkLog(() -> {
+                String errorLog = container().getErrorMessageFromServerStart();
+                assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
+                assertContains(errorLog, "<security enabled=\"false\"/>");
+                assertContains(errorLog, "^^^^ 'security' isn't an allowed element here");
+                assertContains(errorLog, "Elements allowed here are:");
+                assertContains(errorLog, "acceptor                   journal-directory");
+                assertContains(errorLog, "address-setting            large-messages-directory");
+                assertContains(errorLog, "bindings-directory         legacy-connection-factory");
+                assertContains(errorLog, "bridge                     live-only");
+                assertContains(errorLog, "cluster-connection         paging-directory");
+                assertContains(errorLog, "connection-factory         pooled-connection-factory");
+                assertContains(errorLog, "connector                  queue");
+                assertContains(errorLog, "connector-service          remote-acceptor");
+                assertContains(errorLog, "divert                     remote-connector");
+                assertContains(errorLog, "grouping-handler           replication-colocated");
+                assertContains(errorLog, "http-acceptor              replication-master");
+                assertContains(errorLog, "http-connector             replication-slave");
+                assertContains(errorLog, "in-vm-acceptor             security-setting");
+                assertContains(errorLog, "in-vm-connector            shared-store-colocated");
+                assertContains(errorLog, "jgroups-broadcast-group    shared-store-master");
+                assertContains(errorLog, "jgroups-discovery-group    shared-store-slave");
+                assertContains(errorLog, "jms-queue                  socket-broadcast-group");
+                assertContains(errorLog, "jms-topic                  socket-discovery-group");
+                assertContains(errorLog, "'security' is allowed in elements:");
+                assertContains(errorLog, "- server > profile > {urn:jboss:domain:messaging-activemq:");
+                assertContains(errorLog, "subsystem > server");
+            });
     }
 
     /*
@@ -228,10 +241,12 @@ public class MessagingTestCase extends TestBase {
             subtreeName = "messaging", subsystemName = "messaging-activemq")
     public void testFirstMissingRequiredAttributeInElement() throws Exception {
         container().tryStartAndWaitForFail();
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
-        assertContains(errorLog, "<http-connector socket-binding=\"http\" endpoint=\"http-acceptor\"/>");
-        assertContains(errorLog, "^^^^ Missing required attribute(s): name");
-        assertContains(errorLog, "WFLYCTL0133: Missing required attribute(s): name");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone-full-ha.xml ---------------------------");
+            assertContains(errorLog, "<http-connector socket-binding=\"http\" endpoint=\"http-acceptor\"/>");
+            assertContains(errorLog, "^^^^ Missing required attribute(s): name");
+            assertContains(errorLog, "WFLYCTL0133: Missing required attribute(s): name");
+        });
     }
 }

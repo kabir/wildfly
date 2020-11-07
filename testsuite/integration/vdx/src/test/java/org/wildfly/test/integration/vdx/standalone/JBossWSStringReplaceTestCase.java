@@ -71,12 +71,12 @@ public class JBossWSStringReplaceTestCase extends TestBase {
     @ServerConfig(configuration = "standalone-ws-broken.xml")
     public void incorrectValueOfModifyWsdlAddressOpeningElement()throws Exception {
         container().tryStartAndWaitForFail();
-
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "OPVDX001: Validation error in standalone-ws-broken.xml");
-        assertContains(errorLog, "<mmodify-wsdl-address>true</modify-wsdl-address>");
-        assertContains(errorLog, "^^^^ 'mmodify-wsdl-address' isn't an allowed element here");
-        assertContains(errorLog, "matching end-tag \"</mmodify-wsdl-address>");
-
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "OPVDX001: Validation error in standalone-ws-broken.xml");
+            assertContains(errorLog, "<mmodify-wsdl-address>true</modify-wsdl-address>");
+            assertContains(errorLog, "^^^^ 'mmodify-wsdl-address' isn't an allowed element here");
+            assertContains(errorLog, "matching end-tag \"</mmodify-wsdl-address>");
+        });
     }
 }

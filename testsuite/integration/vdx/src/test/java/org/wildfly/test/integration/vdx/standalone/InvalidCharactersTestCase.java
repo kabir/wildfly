@@ -127,9 +127,11 @@ public class InvalidCharactersTestCase extends TestBase {
     @ServerConfig(configuration = STANDALONE_SPACE_IN_XML_DECLARATION_XML)
     public void spaceInXmlDeclaration()throws Exception {
         container().tryStartAndWaitForFail();
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, " ^^^^ Illegal processing instruction target (\"xml\"); xml (case insensitive)");
-        assertContains(errorLog, "is reserved by the specs");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, " ^^^^ Illegal processing instruction target (\"xml\"); xml (case insensitive)");
+            assertContains(errorLog, "is reserved by the specs");
+        });
     }
 
     /*
@@ -139,10 +141,11 @@ public class InvalidCharactersTestCase extends TestBase {
     @ServerConfig(configuration = STANDALONE_MISSING_START_OF_ELEMENT_XML)
     public void missingStartOfElement()throws Exception {
         container().tryStartAndWaitForFail();
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, " modify-wsdl-address>true</modify-wsdl-address>");
-        assertContains(errorLog, "^^^^ Received non-all-whitespace CHARACTERS or CDATA event in nextTag()");
-
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, " modify-wsdl-address>true</modify-wsdl-address>");
+            assertContains(errorLog, "^^^^ Received non-all-whitespace CHARACTERS or CDATA event in nextTag()");
+        });
     }
 
     /*
@@ -152,9 +155,11 @@ public class InvalidCharactersTestCase extends TestBase {
     @ServerConfig(configuration = STANDALONE_MISSING_LAST_QUOTE_XML)
     public void missingLastQuoteStandaloneXml()throws Exception {
         container().tryStartAndWaitForFail();
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "<endpoint-config name=\"Standard-Endpoint-Config/>");
-        assertContains(errorLog, "^^^^ Unexpected character '<' (code 60) in attribute value");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "<endpoint-config name=\"Standard-Endpoint-Config/>");
+            assertContains(errorLog, "^^^^ Unexpected character '<' (code 60) in attribute value");
+        });
     }
 
     /*
@@ -167,9 +172,11 @@ public class InvalidCharactersTestCase extends TestBase {
                 (OfflineCommand) ctx -> ctx.client.apply(GroovyXmlTransform.of(DoNothing.class, "AddElement.groovy")
                         .subtree("path", Subtree.subsystem("webservices")).parameter("elementXml", elementWithNationalCharacters)
                         .build()));
-        String errorLog = container().getErrorMessageFromServerStart();
-        assertContains(errorLog, "isn't an allowed element here");
-        assertContains(errorLog, "Elements allowed here are:");
+        checkLog(() -> {
+            String errorLog = container().getErrorMessageFromServerStart();
+            assertContains(errorLog, "isn't an allowed element here");
+            assertContains(errorLog, "Elements allowed here are:");
+        });
     }
 
 
