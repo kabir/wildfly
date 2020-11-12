@@ -19,6 +19,7 @@ package org.wildfly.test.integration.vdx.domain;
 
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -47,6 +48,7 @@ public class HostXmlSmokeTestCase extends TestBase {
     @Test
     @ServerConfig(configuration = "host.xml", xmlTransformationGroovy = "host/ManagementAuditLogElement.groovy")
     public void addManagementAuditLogElement() throws Exception {
+        Assert.fail("Introduced error");
         container().tryStartAndWaitForFail();
 
         checkLog(() -> {
