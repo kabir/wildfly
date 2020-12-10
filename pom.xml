@@ -310,7 +310,7 @@
         <version.io.reactivex.rxjava2>2.2.19</version.io.reactivex.rxjava2>
         <version.io.reactivex.rxjava3>3.0.8</version.io.reactivex.rxjava3>
         <version.io.rest-assured>3.0.6</version.io.rest-assured>
-        <version.io.smallrye.smallrye-config>1.6.2</version.io.smallrye.smallrye-config>
+        <version.io.smallrye.smallrye-config>2.0.0-RC3</version.io.smallrye.smallrye-config>
         <version.io.smallrye.smallrye-fault-tolerance>4.3.2</version.io.smallrye.smallrye-fault-tolerance>
         <version.io.smallrye.smallrye-health>2.2.0</version.io.smallrye.smallrye-health>
         <version.io.smallrye.smallrye-jwt>2.0.13</version.io.smallrye.smallrye-jwt>
@@ -359,7 +359,7 @@
         <version.org.codehaus.jettison>1.4.0</version.org.codehaus.jettison>
         <version.org.cryptacular>1.2.4</version.org.cryptacular>
         <version.org.eclipse.jdt.core.compiler>4.6.1</version.org.eclipse.jdt.core.compiler>
-        <version.org.eclipse.microprofile.config.api>1.4</version.org.eclipse.microprofile.config.api>
+        <version.org.eclipse.microprofile.config.api>2.0</version.org.eclipse.microprofile.config.api>
         <version.org.eclipse.microprofile.fault-tolerance.api>2.1.1</version.org.eclipse.microprofile.fault-tolerance.api>
         <version.org.eclipse.microprofile.fault-tolerance.tck>${version.org.eclipse.microprofile.fault-tolerance.api}</version.org.eclipse.microprofile.fault-tolerance.tck>
         <version.org.eclipse.microprofile.health.api>2.2</version.org.eclipse.microprofile.health.api>
