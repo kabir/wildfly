@@ -310,6 +310,7 @@
         <version.io.reactivex.rxjava2>2.2.19</version.io.reactivex.rxjava2>
         <version.io.reactivex.rxjava3>3.0.8</version.io.reactivex.rxjava3>
         <version.io.rest-assured>3.0.6</version.io.rest-assured>
+        <version.io.smallrye.smallrye-common>1.5.0</version.io.smallrye.smallrye-common>
         <version.io.smallrye.smallrye-config>2.0.0-RC3</version.io.smallrye.smallrye-config>
         <version.io.smallrye.smallrye-fault-tolerance>4.3.2</version.io.smallrye.smallrye-fault-tolerance>
         <version.io.smallrye.smallrye-health>2.2.0</version.io.smallrye.smallrye-health>
@@ -2057,6 +2058,18 @@
                 <artifactId>rest-assured</artifactId>
                 <version>${version.io.rest-assured}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.smallrye.common</groupId>
+                <artifactId>smallrye-common-constraint</artifactId>
+                <version>${version.io.smallrye.smallrye-common}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.smallrye.common</groupId>
+                <artifactId>smallrye-common-function</artifactId>
+                <version>${version.io.smallrye.smallrye-common}</version>
             </dependency>
 
             <dependency>

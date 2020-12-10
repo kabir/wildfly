@@ -199,7 +199,7 @@
         </license>
       </licenses>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>io.smallrye</groupId>
       <artifactId>smallrye-opentracing</artifactId>
       <licenses>
@@ -210,6 +210,30 @@
         </license>
       </licenses>
     </dependency>
+      <dependency>
+          <groupId>io.smallrye.common</groupId>
+          <artifactId>smallrye-common-constraint</artifactId>
+          <groupId>io.smallrye.common</groupId>
+          <artifactId>smallrye-common-function</artifactId>
+          <licenses>
+              <license>
+                  <name>Apache License 2.0</name>
+                  <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+                  <distribution>repo</distribution>
+              </license>
+          </licenses>
+      </dependency>
+      <dependency>
+          <groupId>io.smallrye.common</groupId>
+          <artifactId>smallrye-common-constraint</artifactId>
+          <licenses>
+              <license>
+                  <name>Apache License 2.0</name>
+                  <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+                  <distribution>repo</distribution>
+              </license>
+          </licenses>
+      </dependency>
     <dependency>
       <groupId>io.smallrye.config</groupId>
       <artifactId>smallrye-config</artifactId>
