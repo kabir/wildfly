@@ -35,6 +35,7 @@
         <module name="org.jboss.logging" />
         <module name="javax.enterprise.api" />
         <module name="javax.annotation.api" />
+        <module name="io.smallrye.common.constraint"/>
         <module name="io.smallrye.common.classloader"/>
         <module name="io.smallrye.common.function"/>
     </dependencies>
