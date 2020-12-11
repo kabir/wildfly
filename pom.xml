@@ -2068,6 +2068,12 @@
 
             <dependency>
                 <groupId>io.smallrye.common</groupId>
+                <artifactId>smallrye-common-classloader</artifactId>
+                <version>${version.io.smallrye.smallrye-common}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.smallrye.common</groupId>
                 <artifactId>smallrye-common-function</artifactId>
                 <version>${version.io.smallrye.smallrye-common}</version>
             </dependency>
