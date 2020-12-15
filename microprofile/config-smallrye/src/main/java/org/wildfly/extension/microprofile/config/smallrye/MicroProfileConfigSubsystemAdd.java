@@ -59,7 +59,7 @@ class MicroProfileConfigSubsystemAdd extends AbstractBoottimeAddStepHandler {
             public SmallRyeConfigBuilder getBuilder() {
                 // The builder will take into account the config-sources available when the Config object is created.
                 // any config-sources added or modified subsequently will not be taken into account.
-                return new SmallRyeConfigBuilder() {
+                SmallRyeConfigBuilder srcBuilder = new SmallRyeConfigBuilder() {
                     @Override
                     public SmallRyeConfigBuilder forClassLoader(ClassLoader classLoader) {
                         SmallRyeConfigBuilder builder = super.forClassLoader(classLoader);
@@ -71,9 +71,16 @@ class MicroProfileConfigSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         for (ConfigSource source : sources) {
                             builder.withSources(source);
                         }
+                        // TODO should this be configurable?
                         return builder;
                     }
                 };
+                // Add the SmallRye interceptors. Other builder methods such as addDefaultSources(),
+                // addDiscoveredConverters() and addDiscoveredSources() are configurable on
+                // the ConfigBuilder itself, and it seems the user should be in control of those.
+                // If I set addDiscoveredConverters() I get a failure in the TCK test
+                // AutoDiscoveredConfigSourceTest.testAutoDiscoveredConverterNotAddedAutomatically()
+                return srcBuilder.addDefaultInterceptors();
             }
         });
     }

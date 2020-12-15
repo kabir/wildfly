@@ -7,16 +7,6 @@
             <package name="org.eclipse.microprofile.config.tck.*">
             </package>
         </packages>
-<!--
-        <classes>
-            &lt;!&ndash; TCK and spec challenge: https://github.com/eclipse/microprofile-config/issues/446 &ndash;&gt;
-            <class name="org.eclipse.microprofile.config.tck.ConfigProviderTest">
-                <methods>
-                    <exclude name="testEnvironmentConfigSource"/>
-                </methods>
-            </class>
-        </classes>
--->
     </test>
 
 </suite>
