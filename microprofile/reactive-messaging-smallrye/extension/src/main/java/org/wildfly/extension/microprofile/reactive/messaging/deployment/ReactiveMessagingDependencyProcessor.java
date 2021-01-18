@@ -116,6 +116,7 @@ public class ReactiveMessagingDependencyProcessor implements DeploymentUnitProce
 
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.reactivex.rxjava2.rxjava", false, false, true, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.mutiny.reactive-streams-operators", false, false, true, false));
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.wildfly.reactive.messaging.config", false, false, true, false));
 
         // These are optional über modules that export all the independent connectors/clients. However, it seems
         // to confuse the ExternalBeanArchiveProcessor which provides the modules to scan for beans, so we
