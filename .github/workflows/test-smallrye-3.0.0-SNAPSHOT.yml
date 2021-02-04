@@ -1,0 +1,60 @@
+name: WildFly against SmallRye RM SNAPSHOT (MP 4.0 and vertx.40)
+
+on:
+  push:
+    branches:
+      - 'reactive-port-with-rm-3.x-snapshot'
+    schedule:
+    - cron: '0 0 * * *'
+env:
+  EXPECTED_SMALLRYE_RM_VERSION: 3.0.0-SNAPSHOT
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: smallrye/smallrye-reactive-messaging
+          ref: 3.x
+          path: .smallrye-rm
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Build SmallRye
+        working-directory: .smallrye-rm
+        run: |
+          mvn -B install -DskipTests
+      - name: Check SmallRye Version
+        working-directory: .smallrye-rm
+        run: |
+          mvn -B help:evaluate -Dexpression=project.version -pl .
+          TMP="$(mvn help:evaluate -Dexpression=project.version -pl . | grep -v '^\[')"
+          if [ "${EXPECTED_SMALLRYE_RM_VERSION}" -ne "${TMP}" ]; then
+            Expected "${EXPECTED_SMALLRYE_RM_VERSION}" of SmallRye reactive messaging, but was "${TMP}"
+            exit 1
+          fi
+      - name: Build WildFly
+        run: |
+          mvn -B install -DskipTests
+      - name: Relevant WildFly tests
+        run: |
+          mvn -B install -DallTests -fae -pl testsuite/integration/microprofile,testsuite/integration/microprofile-tck/reactive-messaging/,testsuite/integration/microprofile-tck/reactive-streams-operators
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: surefire-reports
+          path: '**/surefire-reports/*.txt'
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: server-logs
+          path: '**/server.log'

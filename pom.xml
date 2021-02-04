@@ -322,7 +322,7 @@
         <version.io.smallrye.smallrye-metrics>3.0.0</version.io.smallrye.smallrye-metrics>
         <version.io.smallrye.smallrye-mutiny>0.13.0</version.io.smallrye.smallrye-mutiny>
         <version.io.smallrye.smallrye-reactive-converters>2.0.0.RC3</version.io.smallrye.smallrye-reactive-converters>
-        <version.io.smallrye.smallrye-reactive-messaging>3.0.0.RC1</version.io.smallrye.smallrye-reactive-messaging>
+        <version.io.smallrye.smallrye-reactive-messaging>3.0.0-SNAPSHOT</version.io.smallrye.smallrye-reactive-messaging>
         <version.io.smallrye.smallrye-reactive-streams-operators>1.2.2</version.io.smallrye.smallrye-reactive-streams-operators>
         <version.io.undertow.jastow>2.0.9.Final</version.io.undertow.jastow>
         <version.io.undertow.js>1.0.2.Final</version.io.undertow.js>
