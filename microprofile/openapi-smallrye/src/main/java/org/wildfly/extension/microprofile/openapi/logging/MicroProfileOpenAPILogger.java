@@ -44,7 +44,7 @@ import org.jboss.logging.annotations.MessageLogger;
 public interface MicroProfileOpenAPILogger extends BasicLogger {
     MicroProfileOpenAPILogger LOGGER = Logger.getMessageLogger(MicroProfileOpenAPILogger.class, "org.wildfly.extension.microprofile.openapi.smallrye");
 
-    @LogMessage(level = DEBUG)
+    @LogMessage(level = INFO)
     @Message(id = 1, value = "Activating MicroProfile OpenAPI Subsystem")
     void activatingSubsystem();
 
