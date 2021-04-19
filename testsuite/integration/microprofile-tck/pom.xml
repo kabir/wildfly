@@ -65,6 +65,7 @@
 
     <modules>
         <module>config</module>
+        <module>context-propagation</module>
         <module>fault-tolerance</module>
         <module>health</module>
         <module>jwt</module>
