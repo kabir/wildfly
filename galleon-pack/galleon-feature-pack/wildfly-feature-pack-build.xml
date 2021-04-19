@@ -71,6 +71,7 @@
         <extensions>
             <standalone>
                 <extension>org.wildfly.extension.microprofile.config-smallrye</extension>
+                <extension>org.wildfly.extension.microprofile.context-propagation-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.fault-tolerance-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.health-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.jwt-smallrye</extension>
@@ -82,6 +83,7 @@
             </standalone>
             <domain>
                 <extension>org.wildfly.extension.microprofile.config-smallrye</extension>
+                <extension>org.wildfly.extension.microprofile.context-propagation-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.fault-tolerance-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.jwt-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.openapi-smallrye</extension>
