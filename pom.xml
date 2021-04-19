@@ -318,6 +318,7 @@
         <version.io.smallrye.reactive-utils>2.1.1</version.io.smallrye.reactive-utils>
         <version.io.smallrye.smallrye-common>1.5.0</version.io.smallrye.smallrye-common>
         <version.io.smallrye.smallrye-config>2.0.2</version.io.smallrye.smallrye-config>
+        <version.io.smallrye.smallrye-context-propagation>1.2.0</version.io.smallrye.smallrye-context-propagation>
         <version.io.smallrye.smallrye-fault-tolerance>5.1.0</version.io.smallrye.smallrye-fault-tolerance>
         <version.io.smallrye.smallrye-health>3.0.2</version.io.smallrye.smallrye-health>
         <version.io.smallrye.smallrye-jwt>3.1.1</version.io.smallrye.smallrye-jwt>
@@ -370,6 +371,7 @@
         <version.org.cryptacular>1.2.4</version.org.cryptacular>
         <version.org.eclipse.jdt.core.compiler>4.6.1</version.org.eclipse.jdt.core.compiler>
         <version.org.eclipse.microprofile.config.api>2.0</version.org.eclipse.microprofile.config.api>
+        <version.org.eclipse.microprofile.context-propagation.api>1.2</version.org.eclipse.microprofile.context-propagation.api>
         <version.org.eclipse.microprofile.fault-tolerance.api>3.0</version.org.eclipse.microprofile.fault-tolerance.api>
         <version.org.eclipse.microprofile.fault-tolerance.tck>${version.org.eclipse.microprofile.fault-tolerance.api}</version.org.eclipse.microprofile.fault-tolerance.tck>
         <version.org.eclipse.microprofile.health.api>3.0</version.org.eclipse.microprofile.health.api>
@@ -1187,6 +1189,17 @@
             <dependency>
                 <groupId>${full.maven.groupId}</groupId>
                 <artifactId>wildfly-microprofile-config-smallrye</artifactId>
+                <version>${full.maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-context-propagation</artifactId>
+                <version>${full.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-context-propagation-mutiny-integration</artifactId>
                 <version>${full.maven.version}</version>
             </dependency>
 
@@ -2169,6 +2182,32 @@
             </dependency>
 
             <dependency>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-context-propagation</artifactId>
+                <version>${version.io.smallrye.smallrye-context-propagation}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-context-propagation-api</artifactId>
+                <version>${version.io.smallrye.smallrye-context-propagation}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-context-propagation-cdi</artifactId>
+                <version>${version.io.smallrye.smallrye-context-propagation}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-context-propagation-jta</artifactId>
+                <version>${version.io.smallrye.smallrye-context-propagation}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-context-propagation-storage</artifactId>
+                <version>${version.io.smallrye.smallrye-context-propagation}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.smallrye.common</groupId>
                 <artifactId>smallrye-common-annotation</artifactId>
                 <version>${version.io.smallrye.smallrye-common}</version>
@@ -2280,6 +2319,18 @@
                         <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
+                <artifactId>mutiny-context-propagation</artifactId>
+                <version>${version.io.smallrye.smallrye-mutiny}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
+                <artifactId>mutiny-smallrye-context-propagation</artifactId>
+                <version>${version.io.smallrye.smallrye-mutiny}</version>
             </dependency>
 
             <dependency>
@@ -6084,6 +6135,18 @@
                 <groupId>org.eclipse.microprofile.config</groupId>
                 <artifactId>microprofile-config-tck</artifactId>
                 <version>${version.org.eclipse.microprofile.config.api}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.microprofile.context-propagation</groupId>
+                <artifactId>microprofile-context-propagation-api</artifactId>
+                <version>${version.org.eclipse.microprofile.context-propagation.api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.microprofile.context-propagation</groupId>
+                <artifactId>microprofile-context-propagation-tck</artifactId>
+                <version>${version.org.eclipse.microprofile.context-propagation.api}</version>
                 <scope>test</scope>
             </dependency>
 

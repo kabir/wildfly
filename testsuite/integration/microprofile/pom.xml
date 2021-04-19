@@ -59,6 +59,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.microprofile.context-propagation</groupId>
+            <artifactId>microprofile-context-propagation-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.microprofile.health</groupId>
             <artifactId>microprofile-health-api</artifactId>
             <scope>test</scope>
@@ -209,6 +214,8 @@
             <version>${version.org.apache.kafka}</version>
         </dependency>
 
+        <!-- Microprofile -->
+
         <!-- Other test dependencies -->
         <dependency>
             <groupId>io.rest-assured</groupId>
@@ -296,6 +303,7 @@
                                 <layer>microprofile-opentracing</layer>
                                 <!-- Dependencies for reactive specs -->
                                 <layer>microprofile-reactive-messaging-kafka</layer>
+                                <layer>microprofile-context-propagation-jta</layer>
                                 <layer>h2-default-datasource</layer>
                             </layers>
                         </configuration>
@@ -437,6 +445,7 @@
                                                 <layer>ejb</layer>
                                                 <!-- Dependencies for reactive specs -->
                                                 <layer>microprofile-reactive-messaging-kafka</layer>
+                                                <layer>microprofile-context-propagation-jta</layer>
                                                 <layer>h2-default-datasource</layer>
                                             </layers>
                                         </config>
@@ -559,6 +568,7 @@
                                                 <layer>ejb</layer>
                                                 <!-- Dependencies for reactive specs -->
                                                 <layer>microprofile-reactive-messaging-kafka</layer>
+                                                <layer>microprofile-context-propagation-jta</layer>
                                                 <layer>h2-default-datasource</layer>
                                             </layers>
                                         </config>
