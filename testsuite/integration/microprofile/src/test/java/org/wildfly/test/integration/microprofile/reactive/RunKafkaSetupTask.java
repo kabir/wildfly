@@ -38,21 +38,29 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
  */
 public class RunKafkaSetupTask implements ServerSetupTask {
-    EmbeddedKafkaBroker broker;
-    Path kafkaDir;
+
+    public static String NUM_PARTITIONS = "org.wildfly.test.kafka.num.partitions";
+
+
+    private static volatile EmbeddedKafkaBroker broker;
+    private volatile Path kafkaDir;
+
     @Override
     public void setup(ManagementClient managementClient, String s) throws Exception {
+
+        int numPartitions = Integer.valueOf(System.getProperty(NUM_PARTITIONS, "1"));
+
         Path target = Paths.get("target").toAbsolutePath().normalize();
         kafkaDir = Files.createTempDirectory(target, "kafka");
 
         Files.createDirectories(kafkaDir);
 
-        broker = new EmbeddedKafkaBroker(1, true)
+        broker = new EmbeddedKafkaBroker(1, true, "testing")
                 .zkPort(2181)
                 .kafkaPorts(9092)
                 .brokerProperty("log.dir", kafkaDir.toString())
                 .brokerProperty("num.partitions", 1)
-                .brokerProperty("offsets.topic.num.partitions", 5);
+                .brokerProperty("offsets.topic.num.partitions", numPartitions);
 
         broker.afterPropertiesSet();
     }
@@ -84,5 +92,9 @@ public class RunKafkaSetupTask implements ServerSetupTask {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static EmbeddedKafkaBroker getEmbeddedKafka() {
+        return broker;
     }
 }

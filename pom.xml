@@ -1245,6 +1245,18 @@
 
             <dependency>
                 <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-reactive-messaging-kafka-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-reactive-messaging-kafka-bridge</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
                 <artifactId>wildfly-microprofile-reactive-streams-operators</artifactId>
                 <version>${project.version}</version>
             </dependency>

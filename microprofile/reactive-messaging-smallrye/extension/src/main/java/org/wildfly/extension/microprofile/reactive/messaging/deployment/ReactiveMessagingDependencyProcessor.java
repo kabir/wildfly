@@ -121,16 +121,24 @@ public class ReactiveMessagingDependencyProcessor implements DeploymentUnitProce
             for (DependencySpec dep : module.getDependencies()) {
                 if (dep instanceof ModuleDependencySpec) {
                     ModuleDependencySpec mds = (ModuleDependencySpec) dep;
-                    ModuleDependency md =
-                            cdiDependency(
-                                    new ModuleDependency(moduleLoader, mds.getName(), mds.isOptional(), false, true, false));
-                    moduleSpecification.addSystemDependency(md);
+                    addDependency(moduleLoader, moduleSpecification, mds.getName(), mds.isOptional());
+
+                    if (((ModuleDependencySpec) dep).getName().equals("io.smallrye.reactive.messaging.connector.kafka")) {
+                        addDependency(moduleLoader, moduleSpecification, "org.wildfly.reactive.messaging.kafka.bridge", false);
+                    }
                 }
             }
         } catch (ModuleLoadException e) {
             // The module was not provisioned
             MicroProfileReactiveMessagingLogger.LOGGER.intermediateModuleNotPresent(intermediateModuleName);
         }
+    }
+
+    private void addDependency(ModuleLoader moduleLoader, ModuleSpecification moduleSpecification, String name, boolean optional) {
+        ModuleDependency md =
+                cdiDependency(
+                        new ModuleDependency(moduleLoader, name, optional, false, true, false));
+        moduleSpecification.addSystemDependency(md);
     }
 
     private boolean isReactiveMessagingDeployment(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {

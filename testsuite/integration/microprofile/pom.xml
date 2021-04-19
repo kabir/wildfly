@@ -208,6 +208,11 @@
             <scope>test</scope>
             <version>${version.org.apache.kafka}</version>
         </dependency>
+        <dependency>
+            <groupId>${full.maven.groupId}</groupId>
+            <artifactId>wildfly-microprofile-reactive-messaging-kafka-api</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Other test dependencies -->
         <dependency>
