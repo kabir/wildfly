@@ -77,42 +77,36 @@ public class ContextPropagationClientTestCase {
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    @Ignore("TODO we don't have RestEasy context propagation yet")
     @Test
     public void testRESTEasyManagedExecutorPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/resteasy").then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    @Ignore("TODO we don't have RestEasy context propagation yet")
     @Test
     public void testRESTEasyThreadContextPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/resteasy-tc").then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    @Ignore("TODO we don't have RestEasy context propagation yet")
     @Test
     public void testRESTEasyRsoJavaPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/resteasy-rso").then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    @Ignore("we don't have servlet context propagation yet")
     @Test
     public void testServletContextManagedExecutorPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/servlet").then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    @Ignore("we don't have servlet context propagation yet")
     @Test
     public void testServletContextThreadContextPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/servlet-tc").then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    @Ignore("we don't have servlet context propagation yet")
     @Test
     public void testServletContextRsoPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/servlet-rso").then()
@@ -149,8 +143,7 @@ public class ContextPropagationClientTestCase {
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    @Ignore("This is not possible, since the Publisher uses the 'all' context")
-    @Test
+    //@Test - This is not possible, since the RSO Publisher uses the 'all' context
     public void testNoCdiRsoPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/nocdi-rso").then()
                 .statusCode(Response.Status.OK.getStatusCode());

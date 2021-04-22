@@ -63,6 +63,9 @@ public class ContextPropagationDependencyProcessor implements DeploymentUnitProc
         // From the context-propagation-jta layer
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.jboss.jts", true, false, true, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.context-propagation.providers.jta", true, false, true, false));
+
+        // From the context-propagation-resteasy layer
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.jboss.resteasy.resteasy-context-propagation", true, false, true, false));
     }
 
 

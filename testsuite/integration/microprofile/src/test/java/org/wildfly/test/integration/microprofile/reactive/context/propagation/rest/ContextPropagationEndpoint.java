@@ -15,6 +15,7 @@
  */
 package org.wildfly.test.integration.microprofile.reactive.context.propagation.rest;
 
+import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
@@ -65,13 +66,7 @@ public class ContextPropagationEndpoint {
     public CompletionStage<String> tcclTest() {
         ClassLoader tccl = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
         CompletableFuture<String> ret = allExecutor.completedFuture("OK");
-        return ret.thenApplyAsync(text -> {
-            ClassLoader tccl2 = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
-            if (tccl != tccl2) {
-                throw new IllegalStateException("TCCL was not the same");
-            }
-            return text;
-        });
+        return ret.thenApplyAsync(text -> tcclTest(tccl, text));
     }
 
     @GET
@@ -82,18 +77,12 @@ public class ContextPropagationEndpoint {
         ClassLoader tccl = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
         CompletableFuture<String> ret = allTc.withContextCapture(CompletableFuture.completedFuture("OK"));
 
-        return ret.thenApplyAsync(text -> {
-            ClassLoader tccl2 = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
-            if (tccl != tccl2) {
-                throw new IllegalStateException("TCCL was not the same");
-            }
-            return text;
-        }, executor);
+        return ret.thenApplyAsync(text -> tcclTest(tccl, text), executor);
     }
 
     @GET
     @Path("/tccl-rso")
-    public Publisher<String> tcclRsoJavaTest() {
+    public Publisher<String> tcclRsoTest() {
         ClassLoader tccl = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
         return ReactiveStreams.of("OK")
                 .map(v -> {
@@ -105,41 +94,50 @@ public class ContextPropagationEndpoint {
                     }
                     return v;
                 })
-                .map(text -> {
-                    ClassLoader tccl2 = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
-                    if (tccl != tccl2) {
-                        throw new IllegalStateException("TCCL was not the same");
-                    }
-                    return text;
-                })
+                .map(text -> tcclTest(tccl, text))
                 .buildRs();
+    }
+
+    private String tcclTest(ClassLoader expected, String text) {
+        ClassLoader tccl = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
+        if (expected != tccl) {
+            throw new IllegalStateException("TCCL was not the same");
+        }
+        return text;
+
     }
 
     @GET
     @Path("/resteasy")
     public CompletionStage<String> resteasyTest(@Context UriInfo uriInfo) {
+        URI uri = uriInfo.getAbsolutePath();
+        if (!uri.toString().endsWith("resteasy")) {
+            throw new IllegalStateException();
+        }
         CompletableFuture<String> ret = allExecutor.completedFuture("OK");
-        return ret.thenApplyAsync(text -> {
-            uriInfo.getAbsolutePath();
-            return text;
-        });
+        return ret.thenApplyAsync(text -> restEasyTest(uri, uriInfo, text));
     }
 
     @GET
     @Path("/resteasy-tc")
     public CompletionStage<String> resteasyTcTest(@Context UriInfo uriInfo) {
+        URI uri = uriInfo.getAbsolutePath();
+        if (!uri.toString().endsWith("resteasy-tc")) {
+            throw new IllegalStateException();
+        }
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CompletableFuture<String> ret = allTc.withContextCapture(CompletableFuture.completedFuture("OK"));
 
-        return ret.thenApplyAsync(text -> {
-            uriInfo.getAbsolutePath();
-            return text;
-        }, executor);
+        return ret.thenApplyAsync(text -> restEasyTest(uri, uriInfo, text), executor);
     }
 
     @GET
     @Path("/resteasy-rso")
     public Publisher<String> resteasyRsoTest(@Context UriInfo uriInfo) {
+        URI uri = uriInfo.getAbsolutePath();
+        if (!uri.toString().endsWith("resteasy-rso")) {
+            throw new IllegalStateException();
+        }
         return ReactiveStreams.of("OK")
                 .map(v -> {
                     try {
@@ -150,39 +148,49 @@ public class ContextPropagationEndpoint {
                     }
                     return v;
                 })
-                .map(text -> {
-                    uriInfo.getAbsolutePath();
-                    return text;
-                })
+                .map(text -> restEasyTest(uri, uriInfo, text))
                 .buildRs();
+    }
+
+    private String restEasyTest(URI expected, UriInfo uriInfo, String text) {
+        URI uri = uriInfo.getAbsolutePath();
+        if (!uri.equals(expected)) {
+            throw new IllegalStateException("Different absolute paths");
+        }
+        return text;
     }
 
     @GET
     @Path("/servlet")
     public CompletionStage<String> servletTest(@Context HttpServletRequest servletRequest) {
+        String uri = servletRequest.getRequestURI();
+        if (!uri.endsWith("servlet")) {
+            throw new IllegalStateException();
+        }
         CompletableFuture<String> ret = allExecutor.completedFuture("OK");
-        return ret.thenApplyAsync(text -> {
-            servletRequest.getContentType();
-            return text;
-        });
+        return ret.thenApplyAsync(text -> servletTest(uri, servletRequest, text));
     }
 
     @GET
     @Path("/servlet-tc")
     public CompletionStage<String> servletTcTest(@Context HttpServletRequest servletRequest) {
+        String uri = servletRequest.getRequestURI();
+        if (!uri.endsWith("servlet-tc")) {
+            throw new IllegalStateException();
+        }
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CompletableFuture<String> ret = allTc.withContextCapture(CompletableFuture.completedFuture("OK"));
 
-        return ret.thenApplyAsync(text -> {
-            servletRequest.getContentType();
-            return text;
-        }, executor);
+        return ret.thenApplyAsync(text -> servletTest(uri, servletRequest, text), executor);
     }
 
     @GET
     @Path("/servlet-rso")
     public Publisher<String> servletRsoTest(@Context HttpServletRequest servletRequest) {
-        CompletableFuture<String> ret = allExecutor.completedFuture("OK");
+        String uri = servletRequest.getRequestURI();
+        if (!uri.endsWith("servlet-rso")) {
+            throw new IllegalStateException();
+        }
         return ReactiveStreams.of("OK")
                 .map(v -> {
                     try {
@@ -193,47 +201,39 @@ public class ContextPropagationEndpoint {
                     }
                     return v;
                 })
-                .map(text -> {
-                    servletRequest.getContentType();
-                    return text;
-                })
+                .map(text -> servletTest(uri, servletRequest, text))
                 .buildRs();
+    }
+
+    private String servletTest(String expected, HttpServletRequest servletRequest, String text) {
+        if (!expected.equals(servletRequest.getRequestURI())) {
+            throw new IllegalStateException();
+        }
+        return text;
     }
 
     @GET
     @Path("/cdi")
     public CompletionStage<String> cdiTest() {
-        RequestBean instance = getRequestBean();
+        long id = getRequestBean().id();
         CompletableFuture<String> ret = allExecutor.completedFuture("OK");
-        return ret.thenApplyAsync(text -> {
-            RequestBean instance2 = getRequestBean();
-            if (instance.id() != instance2.id()) {
-                throw new IllegalStateException("Instances were not the same");
-            }
-            return text;
-        });
+        return ret.thenApplyAsync(text -> cdiTest(id, text));
     }
 
     @GET
     @Path("/cdi-tc")
     public CompletionStage<String> cdiTcTest() {
-        RequestBean instance = getRequestBean();
+        long id = getRequestBean().id();
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CompletableFuture<String> ret = allTc.withContextCapture(CompletableFuture.completedFuture("OK"));
 
-        return ret.thenApplyAsync(text -> {
-            RequestBean instance2 = getRequestBean();
-            if (instance.id() != instance2.id()) {
-                throw new IllegalStateException("Instances were not the same");
-            }
-            return text;
-        }, executor);
+        return ret.thenApplyAsync(text -> cdiTest(id, text), executor);
     }
 
     @GET
     @Path("/cdi-rso")
     public Publisher<String> cdiRsoTest() {
-        RequestBean instance = getRequestBean();
+        long id = getRequestBean().id();
 
         return ReactiveStreams.of("OK")
                 .map(v -> {
@@ -245,31 +245,26 @@ public class ContextPropagationEndpoint {
                     }
                     return v;
                 })
-                .map(text -> {
-                    RequestBean instance2 = getRequestBean();
-                    if (instance.id() != instance2.id()) {
-                        throw new IllegalStateException("Instances were not the same");
-                    }
-                    return text;
-                })
+                .map(text -> cdiTest(id, text))
                 .buildRs();
+    }
+
+    private String cdiTest(long expected, String text) {
+        RequestBean instance2 = getRequestBean();
+        if (expected != instance2.id()) {
+            throw new IllegalStateException("Instances were not the same");
+        }
+        return text;
     }
 
     @GET
     @Path("/nocdi")
     public CompletionStage<String> noCdiTest() {
         ManagedExecutor me = ManagedExecutor.builder().cleared(ThreadContext.CDI).build();
-        RequestBean instance = getRequestBean();
-        long id = instance.id();
-        CompletableFuture<String> ret = me.completedFuture("OK");
-        return ret.thenApplyAsync(text -> {
-            RequestBean instance2 = getRequestBean();
+        long id = getRequestBean().id();
 
-            if (id == instance2.id()) {
-                throw new IllegalStateException("Instances were the same");
-            }
-            return text;
-        });
+        CompletableFuture<String> ret = me.completedFuture("OK");
+        return ret.thenApplyAsync(text -> noCdiTest(id, text));
     }
 
 
@@ -277,20 +272,21 @@ public class ContextPropagationEndpoint {
     @Path("/nocdi-tc")
     public CompletionStage<String> noCdiTcTest() {
         ThreadContext tc = ThreadContext.builder().cleared(ThreadContext.CDI).build();
-        RequestBean instance = getRequestBean();
-        long id = instance.id();
+        long id = getRequestBean().id();
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CompletableFuture<String> ret = tc.withContextCapture(CompletableFuture.completedFuture("OK"));
 
-        return ret.thenApplyAsync(text -> {
-            RequestBean instance2 = getRequestBean();
+        return ret.thenApplyAsync(text -> noCdiTest(id, text), executor);
+    }
 
-            if (id == instance2.id()) {
-                throw new IllegalStateException("Instances were the same");
-            }
-            return text;
-        }, executor);
+    private String noCdiTest(long id, String text) {
+        RequestBean instance = getRequestBean();
+
+        if (id == instance.id()) {
+            throw new IllegalStateException("Instances were the same");
+        }
+        return text;
     }
 
     @GET
