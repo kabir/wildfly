@@ -34,9 +34,6 @@ import io.undertow.servlet.handlers.ServletRequestContext;
  */
 public class ServletRequestContextProvider implements ThreadContextProvider {
 
-    // TODO this should be enabled in the ServiceLoader file once it works
-    // Probably it should be in its own module so we don't HAVE to depend on the web layer
-
     @Override
     public ThreadContextSnapshot currentContext(Map<String, String> props) {
         ServletRequestContext captured = ServletRequestContext.current();
