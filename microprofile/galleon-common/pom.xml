@@ -686,6 +686,17 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-context-propagation</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>${full.maven.groupId}</groupId>
             <artifactId>wildfly-microprofile-config-smallrye</artifactId>
             <exclusions>
