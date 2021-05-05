@@ -73,7 +73,12 @@ public class MicroProfileReactiveStreamsOperatorsSubsystemDefinition extends Per
         resourceRegistration.registerAdditionalRuntimePackages(
                 RuntimePackageDependency.required("io.smallrye.reactive.mutiny.reactive-streams-operators"),
                 RuntimePackageDependency.required("org.wildfly.reactive.mutiny.reactive-streams-operators.cdi-provider"),
-                RuntimePackageDependency.required("org.wildfly.security.manager")
+                RuntimePackageDependency.required("org.wildfly.security.manager"),
+                // rxjava2 is only really needed by the resteasy-reactive-streams-operators module but it is easier to
+                // just add it here as it will not affect anything else
+                RuntimePackageDependency.required("io.reactivex.rxjava2.rxjava"),
+                //Will only get provisioned if resteasy is provisioned
+                RuntimePackageDependency.passive("org.jboss.resteasy.resteasy-reactive-streams-operators")
                 );
     }
 

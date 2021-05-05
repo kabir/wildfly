@@ -107,6 +107,15 @@ public class TxContextPropagationClientTestCase {
     }
 
     @Test
+    public void testTransactionContextPropagationRsoPublisherBuilder() {
+        RestAssured.when().get(url.toExternalForm() + "context/transaction-rso-publisher-builder").then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body(equalTo("OK"));
+        awaitState(() -> RestAssured.when().get(url.toExternalForm() + "context/transaction-delete2").then()
+                .statusCode(Response.Status.OK.getStatusCode()));
+    }
+
+    @Test
     public void testTransactionPropagatedToThreadContextCompletionStage() {
         RestAssured.when().get(url.toExternalForm() + "context/transaction-propagated-tc").then()
                 .statusCode(Response.Status.OK.getStatusCode())
@@ -134,8 +143,26 @@ public class TxContextPropagationClientTestCase {
     }
 
     @Test
+    public void testTransactionPropagatedToPublisherBuilder() {
+        RestAssured.when().get(url.toExternalForm() + "context/transaction-propagated-publisher-builder").then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body(equalTo("OK"));
+        awaitState(() -> RestAssured.when().get(url.toExternalForm() + "context/transaction-delete2").then()
+                .statusCode(Response.Status.OK.getStatusCode()));
+    }
+
+    @Test
     public void testTransactionPropagatedToCompletionStageWrappedInPublisher() {
         RestAssured.when().get(url.toExternalForm() + "context/transaction-propagated-cs-wrapped-in-publisher").then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body(equalTo("OK"));
+        awaitState(() -> RestAssured.when().get(url.toExternalForm() + "context/transaction-delete3").then()
+                .statusCode(Response.Status.OK.getStatusCode()));
+    }
+
+    @Test
+    public void testTransactionPropagatedToCompletionStageWrappedInPublisherBuilder() {
+        RestAssured.when().get(url.toExternalForm() + "context/transaction-propagated-cs-wrapped-in-publisher-builder").then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body(equalTo("OK"));
         awaitState(() -> RestAssured.when().get(url.toExternalForm() + "context/transaction-delete3").then()

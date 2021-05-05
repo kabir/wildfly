@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.context.ThreadContext;
+import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import org.jboss.resteasy.annotations.Stream;
 import org.reactivestreams.Publisher;
@@ -166,6 +167,14 @@ public class TxContextPropagationEndpoint {
     @Path("/transaction-rso-publisher")
     @Stream(value = Stream.MODE.RAW)
     public Publisher<String> transactionRsoPublisher() throws SystemException {
+        return transactionRsoPublisherBuilder().buildRs();
+    }
+
+    @Transactional
+    @GET
+    @Path("/transaction-rso-publisher-builder")
+    @Stream(value = Stream.MODE.RAW)
+    public PublisherBuilder<String> transactionRsoPublisherBuilder() throws SystemException {
         ContextEntity entity = new ContextEntity();
         entity.setName("KK");
         em.persist(entity);
@@ -205,7 +214,7 @@ public class TxContextPropagationEndpoint {
                     }
                     TestUtils.assertEquals(Status.STATUS_ACTIVE, status2);
                     return text;
-                }).buildRs();
+                });
     }
 
     @Transactional
@@ -249,6 +258,14 @@ public class TxContextPropagationEndpoint {
     @Path("/transaction-propagated-publisher")
     @Stream(value = Stream.MODE.RAW)
     public Publisher<String> transactionPropagatedToPublisher() {
+        return transactionPropagatedToPublisherBuilder().buildRs();
+    }
+
+    @Transactional
+    @GET
+    @Path("/transaction-propagated-publisher-builder")
+    @Stream(value = Stream.MODE.RAW)
+    public PublisherBuilder<String> transactionPropagatedToPublisherBuilder() {
         ContextEntity entity = new ContextEntity();
         entity.setName("KK");
         em.persist(entity);
@@ -270,7 +287,7 @@ public class TxContextPropagationEndpoint {
                     entity2.setName("KK");
                     em.persist(entity2);
                     return "OK";
-                }).buildRs();
+                });
     }
 
     @Transactional
@@ -278,6 +295,14 @@ public class TxContextPropagationEndpoint {
     @Path("/transaction-propagated-cs-wrapped-in-publisher")
     @Stream(value = Stream.MODE.RAW)
     public Publisher<String> transactionPropagatedToManagedExecutorWrappedInPublisher() {
+        return transactionPropagatedToManagedExecutorWrappedInPublisherBuilder().buildRs();
+    }
+
+    @Transactional
+    @GET
+    @Path("/transaction-propagated-cs-wrapped-in-publisher-builder")
+    @Stream(value = Stream.MODE.RAW)
+    public PublisherBuilder<String> transactionPropagatedToManagedExecutorWrappedInPublisherBuilder() {
         ContextEntity entity = new ContextEntity();
         entity.setName("KK");
         em.persist(entity);
@@ -305,7 +330,7 @@ public class TxContextPropagationEndpoint {
                     entity2.setName("KK");
                     em.persist(entity2);
                     return "OK";
-                }).buildRs();
+                });
     }
 
     @Transactional

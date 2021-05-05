@@ -418,7 +418,13 @@
         <version.org.jboss.mod_cluster>1.4.3.Final</version.org.jboss.mod_cluster>
         <version.org.jboss.narayana>5.11.2.Final</version.org.jboss.narayana>
         <version.org.jboss.openjdk-orb>8.1.5.Final</version.org.jboss.openjdk-orb>
-				<!-- From https://github.com/kabir/Resteasy/tree/3.15-context-propagation -->
+        <!--
+            TODO This is a bit weird for now :)
+            First build https://github.com/kabir/Resteasy/tree/3.15-context-propagation for the main
+            RestEasy bits and the new context propagation module.
+            Then build just the resteasy-reactive-streams-operators module of
+            https://github.com/ronsigal/Resteasy/tree/eap7-1661.
+        -->
         <version.org.jboss.resteasy>3.15.2-SNAPSHOT</version.org.jboss.resteasy>
         <version.org.jboss.seam.int>7.0.0.GA</version.org.jboss.seam.int>
         <version.org.jboss.security.jboss-negotiation>3.0.6.Final</version.org.jboss.security.jboss-negotiation>
@@ -2401,6 +2407,18 @@
             <dependency>
                 <groupId>io.smallrye.reactive</groupId>
                 <artifactId>smallrye-reactive-converter-api</artifactId>
+                <version>${version.io.smallrye.reactive-utils}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
+                <artifactId>smallrye-reactive-converter-reactive-streams-operators</artifactId>
                 <version>${version.io.smallrye.reactive-utils}</version>
                 <exclusions>
                     <exclusion>
@@ -8071,6 +8089,18 @@
                     <exclusion>
                         <groupId>org.jboss.logging</groupId>
                         <artifactId>jboss-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-reactive-streams-operators</artifactId>
+                <version>${version.org.jboss.resteasy}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>*</artifactId>
+                        <groupId>*</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>

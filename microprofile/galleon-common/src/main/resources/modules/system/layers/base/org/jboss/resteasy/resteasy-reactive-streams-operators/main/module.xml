@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ JBoss, Home of Professional Open Source.
-  ~ Copyright 2020, Red Hat, Inc., and individual contributors
+  ~ Copyright 2010, Red Hat, Inc., and individual contributors
   ~ as indicated by the @author tags. See the copyright.txt file in the
   ~ distribution for a full listing of individual contributors.
   ~
@@ -21,15 +22,26 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-reactive-streams-operators">
+<module xmlns="urn:jboss:module:1.9" name="org.jboss.resteasy.resteasy-reactive-streams-operators">
+
+    <properties>
+        <property name="jboss.api" value="private"/>
+    </properties>
+    <resources>
+        <artifact name="${org.jboss.resteasy:resteasy-reactive-streams-operators}" />
+    </resources>
+
+    <!--
+        This is set up as a passive runtime dependency in the subsystem, so it will only get provisioned
+        if the dependencies below are provisioned.
+    -->
     <dependencies>
-        <layer name="cdi"/>
+        <module name="io.reactivex.rxjava2.rxjava"/>
+        <module name="javax.enterprise.api"/>
+        <module name="javax.ws.rs.api"/>
+        <module name="org.eclipse.microprofile.reactive-streams-operators.api"/>
+        <module name="org.reactivestreams"/>
+        <module name="org.jboss.logging"/>
+        <module name="org.jboss.resteasy.resteasy-jaxrs"/>
     </dependencies>
-
-    <feature spec="subsystem.microprofile-reactive-streams-operators-smallrye"/>
-
-    <packages>
-        <package name="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
-        <package name="io.smallrye.reactive.converters.reactive-streams-operators"/>
-    </packages>
-</layer-spec>
+</module>

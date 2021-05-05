@@ -56,13 +56,13 @@ public class ReactiveStreamsOperatorsDependencyProcessor implements DeploymentUn
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.reactivestreams", false, false, true, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.mutiny.reactive-streams-operators", false, false, true, false));
         ModuleDependency moduleDependency = cdiDependency(new ModuleDependency(moduleLoader, "org.wildfly.reactive.mutiny.reactive-streams-operators.cdi-provider", false, false, true, false));
-
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.jboss.resteasy.resteasy-reactive-streams-operators", true, false, true, false));
         moduleSpecification.addSystemDependency(moduleDependency);
 
 
         // Converters
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.converters.api", true, false, false, false));
-        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.converters.rxjava2", true, false, true, false));
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.converters.reactive-streams-operators", true, false, true, false));
 
     }
 

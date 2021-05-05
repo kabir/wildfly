@@ -104,7 +104,6 @@ public class ContextPropagationEndpoint {
             throw new IllegalStateException("TCCL was not the same");
         }
         return text;
-
     }
 
     @GET
