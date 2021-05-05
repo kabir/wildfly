@@ -1205,6 +1205,16 @@
                 <artifactId>wildfly-microprofile-context-propagation-mutiny-integration</artifactId>
                 <version>${full.maven.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-context-propagation-provider-plugin-application-naming</artifactId>
+                <version>${full.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-context-propagation-provider-servlet</artifactId>
+                <version>${full.maven.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>${full.maven.groupId}</groupId>

@@ -35,9 +35,8 @@
             Most CP dependencies are provisioned in the subsystem definition, as they are not
             required by the subsystem itself, only by the deployments
         -->
-        <module name="io.undertow.servlet"/>
         <module name="org.eclipse.microprofile.context-propagation.api"/>
-        <module name="org.wildfly.context-propagation.mutiny-integration"/>
+        <module name="org.wildfly.reactive.context-propagation.mutiny-integration"/>
         <module name="org.wildfly.security.manager"/>
     </dependencies>
 </module>

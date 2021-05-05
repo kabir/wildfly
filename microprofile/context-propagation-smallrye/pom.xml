@@ -42,5 +42,7 @@
     <modules>
         <module>extension</module>
         <module>mutiny-integration</module>
+        <module>provider-plugin-application-naming</module>
+        <module>provider-servlet</module>
     </modules>
 </project>
