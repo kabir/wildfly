@@ -30,7 +30,7 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.modules.Module;
-import org.wildfly.extension.microprofile.context.propagation.mutiny.ThreadContextRegistry;
+import org.wildfly.microprofile.context.propagation.mutiny.ThreadContextRegistry;
 import org.wildfly.security.manager.WildFlySecurityManager;
 
 import io.smallrye.context.SmallRyeContextManagerProvider;

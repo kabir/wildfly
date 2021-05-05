@@ -30,6 +30,11 @@
         <artifact name="${org.jboss.resteasy:resteasy-context-propagation}"/>
     </resources>
 
+    <!--
+        This module is set up as a passive dependency in the Context Propagation
+        subsystem. It will only be provisioned if the dependencies
+        in the below list are provisioned
+    -->
     <dependencies>
         <module name="javax.ws.rs.api"/>
         <module name="org.eclipse.microprofile.context-propagation.api"/>

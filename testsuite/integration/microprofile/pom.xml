@@ -303,8 +303,7 @@
                                 <layer>microprofile-opentracing</layer>
                                 <!-- Dependencies for reactive specs -->
                                 <layer>microprofile-reactive-messaging-kafka</layer>
-                                <layer>microprofile-context-propagation-jaxrs</layer>
-                                <layer>microprofile-context-propagation-jta</layer>
+                                <layer>microprofile-context-propagation</layer>
                                 <layer>h2-default-datasource</layer>
                             </layers>
                         </configuration>
@@ -446,8 +445,7 @@
                                                 <layer>ejb</layer>
                                                 <!-- Dependencies for reactive specs -->
                                                 <layer>microprofile-reactive-messaging-kafka</layer>
-                                                <layer>microprofile-context-propagation-jaxrs</layer>
-                                                <layer>microprofile-context-propagation-jta</layer>
+                                                <layer>microprofile-context-propagation</layer>
                                                 <layer>h2-default-datasource</layer>
                                             </layers>
                                         </config>
@@ -570,8 +568,7 @@
                                                 <layer>ejb</layer>
                                                 <!-- Dependencies for reactive specs -->
                                                 <layer>microprofile-reactive-messaging-kafka</layer>
-                                                <layer>microprofile-context-propagation-jaxrs</layer>
-                                                <layer>microprofile-context-propagation-jta</layer>
+                                                <layer>microprofile-context-propagation</layer>
                                                 <layer>h2-default-datasource</layer>
                                             </layers>
                                         </config>
