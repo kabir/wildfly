@@ -23,6 +23,11 @@
         <artifact name="${io.smallrye:smallrye-context-propagation-jta}"/>
     </resources>
 
+    <!--
+        This module is set up as a passive dependency in the Context Propagation
+        subsystem. It will only be provisioned if the dependencies
+        in the below list are provisioned
+    -->
     <dependencies>
         <module name="io.smallrye.reactive.converters.api"/>
         <module name="javax.enterprise.api"/>

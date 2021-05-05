@@ -22,6 +22,8 @@
 
 package org.wildfly.extension.microprofile.context.propagation.deployment;
 
+import java.util.List;
+
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -35,6 +37,17 @@ import org.jboss.modules.ModuleLoader;
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
  */
 public class ContextPropagationDependencyProcessor implements DeploymentUnitProcessor {
+
+    // These all depend on modules which may or may not have been provisioned.
+    // For example the JtaContextProvider uses the Jta modules.
+    // Set them up as passive so that they are only provisioned if their dependencies
+    // have been provisioned
+    private List<String> passiveProviderModules;
+
+    public ContextPropagationDependencyProcessor(List<String> passiveProviderModules) {
+
+        this.passiveProviderModules = passiveProviderModules;
+    }
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) {
@@ -52,20 +65,17 @@ public class ContextPropagationDependencyProcessor implements DeploymentUnitProc
         final ModuleLoader moduleLoader = Module.getBootModuleLoader();
 
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.wildfly.extension.microprofile.context-propagation-smallrye", false, false, true, false));
-        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.wildfly.context-propagation.mutiny-integration", false, false, true, false));
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.wildfly.reactive.context-propagation.mutiny-integration", false, false, true, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.eclipse.microprofile.context-propagation.api", false, false, true, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.context-propagation.api", false, false, true, false));
         moduleSpecification.addSystemDependency(cdiDependency(new ModuleDependency(moduleLoader, "io.smallrye.context-propagation", false, false, true, false)));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.reactive.mutiny.context-propagation", false, false, false, false));
-
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.wildfly.security.manager", false, false, true, false));
 
-        // From the context-propagation-jta layer
-        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.jboss.jts", true, false, true, false));
-        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "io.smallrye.context-propagation.providers.jta", true, false, true, false));
-
-        // From the context-propagation-resteasy layer
-        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, "org.jboss.resteasy.resteasy-context-propagation", true, false, true, false));
+        for (String passiveModule : passiveProviderModules) {
+            moduleSpecification.addSystemDependency(
+                    new ModuleDependency(moduleLoader, passiveModule, true, false, true, false));
+        }
     }
 
 
