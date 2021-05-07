@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wildfly.test.integration.microprofile.reactive.context.propagation.sanity;
+package org.wildfly.test.integration.microprofile.reactive.context.propagation.sanity.simple;
 
 import java.security.PrivilegedAction;
 import java.util.concurrent.Callable;
@@ -32,6 +32,7 @@ import org.jboss.as.test.shared.TimeoutUtil;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.weld.proxy.WeldClientProxy;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,11 +78,15 @@ public class ContextPropagationSanityTestCase {
     @Test
     public void testManagedExecutorWasInjected() {
         Assert.assertNotNull(managedExecutor);
+        WeldClientProxy proxy = (WeldClientProxy) managedExecutor;
+        Assert.assertSame(Producers.class, proxy.getMetadata().getBean().getBeanClass());
     }
 
     @Test
     public void testThreadContextWasInjected() {
         Assert.assertNotNull(threadContext);
+        WeldClientProxy proxy = (WeldClientProxy) threadContext;
+        Assert.assertSame(Producers.class, proxy.getMetadata().getBean().getBeanClass());
     }
 
     @Test
