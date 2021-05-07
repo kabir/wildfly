@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wildfly.test.integration.microprofile.reactive.context.propagation.rest;
+package org.wildfly.test.integration.microprofile.reactive.context.propagation.sanity.rest;
 
 import java.net.URL;
 
@@ -71,6 +71,7 @@ public class ContextPropagationClientTestCase {
     }
 
     @Test
+
     public void testTcclRsoJavaPropagation() {
         RestAssured.when().get(url.toExternalForm() + "context/tccl-rso").then()
                 .statusCode(Response.Status.OK.getStatusCode());
