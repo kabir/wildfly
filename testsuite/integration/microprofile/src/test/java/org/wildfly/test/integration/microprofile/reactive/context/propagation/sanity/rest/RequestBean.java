@@ -1,4 +1,4 @@
-package org.wildfly.test.integration.microprofile.reactive.context.propagation.rest;
+package org.wildfly.test.integration.microprofile.reactive.context.propagation.sanity.rest;
 
 import javax.enterprise.context.RequestScoped;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wildfly.test.integration.microprofile.reactive.context.propagation.sanity;
+package org.wildfly.test.integration.microprofile.reactive.context.propagation.sanity.simple;
 
 import java.security.PrivilegedAction;
 import java.util.concurrent.Callable;
