@@ -1,0 +1,67 @@
+[[MicroProfile_Context_Propagation_SmallRye]]
+= MicroProfile Context Propagation Subsystem Configuration
+
+Support for https://github.com/eclipse/microprofile-context-propagation[MicroProfile Context Propagation] is
+provided as a Tech Preview feature by the _microprofile-context-propagation-smallrye_ subsystem.
+
+[[required-extension-microprofile-context-propagation-smallrye]]
+== Required Extension
+
+This extension is *not* included in the standard configurations included in the WildFly distribution.
+
+You can add the extension to a configuration either by adding
+an `<extension module="org.wildfly.extension.microprofile.context-propagation-smallrye"/>`
+element to the xml or by using the following CLI operation:
+
+[source,options="nowrap"]
+----
+[standalone@localhost:9990 /] /extension=org.wildfly.extension.microprofile.context-propagation-smallrye:add
+{"outcome" => "success"}
+
+[standalone@localhost:9990 /] /subsystem=microprofile-context-propagation-smallrye:add
+{
+    "outcome" => "success",
+    "response-headers" => {
+        "operation-requires-reload" => true,
+        "process-state" => "reload-required"
+    }
+}
+----
+
+
+If you provision your own server and include the `microprofile-context-propagation` layer, you will get the required modules, and the extension and subsystem will be added to your configuration.
+
+== Specification
+
+WildFly's MicroProfile Context Propagation subsystem implements MicroProfile Context Propagation 1.2, which introduces APIs for propagating contexts across units of work that are thread-agnostic. It makes it possible to propagate context that was traditionally associated to the current thread across various types of units of work such as CompletionStage, CompletableFuture, Function, Runnable regardless of which particular thread ends up executing them. If you use `PublisherBuilder` from <<MicroProfile_Reactive_Streams_Operators_SmallRye, MicroProfile Reactive Streams Operators>>, you also get context propagation when handling data streams.
+
+== Configuration
+The `microprofile-context-propagation-smallrye` subsystem contains no configurable attributes or resources. Its presence makes the interfaces
+and functionality from MicroProfile Context Propagation available to a deployment, and provides the implementation. Additionally, it makes instances of
+https://github.com/eclipse/microprofile-context-propagation/blob/1.2/api/src/main/java/org/eclipse/microprofile/context/ManagedExecutor.java[ManagedExecutor] and https://github.com/eclipse/microprofile-context-propagation/blob/1.2/api/src/main/java/org/eclipse/microprofile/context/ThreadContext.java[ThreadContext] available for injection.
+
+== ThreadContextProvider implementations
+
+WildFly supplies `ThreadContextProvider` implementations, meaning you get propagation of context, for the following areas:
+
+* `Application` - propagates the ThreadContextClassLoader and the current naming context.
+* `CDI` - propagates the CDI context so the same CDI bean instances get injected into code potentially running on another thread.
+* `Transaction` - JTA transactions get propagated to into code potentially running on another thread.
+* `RestEasy` - the RestEasy context is propagated. This means that `@Context` annotated parameters to a REST endpoint for JAX-RS constructs such as `javax.ws.rs.core.UriInfo` get propagated to code potentially running on another thread.
+* `Servlet` - the servlet context is propagated. This means that `@Context` annotated parameters to a REST endpoint for Servlet constructs such as `javax.servlet.http.HttpServletRequest` get propagated.
+
+Note that the subsystem implementing the core functionality for each of these must be enabled for propagation to take place. For example, if the `transactions` modules are not available or the `transactions` subsystem is not enabled in your configuration, you will not get propagation of the JTA transactions.
+
+=== Activation
+If the subsystem is present, the MicroProfile Context Propagation functionality will be available for all deployments on the server.
+
+== Component Reference
+
+The MicroProfile Context Propagation implementation is provided by the SmallRye Context Propagation project.
+
+****
+
+* https://github.com/eclipse/microprofile-context-propagation[MicroProfile Context Propagation]
+* https://github.com/smallrye/smallrye-mutiny[SmallRye Mutiny]
+
+****
