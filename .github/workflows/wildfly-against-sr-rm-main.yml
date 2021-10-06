@@ -1,0 +1,80 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Check Integration with SmallRye Reactive Messaging upstream
+
+on:
+  schedule:
+    - cron: '45 11 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout WildFly
+        uses: actions/checkout@v4
+        with: 
+          path: wildfly
+          fetch-depth: 0
+          # Needed to push in case there are changes to the workflows upstream, or we will fail when pushing below
+          token: ${{ secrets.UPDATE_WORKFLOW }}
+          
+#      - name: Setup tmate session
+#        uses: mxschmitt/action-tmate@v3
+        
+      - name: Rebase WildFly
+        working-directory: wildfly
+        run: |
+          echo "checking branch"
+          git branch
+          echo "checked branch"
+          git remote add upstream https://github.com/wildfly/wildfly.git
+          git fetch upstream
+          git config --global user.email "kkhan@redhat.com"
+          git config --global user.name "Kabir Khan"
+          git rebase upstream/main
+          if [ $? -ne 0 ]; then
+             exit 1
+          fi
+          git push --force origin ${GITHUB_REF}
+          
+      - name: Checkout SmallRye Reactive Messaging
+        uses: actions/checkout@v4
+        with:
+          path: smallrye
+          repository: 'smallrye/smallrye-reactive-messaging'
+          
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Build SmallRye Reactive Messaging
+        run: mvn install -B -DskipTests -Drevapi.skip=true
+        working-directory: smallrye
+  
+      - name: Grab SmallRye Reactive Messaging Version
+        id: grab-version
+        run: |
+          mvn -B help:evaluate -Dexpression=project.version -pl .
+          TMP="$(mvn -B help:evaluate -Dexpression=project.version -pl . | grep -v '^\[')"
+          echo "version: ${TMP}"
+          echo "VERSION_SMALLRYE=${TMP}" >> $GITHUB_ENV
+        working-directory: smallrye
+          
+      - name: Add '::1 localhost' to hosts file
+        run: sudo bash -c 'echo ::1 localhost >> /etc/hosts'
+        
+      - name: Build WildFly
+        run: mvn -B install -DskipTests -Dskip.preview -Dversion.io.smallrye.smallrye-reactive-messaging=${VERSION_SMALLRYE}
+        working-directory: wildfly
+
+      - name: Run WildFly tests
+        run: mvn -B install -DallTests -Dversion.io.smallrye.smallrye-reactive-messaging=${VERSION_SMALLRYE} -pl testsuite/integration/expansion,testsuite/integration/microprofile-tck/reactive-messaging
+        working-directory: wildfly
