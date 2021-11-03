@@ -22,13 +22,13 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.9" name="io.netty">
+<module xmlns="urn:jboss:module:1.9" name="io.netty.netty-codec-dns">
     <properties>
         <property name="jboss.api" value="private"/>
     </properties>
 
     <resources>
-        <artifact name="${io.netty:netty-all}"/>
+        <artifact name="${io.netty:netty-codec-dns}"/>
     </resources>
 
     <dependencies>
@@ -40,5 +40,9 @@
         <module name="sun.jdk"/>
         <module name="jdk.sctp"/>
         <module name="jdk.unsupported"/>
+        <module name="io.netty.netty-common" />
+        <module name="io.netty.netty-buffer" />
+        <module name="io.netty.netty-transport" />
+        <module name="io.netty.netty-codec" />
     </dependencies>
 </module>
