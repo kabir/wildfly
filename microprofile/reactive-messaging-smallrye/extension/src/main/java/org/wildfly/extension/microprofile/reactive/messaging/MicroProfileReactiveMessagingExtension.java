@@ -89,7 +89,7 @@ public class MicroProfileReactiveMessagingExtension implements Extension {
         if (cl instanceof ModuleClassLoader) {
             ModuleLoader loader = ((ModuleClassLoader) cl).getModule().getModuleLoader();
             try {
-                Module module = loader.loadModule("io.netty");
+                Module module = loader.loadModule("io.netty.netty-common");
                 InternalLoggerFactory.setDefaultFactory(JdkLoggerFactory.INSTANCE);
             } catch (ModuleLoadException e) {
                 // The netty module is not there so don't do anything
