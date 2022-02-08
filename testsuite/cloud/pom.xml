@@ -126,6 +126,7 @@
                                                 <from>${image.name.wildfly.builder}</from>
                                                 <assembly>
                                                     <mode>dir</mode>
+                                                    <user>jboss:root</user>
 <!--                                                    <baseDir>target/cloud-server</baseDir>-->
                                                     <targetDir>/opt/server</targetDir>
                                                     <descriptor>${project.basedir}/src/test/resources/assembly/cloud-server.xml</descriptor>
@@ -140,6 +141,9 @@
                                                     </inline>
 -->
                                                 </assembly>
+                                                <runCmds>
+                                                    <run>chown -R jboss:root /opt/server</run>
+                                                </runCmds>
                                             </build>
                                         </image>
                                     </images>
