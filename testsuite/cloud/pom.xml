@@ -127,19 +127,21 @@
                                                 <assembly>
                                                     <mode>dir</mode>
                                                     <user>jboss:root</user>
-<!--                                                    <baseDir>target/cloud-server</baseDir>-->
                                                     <targetDir>/opt/server</targetDir>
-                                                    <descriptor>${project.basedir}/src/test/resources/assembly/cloud-server.xml</descriptor>
-<!--
                                                     <inline>
-                                                        <files>
-
-                                                        </files>
+                                                        <formats>
+                                                            <format>dir</format>
+                                                        </formats>
                                                         <fileSets>
-                                                            <directory>${project.basedir}/target/cloud-server</directory>
+                                                            <fileSet>
+                                                                <directory>target/cloud-server/server</directory>
+                                                                <outputDirectory>/</outputDirectory>
+                                                                <includes>
+                                                                    <include>**</include>
+                                                                </includes>
+                                                            </fileSet>
                                                         </fileSets>
                                                     </inline>
--->
                                                 </assembly>
                                                 <runCmds>
                                                     <run>chown -R jboss:root /opt/server</run>
