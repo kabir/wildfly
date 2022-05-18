@@ -69,8 +69,8 @@
                             scheduled-thread-pool-max-size="${scheduled.thread.pool.max.size:24}"
                             thread-pool-max-size="${thread.pool.max.size:48}"
                             group-id="${group.id:myGroup}"
-                            deserialization-black-list="org.foo.Bar org.foo.Baz"
-                            deserialization-white-list="org.bar.Bar org.baz.Baz"
+                            deserialization-block-list="org.foo.Bar org.foo.Baz"
+                            deserialization-allow-list="org.bar.Bar org.baz.Baz"
                             initial-message-packet-size="${initial.message.packet.size:456}"
                         use-topology-for-load-balancing="false"
                         enable-amq1-prefix="false" />
@@ -192,8 +192,8 @@
         <connection-factory name="otherConnectionFactory"
                             discovery-group="groupC"
                             entries="otherConnectionFactory"
-                            deserialization-black-list="org.foo.Bar org.foo.Baz"
-                            deserialization-white-list="org.bar.Bar org.baz.Baz"
+                            deserialization-block-list="org.foo.Bar org.foo.Baz"
+                            deserialization-allow-list="org.bar.Bar org.baz.Baz"
                             initial-message-packet-size="${initial.message.packet.size:12345}"/>
 
         <pooled-connection-factory name="hornetq-ra-local"
@@ -214,8 +214,8 @@
                                    entries="java:/JmsLocal2"
                                    connectors="in-vm"
                                    user="foo"
-                                   deserialization-black-list="org.foo.Bar org.foo.Baz"
-                                   deserialization-white-list="org.bar.Bar org.baz.Baz">
+                                   deserialization-block-list="org.foo.Bar org.foo.Baz"
+                                   deserialization-allow-list="org.bar.Bar org.baz.Baz">
             <credential-reference clear-text="passwordOut!"/>
         </pooled-connection-factory>
 
@@ -255,8 +255,8 @@
                                    entries="java:/JmsLocal2"
                                    connectors="in-vm"
                                    user="foo"
-                                   deserialization-black-list="org.foo.Bar org.foo.Baz"
-                                   deserialization-white-list="org.bar.Bar org.baz.Baz">
+                                   deserialization-block-list="org.foo.Bar org.foo.Baz"
+                                   deserialization-allow-list="org.bar.Bar org.baz.Baz">
             <credential-reference store="cs1" clear-text="pooledpass"/>
         </pooled-connection-factory>
     </server>
