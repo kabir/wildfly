@@ -219,6 +219,7 @@ public interface ConnectionFactoryAttributes {
                 .setAttributeParser(AttributeParser.STRING_LIST)
                 .setAttributeMarshaller(AttributeMarshaller.STRING_LIST)
                 .setDeprecated(ModelVersion.create(13, 0, 0), false)
+                .setAlternatives("deserialization-allow-list")
                 .setRestartAllServices()
                 .build();
 
@@ -238,6 +239,7 @@ public interface ConnectionFactoryAttributes {
                 .setAttributeParser(AttributeParser.STRING_LIST)
                 .setAttributeMarshaller(AttributeMarshaller.STRING_LIST)
                 .setDeprecated(ModelVersion.create(13, 0, 0), false)
+                .setAlternatives("deserialization-block-list")
                 .setRestartAllServices()
                 .build();
 

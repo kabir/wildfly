@@ -98,14 +98,6 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
     }
 
     private static void registerTransformers_WF_27(ResourceTransformationDescriptionBuilder subsystem) {
-        ResourceTransformationDescriptionBuilder externaljmsqueue = subsystem.addChildResource(MessagingExtension.EXTERNAL_JMS_QUEUE_PATH);
-        rejectDefinedAttributeWithDefaultValue(externaljmsqueue, ConnectionFactoryAttributes.External.ENABLE_AMQ1_PREFIX);
-        ResourceTransformationDescriptionBuilder externaljmstopic = subsystem.addChildResource(MessagingExtension.EXTERNAL_JMS_TOPIC_PATH);
-        rejectDefinedAttributeWithDefaultValue(externaljmstopic, ConnectionFactoryAttributes.External.ENABLE_AMQ1_PREFIX);
-        ResourceTransformationDescriptionBuilder server = subsystem.addChildResource(MessagingExtension.SERVER_PATH);
-        ResourceTransformationDescriptionBuilder bridge = server.addChildResource(MessagingExtension.BRIDGE_PATH);
-        rejectDefinedAttributeWithDefaultValue(bridge, BridgeDefinition.ROUTING_TYPE);
-
         ResourceTransformationDescriptionBuilder externalConnectionFactory = subsystem.addChildResource(MessagingExtension.CONNECTION_FACTORY_PATH);
         renameAttribute(externalConnectionFactory, DESERIALIZATION_BLACKLIST, DESERIALIZATION_BLOCKLIST);
         renameAttribute(externalConnectionFactory, DESERIALIZATION_WHITELIST, DESERIALIZATION_ALLOWLIST);
@@ -113,6 +105,10 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
         ResourceTransformationDescriptionBuilder pooledExternalConnectionFactory = subsystem.addChildResource(MessagingExtension.POOLED_CONNECTION_FACTORY_PATH);
         renameAttribute(pooledExternalConnectionFactory, DESERIALIZATION_BLACKLIST, DESERIALIZATION_BLOCKLIST);
         renameAttribute(pooledExternalConnectionFactory, DESERIALIZATION_WHITELIST, DESERIALIZATION_ALLOWLIST);
+
+        ResourceTransformationDescriptionBuilder server = subsystem.addChildResource(MessagingExtension.SERVER_PATH);
+        ResourceTransformationDescriptionBuilder bridge = server.addChildResource(MessagingExtension.BRIDGE_PATH);
+        rejectDefinedAttributeWithDefaultValue(bridge, BridgeDefinition.ROUTING_TYPE);
 
         ResourceTransformationDescriptionBuilder connectionFactory = server.addChildResource(MessagingExtension.CONNECTION_FACTORY_PATH);
         renameAttribute(connectionFactory, DESERIALIZATION_BLACKLIST, DESERIALIZATION_BLOCKLIST);
@@ -158,7 +154,6 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
         clusterConnection.getAttributeBuilder()
                 .setValueConverter(AttributeConverter.DEFAULT_VALUE, CommonAttributes.BRIDGE_CONFIRMATION_WINDOW_SIZE)
                 .end();
-
     }
 
     private static void registerTransformers_WF_22(ResourceTransformationDescriptionBuilder subsystem) {
@@ -208,9 +203,7 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
                 ConnectionFactoryAttributes.Common.SCHEDULED_THREAD_POOL_MAX_SIZE,
                 ConnectionFactoryAttributes.Common.THREAD_POOL_MAX_SIZE,
                 ConnectionFactoryAttributes.Common.GROUP_ID,
-                ConnectionFactoryAttributes.Common.DESERIALIZATION_ALLOWLIST,
                 ConnectionFactoryAttributes.Common.DESERIALIZATION_BLACKLIST,
-                ConnectionFactoryAttributes.Common.DESERIALIZATION_BLOCKLIST,
                 ConnectionFactoryAttributes.Common.DESERIALIZATION_WHITELIST,
                 ConnectionFactoryAttributes.Common.INITIAL_MESSAGE_PACKET_SIZE);
     }

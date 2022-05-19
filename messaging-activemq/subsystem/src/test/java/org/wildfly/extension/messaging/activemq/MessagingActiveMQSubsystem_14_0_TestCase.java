@@ -21,6 +21,7 @@ import static org.jboss.as.model.test.ModelTestControllerVersion.EAP_7_0_0;
 import static org.jboss.as.model.test.ModelTestControllerVersion.EAP_7_1_0;
 import static org.jboss.as.model.test.ModelTestControllerVersion.EAP_7_2_0;
 import static org.jboss.as.model.test.ModelTestControllerVersion.EAP_7_3_0;
+import static org.jboss.as.model.test.ModelTestControllerVersion.EAP_7_4_0;
 import static org.junit.Assert.assertTrue;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.BRIDGE;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.DEFAULT;
@@ -162,6 +163,11 @@ public class MessagingActiveMQSubsystem_14_0_TestCase extends AbstractSubsystemB
     }
 
     @Test
+    public void testTransformersEAP_7_4_0() throws Exception {
+        testTransformers(EAP_7_4_0, MessagingExtension.VERSION_13_0_0);
+    }
+
+    @Test
     public void testTransformersEAP_7_3_0() throws Exception {
         testTransformers(EAP_7_3_0, MessagingExtension.VERSION_8_0_0);
     }
@@ -179,6 +185,11 @@ public class MessagingActiveMQSubsystem_14_0_TestCase extends AbstractSubsystemB
     @Test
     public void testTransformersEAP_7_0_0() throws Exception {
         testTransformers(EAP_7_0_0, MessagingExtension.VERSION_1_0_0);
+    }
+
+    @Test
+    public void testRejectingTransformersEAP_7_4_0() throws Exception {
+        testRejectingTransformers(EAP_7_4_0, MessagingExtension.VERSION_13_0_0);
     }
 
     @Test
@@ -488,7 +499,7 @@ public class MessagingActiveMQSubsystem_14_0_TestCase extends AbstractSubsystemB
                     ConnectionFactoryAttributes.Common.DESERIALIZATION_BLACKLIST,
                     ConnectionFactoryAttributes.Common.DESERIALIZATION_WHITELIST,
                     ConnectionFactoryAttributes.Common.INITIAL_MESSAGE_PACKET_SIZE));
-        } else {
+        } else if (messagingVersion.compareTo(MessagingExtension.VERSION_12_0_0) > 0) {
             config.addFailedAttribute(subsystemAddress.append(CONNECTION_FACTORY_PATH), new FailedOperationTransformationConfig.NewAttributesConfig(
                     ConnectionFactoryAttributes.Common.CLIENT_FAILURE_CHECK_PERIOD,
                     ConnectionFactoryAttributes.Common.CONNECTION_TTL,
@@ -545,6 +556,11 @@ public class MessagingActiveMQSubsystem_14_0_TestCase extends AbstractSubsystemB
                     new FailedOperationTransformationConfig.NewAttributesConfig(ConnectionFactoryAttributes.External.ENABLE_AMQ1_PREFIX));
             config.addFailedAttribute(subsystemAddress.append(EXTERNAL_JMS_TOPIC_PATH),
                     new FailedOperationTransformationConfig.NewAttributesConfig(ConnectionFactoryAttributes.External.ENABLE_AMQ1_PREFIX));
+        } else {
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, BRIDGE_PATH), new FailedOperationTransformationConfig.NewAttributesConfig(BridgeDefinition.ROUTING_TYPE));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH), new FailedOperationTransformationConfig.NewAttributesConfig(
+                    ServerDefinition.ADDRESS_QUEUE_SCAN_PERIOD
+            ));
         }
         ModelTestUtils.checkFailedTransformedBootOperations(mainServices, messagingVersion, ops, config);
         mainServices.shutdown();
