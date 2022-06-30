@@ -44,7 +44,8 @@ import java.util.Map;
 @Path("/")
 @Produces(MediaType.TEXT_PLAIN)
 public class JmxResource {
-    private static final String MBEAN_NAME = "jboss.as:subsystem=datasources,data-source=ExampleDS,statistics=pool";
+    private static final String DATASOURCE_MBEAN_NAME = "jboss.as:subsystem=datasources,data-source=ExampleDS,statistics=pool";
+    private static final String ROOT_MBEAN_NAME = "jboss.as:management-root=server";
 
     String HOST_NAME = "127.0.0.1";
     String PORT = "9990";
@@ -71,7 +72,7 @@ public class JmxResource {
         for (int i = 0; i < servers.size(); i++) {
             MBeanServer server = servers.get(i);
 
-            if (server.isRegistered(ObjectName.getInstance(MBEAN_NAME))) {
+            if (server.isRegistered(ObjectName.getInstance(DATASOURCE_MBEAN_NAME))) {
                 response = callMBeanServer(server);
             }
         }
@@ -98,8 +99,14 @@ public class JmxResource {
 
     private Response callMBeanServer(MBeanServerConnection server) {
         try {
-            Object r = server.getAttribute(new ObjectName(MBEAN_NAME), "ActiveCount");
-            return Response.ok("ok").build();
+            server.getAttribute(new ObjectName(DATASOURCE_MBEAN_NAME), "ActiveCount");
+            Object whoAmI = server.invoke(new ObjectName(ROOT_MBEAN_NAME), "whoami", new Object[]{Boolean.TRUE}, new String[]{"verbose"});
+            System.out.println("=======================================");
+            System.out.println(whoAmI.getClass());
+            System.out.println(whoAmI);
+            System.out.println("=======================================");
+
+            return Response.ok(whoAmI.toString()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

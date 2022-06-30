@@ -66,6 +66,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ROL
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.USERNAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.USE_IDENTITY_ROLES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -121,19 +122,33 @@ public abstract class AbstractJmxAccessFromDeploymentWithRbacTest {
     @Test
     public void testJmxCallWithPlatformMBeanServer() throws Exception {
         String result = performCall("platform");
-        assertEquals("ok", result);
+        checkResult(result, securedApplication ? "kabir" : "anonymous");
     }
 
     @Test
     public void testJmxCallWithFoundMBeanServer() throws Exception {
         String result = performCall("found");
-        assertEquals("ok", result);
+        checkResult(result, securedApplication ? "kabir" : "anonymous");
     }
 
     @Test
     public void testJmxCallWithRemoteMBeanServer() throws Exception {
         String result = performCall("remote");
-        assertEquals("ok", result);
+        checkResult(result, "$local");
+    }
+
+    private void checkResult(String result, String userName) {
+        ModelNode resultNode = ModelNode.fromString(result);
+        Assert.assertEquals(userName, resultNode.get(IDENTITY, USERNAME).asString());
+
+//        checkSuperUserInList(resultNode.get(ROLES));
+        //checkSuperUserInList(resultNode.get(ATTRIBUTES, "groups"));
+        checkSuperUserInList(resultNode.get("mapped-roles"));
+    }
+
+    private void checkSuperUserInList(ModelNode modelNode) {
+        Assert.assertEquals(1, modelNode.asList().size());
+        Assert.assertEquals("SuperUser", modelNode.asList().get(0).asString());
     }
 
     static class EnableRbacSetupTask extends SnapshotRestoreSetupTask {
