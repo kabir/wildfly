@@ -3919,6 +3919,34 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- New plugin to index the annotation marked as experimental -->
+            <plugin>
+                <groupId>org.wildfly.plugin</groupId>
+                <artifactId>experimental-annotation-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>index-experimental-annotations</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>index-experimental-annotations</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <annotation>org.hibernate.Incubating</annotation>
+                                    <groupIds>
+                                        <!-- Wildcard support would be better than having to list everything -->
+                                        <groupId>org.hibernate.orm</groupId>
+                                        <groupId>org.hibernate.search</groupId>
+                                        <groupId>org.hibernate.validator</groupId>
+                                    </groupIds>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

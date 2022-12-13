@@ -88,6 +88,46 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- New plugin to index the annotation marked as experimental -->
+            <plugin>
+                <groupId>org.wildfly.plugin</groupId>
+                <artifactId>experimental-annotation-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>index-experimental-annotations</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>index-experimental-annotations</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <annotation>io.smallrye.common.annotation.Experimental</annotation>
+                                    <groupIds>
+                                        <!-- Wildcard support would be better than having to list everything -->
+                                        <groupId>io.smallrye</groupId>
+                                        <groupId>io.smallrye.common</groupId>
+                                        <groupId>io.smallrye.config</groupId>
+                                        <groupId>io.smallrye.reactive</groupId>
+                                    </groupIds>
+                                    <!--
+                                        These annotations are allowed, and exist in both the spec jar and in the smallrye
+                                        API jar. The SmallRye API jar adds the @Experimental annotation since its copy
+                                        adds @Repeatable to the annotations. However, users need to be able to use
+                                        this annotation without warning. The assumption is they are using the spec
+                                        version exposed in our BOMs.
+                                    -->
+                                    <excludedClasses>
+                                        <excludedClass>org.eclipse.microprofile.reactive.messaging.Channel</excludedClass>
+                                        <excludedClass>org.eclipse.microprofile.reactive.messaging.Incoming</excludedClass>
+                                    </excludedClasses>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
