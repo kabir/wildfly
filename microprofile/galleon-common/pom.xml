@@ -88,7 +88,10 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- New plugin to index the annotation marked as experimental -->
+            <!--
+                New plugin to index the annotation marked as experimental
+                From https://github.com/kabir/experimental-annotation-plugin
+            -->
             <plugin>
                 <groupId>org.wildfly.plugin</groupId>
                 <artifactId>experimental-annotation-plugin</artifactId>
@@ -101,6 +104,7 @@
                             <goal>index-experimental-annotations</goal>
                         </goals>
                         <configuration>
+                            <outputFile>target/experimental-index.txt</outputFile>
                             <filters>
                                 <filter>
                                     <annotation>io.smallrye.common.annotation.Experimental</annotation>
