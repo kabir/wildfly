@@ -3939,6 +3939,15 @@
                                         <!-- Wildcard support would be better than having to list everything -->
                                         <groupId>org.hibernate.orm</groupId>
                                         <groupId>org.hibernate.search</groupId>
+                                        <!--<groupId>org.hibernate.validator</groupId>-->
+                                    </groupIds>
+                                </filter>
+                                <filter>
+                                    <annotation>org.hibernate.validator.Incubating</annotation>
+                                    <groupIds>
+                                        <!-- Wildcard support would be better than having to list everything -->
+                                        <!--<groupId>org.hibernate.orm</groupId>-->
+                                        <groupId>org.hibernate.search</groupId>
                                         <groupId>org.hibernate.validator</groupId>
                                     </groupIds>
                                 </filter>
