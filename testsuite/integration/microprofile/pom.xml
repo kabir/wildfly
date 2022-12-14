@@ -57,6 +57,13 @@
     </properties>
 
     <dependencies>
+
+        <!-- Dependency to be able to use a experimental annotation -->
+        <dependency>
+            <groupId>io.smallrye.config</groupId>
+            <artifactId>smallrye-config</artifactId>
+        </dependency>
+
         <!-- MicroProfile APIs -->
         <dependency>
             <groupId>org.eclipse.microprofile.config</groupId>

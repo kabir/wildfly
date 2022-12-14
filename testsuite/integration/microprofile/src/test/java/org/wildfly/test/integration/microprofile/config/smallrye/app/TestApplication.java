@@ -22,11 +22,7 @@
 
 package org.wildfly.test.integration.microprofile.config.smallrye.app;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
+import io.smallrye.config.ConfigMapping;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.GET;
@@ -34,10 +30,14 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.Response;
-
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.wildfly.test.integration.microprofile.config.smallrye.SubsystemConfigSourceTask;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author <a href="http://jmesnil.net/">Jeff Mesnil</a> (c) 2017 Red Hat inc.
@@ -55,6 +55,15 @@ public class TestApplication extends Application {
     public static final String ARRAY_SET_LIST_OVERRIDE_APP_PATH = "/arraySetListOverriddenTest";
     public static final String ARRAY_SET_LIST_NO_DEF_APP_PATH = "/arraySetListNoDefTest";
     public static final String PRIORITY_APP_PATH = "/priorityTest";
+
+
+
+    // Class with experimental annotation. Should get picked up
+    @ConfigMapping
+    public interface ClassWithExperimentalAnnotation {
+
+    }
+
 
     @Path(APP_PATH)
     public static class ResourceSimple {

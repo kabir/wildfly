@@ -59,6 +59,9 @@ import org.wildfly.test.integration.microprofile.config.smallrye.SubsystemConfig
 @ServerSetup(SubsystemConfigSourceTask.class)
 public class MicroProfileConfigTestCase extends AbstractMicroProfileConfigTestCase {
 
+    // Test for demo
+
+
     @Deployment
     public static Archive<?> deploy() {
         WebArchive war = ShrinkWrap.create(WebArchive.class, "MicroProfileConfigTestCase.war")
