@@ -49,6 +49,7 @@
         <license.directory>${project.build.directory}/resources/content/docs/licenses</license.directory>
         <oidc.feature-pack.license.directory>${basedir}/../../elytron-oidc-client/galleon-common/src/main/resources/license</oidc.feature-pack.license.directory>
         <common.resources.directory>${basedir}/../common/src/main/resources</common.resources.directory>
+        <common.experimental.index.directory>${basedir}/../common/target/experimental</common.experimental.index.directory>
         <ee-10-api.resources.directory>${basedir}/../ee-10-api/src/main/resources</ee-10-api.resources.directory>
         <galleon-common.resources.directory>${basedir}/../galleon-common/src/main/resources</galleon-common.resources.directory>
         <pruned.resources.directory>${basedir}/../pruned/src/main/resources</pruned.resources.directory>
@@ -252,6 +253,25 @@
                                         <include>license/*.xml</include>
                                     </includes>
                                     <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <overwrite>true</overwrite>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-experimental-index</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/resources/modules/system/layers/base/org/wildfly/_internal/experimental-indices/ee-feature-pack/main/index</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${common.experimental.index.directory}</directory>
+                                    <includes>
+                                        <include>experimental-index.txt</include>
+                                    </includes>
                                 </resource>
                             </resources>
                             <overwrite>true</overwrite>

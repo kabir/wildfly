@@ -3935,7 +3935,7 @@
                             <goal>index-experimental-annotations</goal>
                         </goals>
                         <configuration>
-                            <outputFile>target/experimental-index.txt</outputFile>
+                            <outputFile>target/experimental/experimental-index.txt</outputFile>
                             <filters>
                                 <filter>
                                     <annotation>org.hibernate.Incubating</annotation>

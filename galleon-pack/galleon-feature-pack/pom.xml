@@ -45,6 +45,7 @@
 
     <properties>
         <mp.galleon.common.resources.directory>${basedir}/../../microprofile/galleon-common/src/main/resources</mp.galleon.common.resources.directory>
+        <mp.galleon.common.experimental.index.directory>${basedir}/../../microprofile/galleon-common/target/experimental</mp.galleon.common.experimental.index.directory>
         <license.directory>${project.build.directory}/resources/content/docs/licenses</license.directory>
         <feature-pack.license.directory>${basedir}/../../microprofile/galleon-common/src/main/resources/license</feature-pack.license.directory>
         <content.resources.directory>${basedir}/../galleon-content/src/main/resources</content.resources.directory>
@@ -111,6 +112,25 @@
                             <resources>
                                 <resource>
                                     <directory>${content.resources.directory}</directory>
+                                </resource>
+                            </resources>
+                            <overwrite>true</overwrite>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-experimental-index</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/resources/modules/system/layers/base/org/wildfly/_internal/experimental-indices/microprofile-feature-pack/main/index</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${mp.galleon.common.experimental.index.directory}</directory>
+                                    <includes>
+                                        <include>experimental-index.txt</include>
+                                    </includes>
                                 </resource>
                             </resources>
                             <overwrite>true</overwrite>

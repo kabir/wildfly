@@ -12,7 +12,7 @@
             <outputDirectory/>
         </fileSet>
         <fileSet>
-            <directory>target</directory>
+            <directory>target/experimental</directory>
             <outputDirectory>modules/system/layers/base/org/wildfly/_internal/experimental-indices/microprofile-feature-pack/main/index</outputDirectory>
             <includes>
                 <include>experimental-index.txt</include>
