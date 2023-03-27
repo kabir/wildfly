@@ -72,6 +72,7 @@ public class RunKafkaSetupTask implements ServerSetupTask {
                 broker.close();
             }
         }
+        throw new IllegalStateException("Boom!");
     }
 
     protected EmbeddedKafkaBroker augmentKafkaBroker(EmbeddedKafkaBroker broker) {
