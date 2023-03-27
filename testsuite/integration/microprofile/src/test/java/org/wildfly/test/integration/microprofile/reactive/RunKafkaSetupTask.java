@@ -26,6 +26,7 @@ import io.smallrye.reactive.messaging.kafka.companion.KafkaCompanion;
 import io.smallrye.reactive.messaging.kafka.companion.test.EmbeddedKafkaBroker;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
+import org.jboss.logging.Logger;
 import org.wildfly.security.manager.WildFlySecurityManager;
 
 import java.security.PrivilegedAction;
@@ -39,6 +40,7 @@ import java.util.Properties;
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
  */
 public class RunKafkaSetupTask implements ServerSetupTask {
+    static final Logger LOGGER = Logger.getLogger(RunKafkaSetupTask.class);
     volatile EmbeddedKafkaBroker broker;
     volatile KafkaCompanion companion;
 
@@ -48,6 +50,8 @@ public class RunKafkaSetupTask implements ServerSetupTask {
 
     @Override
     public void setup(ManagementClient managementClient, String s) throws Exception {
+        LOGGER.info("Setting up embedded Kafka");
+        boolean success = false;
         try {
             broker = new EmbeddedKafkaBroker()
                     .withNodeId(0)
@@ -62,17 +66,24 @@ public class RunKafkaSetupTask implements ServerSetupTask {
 
 
             for (Map.Entry<String, Integer> topicAndPartition : getTopicsAndPartitions().entrySet()) {
+                LOGGER.info("Creating topic " + topicAndPartition.getKey() + " with " + topicAndPartition.getValue() + " partitions");
                 companion.topics().createAndWait(topicAndPartition.getKey(), topicAndPartition.getValue(), Duration.of(10, ChronoUnit.SECONDS));
             }
+            success = true;
         } catch (Exception e) {
-            if (companion != null) {
-                companion.close();
+            try {
+                if (companion != null) {
+                    companion.close();
+                }
+                if (broker != null) {
+                    broker.close();
+                }
+            } finally {
+                throw e;
             }
-            if (broker != null) {
-                broker.close();
-            }
+        } finally {
+            LOGGER.info("Set up Embedded Kafka success: " + success);
         }
-        throw new IllegalStateException("Boom!");
     }
 
     protected EmbeddedKafkaBroker augmentKafkaBroker(EmbeddedKafkaBroker broker) {
@@ -98,6 +109,7 @@ public class RunKafkaSetupTask implements ServerSetupTask {
 
     @Override
     public void tearDown(ManagementClient managementClient, String s) throws Exception {
+        LOGGER.info("Tearing down embedded Kafka");
         if (companion != null) {
             companion.close();
         }
