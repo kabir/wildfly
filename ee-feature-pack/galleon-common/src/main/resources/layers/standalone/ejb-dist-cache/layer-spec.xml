@@ -2,7 +2,9 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="ejb-dist-cache">
 
     <!-- Infinispan cache configuration used for distributed SFSB caching -->
-
+    <props>
+        <prop name="profile-ha" value="ejb-local-cache"/>
+    </props>
     <dependencies>
         <layer name="transactions"/>
     </dependencies>
