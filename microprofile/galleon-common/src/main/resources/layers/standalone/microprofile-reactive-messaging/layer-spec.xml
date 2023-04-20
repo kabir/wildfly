@@ -22,6 +22,9 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="reactive-messaging">
+    <props>
+        <prop name="annotations" value="org.eclipse.microprofile.reactive.messaging"/>
+    </props>
     <dependencies>
         <layer name="cdi"/>
         <layer name="microprofile-config"/>

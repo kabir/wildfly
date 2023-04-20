@@ -21,6 +21,9 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-reactive-messaging-kafka">
+    <props>
+        <prop name="extends" value="microprofile-reactive-messaging"/>
+    </props>
     <dependencies>
         <layer name="microprofile-reactive-messaging"/>
     </dependencies>

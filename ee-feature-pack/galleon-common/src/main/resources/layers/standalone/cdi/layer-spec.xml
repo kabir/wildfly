@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="cdi">
+    <props>
+        <prop name="expected-file" value="WEB-INF/beans.xml"/>
+        <prop name="annotations" value="javax.inject,jakarta.enterprise.context"/>
+    </props>
     <dependencies>
         <layer name="base-server"/>
         <layer name="bean-validation" optional="true"/>

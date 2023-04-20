@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="servlet">
+    <props>
+        <prop name="annotations" value="jakarta.servlet.annotation"/>
+        <prop name="xml-path" value="WEB-INF/web.xml,/web-app/servlet"/>
+    </props>
     <dependencies>
         <layer name="ee-integration"/>
         <layer name="naming"/>

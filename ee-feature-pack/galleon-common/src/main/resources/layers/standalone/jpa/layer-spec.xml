@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="jpa">
+    <props>
+        <prop name="annotations" value="jakarta.persistence"/>
+    </props>
     <dependencies>
         <layer name="datasources"/>
         <layer name="bean-validation" optional="true"/>

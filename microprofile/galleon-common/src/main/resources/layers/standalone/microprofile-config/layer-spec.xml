@@ -23,6 +23,9 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-config">
+    <props>
+        <prop name="annotations" value="org.eclipse.microprofile.config.inject"/>
+    </props>
     <dependencies>
         <layer name="cdi"/>
     </dependencies>
