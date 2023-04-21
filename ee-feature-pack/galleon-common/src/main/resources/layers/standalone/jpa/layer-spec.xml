@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="jpa">
     <props>
+        <prop name="expected-file" value="/WEB-INF/classes/META-INF/persistence.xml"/>
         <prop name="annotations" value="jakarta.persistence"/>
     </props>
     <dependencies>

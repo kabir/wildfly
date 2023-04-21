@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="h2-driver">
+    <props>
+        <prop name="pattern-xml-path" value="/WEB-INF/.*.xml,/datasources/datasource/driver,h2"/>
+    </props>
     <dependencies>
         <layer name="base-server"/>
     </dependencies>
