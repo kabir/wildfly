@@ -2,7 +2,7 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="jsf">
     <props>
         <prop name="xml-path" value="/WEB-INF/web.xml,/web-app/servlet/servlet-class,jakarta.faces.webapp.FacesServlet"/>
-        <prop name="expect-file" value="/WEB-INF/faces-config.xml"/>
+        <prop name="expected-file" value="/WEB-INF/faces-config.xml"/>
     </props>
     <dependencies>
         <layer name="web-server"/>

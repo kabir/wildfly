@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="h2-datasource">
     <props>
-        <prop name="extends" value="h2-driver"/>
+        <prop name="member-of" value="datasources"/>
+        <prop name="xml-path" value="/WEB-INF/classes/META-INF/persistence.xml,/persistence/persistence-unit/jta-data-source,java:jboss/datasources/ExampleDS"/>
     </props>
     <dependencies>
         <layer name="h2-driver"/>

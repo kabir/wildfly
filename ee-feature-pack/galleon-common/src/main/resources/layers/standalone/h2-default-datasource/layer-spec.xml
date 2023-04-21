@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="h2-default-datasource">
     <props>
-        <prop name="extends" value="h2-driver"/>
+        <prop name="default-member-of" value="datasources"/>
     </props>
     <dependencies>
         <layer name="h2-datasource"/>
