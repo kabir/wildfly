@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="cloud-server">
     <props>
-        <prop name="kind" value="base-layer"/>
+        <prop name="kind" value="default-base-layer"/>
     </props>
     <dependencies>
         <layer name="jaxrs-server"/>
