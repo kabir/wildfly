@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-jwt">
+    <props>
+        <prop name="annotations" value="org.eclipse.microprofile.jwt"/>
+    </props>
     <dependencies>
         <layer name="ee-security"/>
         <layer name="microprofile-config"/>

@@ -21,6 +21,9 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-rest-client">
+    <props>
+        <prop name="annotations" value="org.eclipse.microprofile.rest.client.annotation,org.eclipse.microprofile.rest.client.inject"/>
+    </props>
     <dependencies>
         <layer name="microprofile-config"/>
     </dependencies>

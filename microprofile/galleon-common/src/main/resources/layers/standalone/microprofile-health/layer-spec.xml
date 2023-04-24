@@ -23,6 +23,9 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-health">
+    <props>
+        <prop name="annotations" value="org.eclipse.microprofile.health"/>
+    </props>
     <dependencies>
         <layer name="management"/>
         <layer name="microprofile-config"/>

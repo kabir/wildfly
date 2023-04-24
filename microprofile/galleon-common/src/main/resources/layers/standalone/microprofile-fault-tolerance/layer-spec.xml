@@ -23,6 +23,9 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-fault-tolerance">
+    <props>
+        <prop name="annotations" value="org.eclipse.microprofile.faulttolerance"/>
+    </props>
     <dependencies>
         <layer name="cdi"/>
         <layer name="microprofile-config"/>
