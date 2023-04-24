@@ -20,7 +20,7 @@
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="ee-core-profile-server">
     <props>
-        <prop name="kind" value="base-layer"/>
+        <prop name="kind" value="default-base-layer"/>
     </props>
     <dependencies>
         <layer name="core-server"/>
