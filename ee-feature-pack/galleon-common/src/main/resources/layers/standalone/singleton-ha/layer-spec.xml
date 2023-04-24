@@ -21,7 +21,9 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="singleton-ha">
-
+    <props>
+        <prop name="profile-ha" value="singleton-local"/>
+    </props>
     <dependencies>
         <layer name="base-server"/>
         <layer name="transactions"/>

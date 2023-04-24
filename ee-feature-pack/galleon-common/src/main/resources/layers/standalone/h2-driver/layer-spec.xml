@@ -3,7 +3,8 @@
     <props>
         <!-- If the driver is found, it means that we have configured datasources in xml file -->
         <prop name="member-of" value="datasources"/>
-        <prop name="pattern-xml-path" value="/WEB-INF/.*.xml,/datasources/datasource/driver,h2"/>        
+        <prop name="pattern-xml-path" value="/WEB-INF/.*.xml,/datasources/datasource/driver,h2"/>
+        <prop name="pattern-xml-path-xa" value="/WEB-INF/.*.xml,/datasources/xa-datasource/driver,h2"/>
     </props>
     <dependencies>
         <layer name="base-server"/>

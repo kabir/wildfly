@@ -21,6 +21,10 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="singleton-local">
+    <props>
+        <prop name="expected-file-in-jar" value="/META-INF/singleton-deployment.xml"/>
+        <prop name="expected-file-in-war" value="/WEB-INF/classes/META-INF/singleton-deployment.xml"/>
+    </props>
 
     <dependencies>
         <layer name="base-server"/>
