@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="remote-activemq">
     <props>
-        <prop name="inclusion-mode" value="all-dependencies"/>
+        <prop name="inclusion-mode" value="only:messaging-activemq"/>
         <prop name="add-on" value="remote-activemq"/>
     </props>
     <dependencies>

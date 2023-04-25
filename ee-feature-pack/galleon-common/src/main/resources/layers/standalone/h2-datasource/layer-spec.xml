@@ -1,10 +1,12 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="h2-datasource">
     <props>
-        <prop name="member-of" value="datasources"/>
+        <prop name="add-on" value="h2-database"/>
+        <prop name="inclusion-mode" value="only:datasources"/>
         <prop name="xml-path" value="/WEB-INF/classes/META-INF/persistence.xml,/persistence/persistence-unit/jta-data-source,java:jboss/datasources/ExampleDS"/>
     </props>
     <dependencies>
+        <layer name="datasources"/>
         <layer name="h2-driver"/>
     </dependencies>
     <feature-group name="h2-datasource"/>

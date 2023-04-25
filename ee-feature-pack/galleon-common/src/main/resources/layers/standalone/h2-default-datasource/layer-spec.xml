@@ -1,9 +1,11 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="h2-default-datasource">
     <props>
-        <prop name="default-member-of" value="datasources"/>
+        <prop name="inclusion-mode" value="only:datasources"/>
+        <prop name="add-on" value="h2-database"/>
     </props>
     <dependencies>
+        <layer name="datasources"/>
         <layer name="h2-datasource"/>
     </dependencies>
     <feature-group name="h2-default-datasource"/>

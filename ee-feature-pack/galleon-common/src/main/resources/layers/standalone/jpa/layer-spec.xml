@@ -3,7 +3,6 @@
     <props>
         <prop name="expected-file" value="/WEB-INF/classes/META-INF/persistence.xml"/>
         <prop name="annotations" value="jakarta.persistence"/>
-        <prop name="expect-member-of" value="datasources"/>
     </props>
     <dependencies>
         <layer name="datasources"/>
