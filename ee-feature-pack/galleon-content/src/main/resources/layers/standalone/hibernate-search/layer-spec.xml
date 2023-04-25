@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="hibernate-search">
     <props>
-        <prop name="extends" value="jpa"/>
+        <prop name="inclusion-mode" value="all-dependencies"/>
+        <prop name="add-on" value="hibernate-search"/>
     </props>
     <dependencies>
         <!-- 'jpa-distributed' can be used instead.

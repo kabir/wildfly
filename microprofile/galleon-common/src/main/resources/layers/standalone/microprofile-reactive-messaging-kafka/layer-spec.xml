@@ -22,7 +22,8 @@
   -->
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-reactive-messaging-kafka">
     <props>
-        <prop name="extends" value="microprofile-reactive-messaging"/>
+        <prop name="inclusion-mode" value="all-dependencies"/>
+        <prop name="add-on" value="kafka"/>
     </props>
     <dependencies>
         <layer name="microprofile-reactive-messaging"/>

@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="core-tools">
-        <props>
-        <prop name="extends" value="management"/>
+    <props>
+        <prop name="inclusion-mode" value="all-dependencies"/>
+        <prop name="add-on" value="wildfly-cli"/>
     </props>
     <dependencies>
         <layer name="management" optional="true"/>

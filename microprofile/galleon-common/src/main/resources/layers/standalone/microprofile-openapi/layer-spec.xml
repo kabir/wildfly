@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-openapi">
     <props>
-        <prop name="extends" value="jaxrs"/>
+        <prop name="inclusion-mode" value="only:jaxrs"/>
+        <prop name="add-on" value="openapi"/>
     </props>
     <dependencies>
         <layer name="jaxrs"/>

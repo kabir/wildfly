@@ -2,7 +2,6 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="messaging-activemq">
     <props>
         <prop name="fields" value="jakarta.jms"/>
-        <prop name="expect-member-of" value="messaging"/>
     </props>
     <dependencies>
         <layer name="resource-adapters"/>
