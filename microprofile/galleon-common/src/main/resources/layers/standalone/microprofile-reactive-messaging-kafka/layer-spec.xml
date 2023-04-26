@@ -24,6 +24,7 @@
     <props>
         <prop name="inclusion-mode" value="all-dependencies"/>
         <prop name="add-on" value="kafka"/>
+        <prop name="add-on-suggest" value="/WEB-INF/classes/META-INF/microprofile-config.properties,kafka"/>
     </props>
     <dependencies>
         <layer name="microprofile-reactive-messaging"/>
