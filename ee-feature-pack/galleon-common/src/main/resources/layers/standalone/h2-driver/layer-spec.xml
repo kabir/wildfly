@@ -1,8 +1,6 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="h2-driver">
     <props>
-        <prop name="add-on" value="h2-database"/>
-        <prop name="inclusion-mode" value="only:datasources"/>
         <prop name="pattern-xml-path" value="/WEB-INF/.*.xml,/datasources/datasource/driver,h2"/>
         <prop name="pattern-xml-path-xa" value="/WEB-INF/.*.xml,/datasources/xa-datasource/driver,h2"/>
     </props>
