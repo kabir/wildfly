@@ -2,7 +2,7 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-openapi">
     <props>
         <prop name="add-on-depends-on" value="only:jaxrs"/>
-        <prop name="add-on" value="REST:openapi"/>
+        <prop name="add-on" value="REST,openapi"/>
     </props>
     <dependencies>
         <layer name="jaxrs"/>

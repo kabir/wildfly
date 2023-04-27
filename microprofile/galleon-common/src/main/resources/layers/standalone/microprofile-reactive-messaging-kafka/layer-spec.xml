@@ -23,7 +23,7 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-reactive-messaging-kafka">
     <props>
         <prop name="add-on-depends-on" value="all-dependencies"/>
-        <prop name="add-on" value="reactive-messaging:kafka"/>
+        <prop name="add-on" value="reactive-messaging,kafka"/>
         <prop name="properties-file-contains-key" value="/WEB-INF/classes/META-INF/microprofile-config.properties,mp.messaging.connector.smallrye-kafka"/>
     </props>
     <dependencies>
