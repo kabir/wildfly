@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="web-console">
     <props>
-        <prop name="inclusion-mode" value="all-dependencies"/>
-        <prop name="add-on" value="hal-web-console"/>
+        <prop name="add-on-depends-on" value="all-dependencies"/>
+        <prop name="add-on" value="management:hal-web-console"/>
     </props>
     <dependencies>
         <layer name="management"/>

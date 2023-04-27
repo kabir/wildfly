@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="embedded-activemq">
     <props>
-        <prop name="inclusion-mode" value="only:messaging-activemq"/>
-        <prop name="add-on" value="embedded-activemq"/>
+        <prop name="add-on-depends-on" value="only:messaging-activemq"/>
+        <prop name="add-on" value="messaging:embedded-activemq"/>
         <prop name="pattern-xml-path" value="/WEB-INF/.*-jms.xml,/messaging-deployment/server/jms-destinations"/>     
     </props>
     <dependencies>

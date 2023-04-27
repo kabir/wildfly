@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="h2-datasource">
     <props>
-        <prop name="add-on" value="h2-database"/>
-        <prop name="inclusion-mode" value="only:datasources"/>
+        <prop name="add-on" value="database:h2-database"/>
+        <prop name="add-on-depends-on" value="only:datasources"/>
         <!-- Tpo be reworked with smarter approach -->
         <prop name="bring-datasource" value="java:jboss/datasources/ExampleDS"/>
         <prop name="xml-path" value="/WEB-INF/classes/META-INF/persistence.xml,/persistence/persistence-unit/jta-data-source,java:jboss/datasources/ExampleDS"/>
