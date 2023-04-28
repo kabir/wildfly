@@ -3,6 +3,7 @@
     <props>
         <prop name="add-on-depends-on" value="only:messaging-activemq"/>
         <prop name="add-on" value="messaging,embedded-activemq"/>
+        <prop name="add-on-cardinality" value="1"/>
         <prop name="pattern-xml-path" value="/WEB-INF/.*-jms.xml,/messaging-deployment/server/jms-destinations"/>     
     </props>
     <dependencies>
