@@ -2,7 +2,7 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="hibernate-search">
     <props>
         <prop name="add-on-depends-on" value="only:jpa"/>
-        <prop name="add-on" value="jpa:hibernate-search"/>
+        <prop name="add-on" value="jpa,hibernate-search"/>
     </props>
     <dependencies>
         <!-- 'jpa-distributed' can be used instead.
