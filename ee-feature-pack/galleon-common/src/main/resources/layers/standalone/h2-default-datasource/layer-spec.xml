@@ -3,7 +3,6 @@
     <props>
         <prop name="add-on" value="database,h2-database:default"/>
         <prop name="add-on-fix-no-default-datasource" value=""/>
-        <prop name="bring-datasource" value="###DEFAULT_DS###"/>
         <prop name="add-on-depends-on" value="only:datasources"/>
     </props>
     <dependencies>
