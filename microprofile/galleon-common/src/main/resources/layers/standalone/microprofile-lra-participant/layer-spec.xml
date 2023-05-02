@@ -22,6 +22,9 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-lra-participant">
+    <props>
+        <prop name="annotations" value="org.eclipse.microprofile.lra.annotation"/>
+    </props>
     <dependencies>
         <layer name="cdi"/>
         <layer name="jaxrs"/>

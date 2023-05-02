@@ -22,6 +22,10 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-lra-coordinator">
+    <props>
+        <prop name="add-on-depends-on" value="none"/>
+        <prop name="add-on" value="microprofile,lra-coordinator"/>
+    </props>
     <dependencies>
         <layer name="cdi"/>
         <layer name="jaxrs"/>

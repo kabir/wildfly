@@ -1,5 +1,12 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="observability">
+    <props>
+        <prop name="add-on" value="monitoring,observability"/>
+        <prop name="add-on-depends-on" value="only:management"/>
+        <!-- This add-on is enabled if all its dependencies are provisioned -->
+        <prop name="add-on-enabled-if-dependencies" value="all-dependencies"/>
+        <prop name="add-on-description" value="health and metrics subsystems."/>
+    </props>
     <dependencies>
         <layer name="metrics" optional="true"/>
         <layer name="health" optional="true" />
