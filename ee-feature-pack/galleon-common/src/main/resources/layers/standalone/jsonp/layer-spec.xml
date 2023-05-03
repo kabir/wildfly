@@ -1,9 +1,5 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="jsonp">
-    <props>
-        <prop name="add-on" value="json,json-parsing" />
-        <prop name="add-on-depends-on" value="none" />
-    </props>
     <dependencies>
         <layer name="base-server"/>
     </dependencies>
