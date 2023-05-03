@@ -1,8 +1,5 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="observability">
-    <props>
-        <prop name="add-on-description" value="microprofile-telemetry and microprofile-health subsystems."/>
-    </props>
     <dependencies>
         <layer name="microprofile-config" optional="true"/>
         <layer name="microprofile-telemetry" optional="true"/>

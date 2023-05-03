@@ -1,5 +1,11 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-telemetry">
+    <props>
+        <prop name="annotations" value="io.opentelemetry.instrumentation.annotations"/>
+        <prop name="fields" value="io.opentelemetry.api.trace"/>
+        <prop name="add-on-depends-on" value="only:cdi"/>
+        <prop name="add-on" value="observability,microprofile-telemetry"/>
+    </props>
     <dependencies>
         <layer name="cdi"/>
         <layer name="opentelemetry"/>
