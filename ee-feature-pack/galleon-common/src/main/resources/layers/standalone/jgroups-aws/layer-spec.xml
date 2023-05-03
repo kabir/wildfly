@@ -22,7 +22,10 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="jgroups-aws">
-
+    <props>
+        <prop name="add-on-depends-on" value="only:jgroups"/>
+        <prop name="add-on" value="clustering,jgroups-aws"/>
+    </props>
     <!--
     This layer only brings in modules required to configure the 'aws.S3_PING' discovery protocol:
     <protocol name="org.jgroups.protocols.aws.S3_PING" module="org.jgroups.aws">

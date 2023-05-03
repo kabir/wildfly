@@ -23,6 +23,10 @@
   -->
 
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="health">
+    <props>
+        <prop name="add-on" value="observability,health"/>
+        <prop name="add-on-depends-on" value="only:management"/>
+    </props>
     <dependencies>
         <layer name="management"/>
     </dependencies>
