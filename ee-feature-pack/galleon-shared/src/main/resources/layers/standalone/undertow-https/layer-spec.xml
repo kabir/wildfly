@@ -2,7 +2,7 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="undertow-https">
     <props>
         <prop name="add-on-depends-on" value="all-dependencies"/>
-        <prop name="add-on" value="security,SSL"/>
+        <prop name="add-on" value="security,ssl"/>
     </props>
     <dependencies>
         <layer name="elytron"/>
