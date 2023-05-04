@@ -3,6 +3,7 @@
     <props>
         <prop name="add-on-depends-on" value="all-dependencies"/>
         <prop name="add-on" value="management,hal-web-console"/>
+        <prop name="add-on-description" value="Management Web console. Make sure to add an initial user."/>
     </props>
     <dependencies>
         <layer name="management"/>
