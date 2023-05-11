@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="messaging-activemq">
     <props>
-        <prop name="fields" value="jakarta.jms"/>
+        <prop name="constant-pool-class-info" value="jakarta.jms"/>
         <prop name="annotations" value="jakarta.jms"/>
         <prop name="expect-add-on-family" value="messaging"/>
     </props>

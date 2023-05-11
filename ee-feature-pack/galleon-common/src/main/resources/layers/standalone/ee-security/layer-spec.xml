@@ -2,7 +2,7 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="ee-security">
     <props>
         <prop name="annotations" value="jakarta.security.enterprise.authentication.mechanism.http,jakarta.security.enterprise.identitystore"/>
-        <prop name="fields" value="jakarta.security.enterprise"/>
+        <prop name="constant-pool-class-info" value="jakarta.security.enterprise"/>
     </props>
      <dependencies>
         <layer name="cdi"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="mail">
     <props>
-        <prop name="fields" value="jakarta.mail"/>
+        <prop name="constant-pool-class-info" value="jakarta.mail"/>
     </props>
     <dependencies>
         <layer name="base-server"/>

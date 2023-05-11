@@ -2,7 +2,7 @@
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="opentelemetry">
     <props>
         <prop name="annotations" value="io.opentelemetry.instrumentation.annotations"/>
-        <prop name="fields" value="io.opentelemetry.api.trace"/>
+        <prop name="constant-pool-class-info" value="io.opentelemetry.api.trace"/>
         <prop name="add-on-depends-on" value="only:cdi"/>
         <prop name="add-on" value="observability,opentelemetry"/>
     </props>
