@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
 <layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="ee-integration">
+    <props>
+        <prop name="annotations" value="jakarta.annotation,jakarta.xml.bind.annotation,jakarta.xml.bind.annotation.adapters"/>
+        <prop name="constant-pool-class-info" value="jakarta.xml.bind.*"/>
+    </props>
     <dependencies>
         <layer name="naming"/>
         <layer name="jsonb" optional="true"/>
