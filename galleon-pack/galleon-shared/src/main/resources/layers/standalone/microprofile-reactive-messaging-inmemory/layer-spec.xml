@@ -20,21 +20,12 @@
   ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
-
-<module xmlns="urn:jboss:module:1.9" name="io.smallrye.reactive.messaging.connector">
-    <properties>
-        <property name="jboss.api" value="private"/>
-    </properties>
-
+<layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="microprofile-reactive-messaging-inmemory">
     <dependencies>
-        <module name="io.smallrye.reactive.messaging.connector.amqp" optional="true" export="true" services="export"/>
-
-        <module name="io.smallrye.reactive.messaging.connector.kafka" optional="true" export="true" services="export"/>
-        <!-- Add the kafka API module and a few other central ones so that it will be added to the deployment classpath by the DUP -->
-        <module name="io.smallrye.reactive.messaging.connector.kafka.api" optional="true" export="true" services="export"/>
-        <module name="org.wildfly.reactive.messaging.kafka" optional="true" export="true" services="export"/>
-        <module name="io.smallrye.reactive.messaging.connector.inmemory" optional="true" export="true" services="export"/>
-
-        <module name="io.smallrye.reactive.messaging.connector.mqtt" optional="true" export="true" services="export"/>
+        <layer name="microprofile-reactive-messaging"/>
     </dependencies>
-</module>
+
+    <packages>
+        <package name="io.smallrye.reactive.messaging.connector.inmemory"/>
+    </packages>
+</layer-spec>

@@ -45,5 +45,6 @@
         <module>extension</module>
         <module>config</module>
         <module>kafka</module>
+        <module>inmemory</module>
     </modules>
 </project>
