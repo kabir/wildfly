@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 
-<module xmlns="urn:jboss:module:1.1" name="io.smallrye.reactive.messaging.connector.inmemory">
+<module xmlns="urn:jboss:module:1.9" name="io.smallrye.reactive.messaging.connector.inmemory">
 
     <resources>
-        <resource-root path="${org.wildfly:wildfly-microprofile-reactive-messaging-inmemory}"/>
+        <artifact name="${org.wildfly:wildfly-microprofile-reactive-messaging-inmemory}"/>
     </resources>
 
     <dependencies>

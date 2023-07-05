@@ -229,6 +229,17 @@
             </dependency>
             <dependency>
                 <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-reactive-messaging-inmemory</artifactId>
+                <version>${full.maven.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
                 <artifactId>wildfly-microprofile-reactive-streams-operators</artifactId>
                 <version>${full.maven.version}</version>
             </dependency>

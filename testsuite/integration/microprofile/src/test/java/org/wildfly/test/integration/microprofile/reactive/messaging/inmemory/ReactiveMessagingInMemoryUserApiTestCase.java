@@ -55,7 +55,7 @@ import static org.jboss.as.test.shared.integration.ejb.security.PermissionUtils.
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
  */
 @RunWith(Arquillian.class)
-@ServerSetup({ EnableReactiveExtensionsSetupTask.class})
+@ServerSetup({EnableReactiveExtensionsSetupTask.class})
 public class ReactiveMessagingInMemoryUserApiTestCase {
 
     private static final long TIMEOUT = TimeoutUtil.adjust(15000);
@@ -66,7 +66,7 @@ public class ReactiveMessagingInMemoryUserApiTestCase {
     @Deployment
     public static WebArchive getDeployment() {
 
-        return ShrinkWrap.create(WebArchive.class, "reactive-messaging-kafka-user-api.war")
+        return ShrinkWrap.create(WebArchive.class, "reactive-messaging-connector-inmemory.war")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addPackage(ReactiveMessagingInMemoryUserApiTestCase.class.getPackage())
                 .addClasses(EnableReactiveExtensionsSetupTask.class, CLIServerSetupTask.class)
