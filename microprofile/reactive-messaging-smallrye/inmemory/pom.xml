@@ -39,44 +39,12 @@
     <artifactId>wildfly-microprofile-reactive-messaging-inmemory</artifactId>
     <name>WildFly: MicroProfile Reactive Messaging In-Memory</name>
 
-    <build>
-        <plugins>
-            <plugin>
-                <!--
-                The smallrye-reactive-messaging-in-memory JAR file does not contain a beans.xml, so the InMemoryConnector
-                could not be injected by io.smallrye.reactive.messaging.providers.impl.ConnectorFactories. We unpack the
-                smallrye-reactive-messaging-in-memory JAR file and add the META-INF/beans.xml from src/main/resources.
-                The original dependency is set to optional true, otherwise the patched and original version would be included.
-
-                TODO Maybe the optional flag is not necessary at all because the build process would never include automatically dependencies.
-                -->
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>io.smallrye.reactive</groupId>
-                                    <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
-                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
             <version>${version.io.smallrye.smallrye-reactive-messaging}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
