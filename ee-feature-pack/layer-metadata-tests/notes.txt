@@ -1,0 +1,87 @@
+NB - I have not tested add-ons since I think that mechanism is taken as it should work.
+
+Similarly, I have not tested the org.wildfly.rule.profile-ha rule which shows up in a fair amount of layers
+
+batch-jberet:
+- war only, needs jar support?
+- META-INF/batch-jobs and WEB-INF/batch-jobs? What about WEB-INF/classes/META-INF/batch-jobs
+- There is a jakarta.batch.api.BatchProperty annotation we are not picking up. Does it make sense on its own?
+- We are missing the jakarta.batch.operations and jakarta.batch.runtime packages. Are those needed or not?
+
+bean-validation
+- had to fix annotation rule
+
+cdi
+- added /META-INF/beans.xml
+- Also WEB-INF/classes/META-INF/beans.xml?
+- Annotations: looks for jakarta.inject and jakarta.enterprise.context.
+-- However the cdi-api jar contains a lot of other packages under jakarta.enterprise, as well as a jakarta.decorator package. Should these also be picked out? Or do these only make sense if used in conjunction with something we are already picking up?
+
+datasources
+- added support for java.sql classes in addition to javax.sql
+- The 'class' rule doesn't seem to pick up usage of classes from within a method
+
+ee-concurrency
+- Currently has class rule for jakarta.enterprise.concurrent.
+- This package also has some annotations. Should we also trigger if those are used?
+- The jakarta.enterprise.concurrent.spi package is not picked up, is it intended for user applications?
+
+ee-security
+- Changed the annotation rule from jakarta.security.enterprise.authentication.mechanism.http to jakarta.security.enterprise.authentication.mechanism.http.* (there is also an openid child package)
+
+ejb
+- No changes made to metadata, but I think things like RemoteHome should trigger this.
+- Maybe also RemoteException (but only in conjunction with other classes)?
+
+ejb-lite
+- There are two subpackages (embeddable and spi) of jakarta.ejb, not picked up by the current rules.
+- I think this is ok as they don't seem for user apps inside WildFly?
+
+h2-datasource
+- Rule was looking at /WEB-INF/classes/META-INF/persistence.xml
+- Expanded to also look at /META-INF/persistence.xml
+- Is /WEB-INF/persistence.xml also a valid location?
+
+h2-driver
+- [/WEB-INF/*.xml,/META-INF/*.xml] seems a bit lenient
+- Is there some suffix to the files? (e.g *-ds.xml)
+- Should /WEB-INF/classes/META-INF also be considered?
+
+jaxrs
+- Currently looks in
+-- WEB-INF/web.xml for Application
+-- annotations from the jakarta.ws.rs package
+- Should we also look for annotations from child packages?
+- Do we need a class rule for non-annotation classes used? (e.g. I think I have seen the Application class used somehow?)
+- For now I expanded to look for classes and annotations in both jakarta.ws.rs and jakarta.ws.rs.core
+-- need to decide whether the client, container, ext and sse child packages of jakarta.ws.rs are important.
+
+jpa
+- Added /META-INF/persistence.xml to the files (was just /WEB-INF/classes/META-INF/persistence.xml)
+-- Should /WEB-INF/persistence.xml also be considered?
+- Added jakarta.persistence.criteria to the class packages
+-- Not sure if jakarta.persistence.metamodel and jakarta.persistence.spi should also be added
+--- Note that the .metamodel package also contains an annotation
+- jakarta.persistence classes are not picked up. Only annotations, do classes like jakarta.persistence.EntityManager make sense without the annotations?
+
+
+jsf
+- There are some annotations in packages other than jakarta.faces.annotation, which is the current rule. Are these usable in user applications?
+- I've done some cursory tests of tests in a sub-package. Are all the sub-packages relevant?
+
+jsonb
+- Left out testing of the .spi package. It sounds internal?
+
+jsonp
+- Left out testing of the .spi package. It sounds internal?
+
+naming
+- We only handle classes from javax.naming. There are a number of sub-packages, but do they make sense without any of the root package ones?
+
+servlet
+- Changed annotation rule from "jakarta.servlet.annotation,jakarta.websocket" to "jakarta.servlet.annotation,jakarta.websocket.*" since in addition to the jakarta.websocket-client-api there is a jakarta.websocket-api, which contains annotations in the jakarta.websocket.server package.
+- Added jakarta.websocket.* to the class rule so websocket class usage gets picked up
+
+webservices
+- changed annotation rule from jakarta.jws,jakarta.jws.soap,jakarta.xml.ws.soap to jakarta.jws,jakarta.jws.soap,jakarta.xml.ws.* (since jakarta.xml.ws contains annotations, and so does jakarta.xml.ws.spi, although the last one might be more debatable)
+- Removed jakarta.jws.* from class list, since looking in jboss-jakarta-xml-ws-api_4.0_spec this package and its children only contain annotations.
