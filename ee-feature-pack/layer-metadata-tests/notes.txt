@@ -1,7 +1,5 @@
 NB - I have not tested add-ons since I think that mechanism is taken as it should work.
 
-Similarly, I have not tested the org.wildfly.rule.profile-ha rule which shows up in a fair amount of layers
-
 batch-jberet:
 - war only, needs jar support?
 - META-INF/batch-jobs and WEB-INF/batch-jobs? What about WEB-INF/classes/META-INF/batch-jobs
