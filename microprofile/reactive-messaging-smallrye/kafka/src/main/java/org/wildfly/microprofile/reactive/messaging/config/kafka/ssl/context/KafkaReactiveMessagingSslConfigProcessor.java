@@ -21,7 +21,6 @@ import org.wildfly.security.manager.WildFlySecurityManager;
  */
 class KafkaReactiveMessagingSslConfigProcessor extends BaseReactiveMessagingSslConfigProcessor {
 
-    static final String SSL_CONTEXT_PROPERTY_SUFFIX = "wildfly.elytron.ssl.context";
     private static final String SSL_ENGINE_FACTORY_CLASS = "ssl.engine.factory.class";
 
     private static final String CONNECTOR_NAME = "smallrye-kafka";

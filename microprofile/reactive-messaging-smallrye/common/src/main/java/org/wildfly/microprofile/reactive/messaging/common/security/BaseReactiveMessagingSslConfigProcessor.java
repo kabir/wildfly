@@ -31,15 +31,18 @@ public abstract class BaseReactiveMessagingSslConfigProcessor implements Deploym
     private static final String RM_INCOMING_PROPERTY_PREFIX = "mp.messaging.outgoing.";
     private static final String RM_OUTGOING_PROPERTY_PREFIX = "mp.messaging.incoming.";
     private static final String RM_CONNECTION_CONNECTOR_PROPERTY_SUFFIX = "connector";
-    static final String SSL_CONTEXT_PROPERTY_SUFFIX = "wildfly.elytron.ssl.context";
+    public static final String SSL_CONTEXT_PROPERTY_SUFFIX = "wildfly.elytron.ssl.context";
 
     private static final AttachmentKey<Object> DEPLOYMENT_ATTACHMENT_KEY = AttachmentKey.create(Object.class);
 
     private final String connectorName;
     private final String globalPropertyPrefix;
 
+    private final String globalPropertyName;
+
     protected BaseReactiveMessagingSslConfigProcessor(String connectorName) {
         globalPropertyPrefix = RM_CONNECTOR_GLOBAL_PROPERTY_PREFIX + connectorName + ".";
+        globalPropertyName = globalPropertyPrefix + SSL_CONTEXT_PROPERTY_SUFFIX;
         this.connectorName = connectorName;
     }
 
@@ -55,14 +58,17 @@ public abstract class BaseReactiveMessagingSslConfigProcessor implements Deploym
         SecurityDeploymentContext sdc = createSecurityDeploymentContext();
         Set<ServiceName> mscDependencies = new HashSet<>();
 
-        for (String propertyName : config.getPropertyNames()) {
-
-            if (propertyName.equals(globalPropertyPrefix + SSL_CONTEXT_PROPERTY_SUFFIX)) {
-                // global thingy for this connector
-                String propertyValue = config.getValue(propertyName, String.class);
-                logAndCheck(mscDependencies, propertyName, propertyValue);
+        String globalValue =
+                config.getOptionalValue(globalPropertyName, String.class)
+                        .orElse(null);
+        if (globalValue != null) {
+                String propertyValue = config.getValue(globalPropertyName, String.class);
+                logAndCheck(mscDependencies, globalPropertyName, propertyValue);
                 sdc.setGlobalSslContext(globalPropertyPrefix, propertyValue);
-            } else if (propertyName.startsWith(RM_INCOMING_PROPERTY_PREFIX) ||
+        }
+
+        for (String propertyName : config.getPropertyNames()) {
+            if (propertyName.startsWith(RM_INCOMING_PROPERTY_PREFIX) ||
                     propertyName.startsWith(RM_OUTGOING_PROPERTY_PREFIX)) {
                 if (propertyName.endsWith(RM_CONNECTION_CONNECTOR_PROPERTY_SUFFIX)) {
                     if (config.getValue(propertyName, String.class).equals(connectorName)) {

@@ -7,8 +7,8 @@ package org.wildfly.microprofile.reactive.messaging.config.kafka.ssl.context;
 
 import org.wildfly.microprofile.reactive.messaging.common.security.ElytronSSLContextRegistry;
 
-import static org.wildfly.microprofile.reactive.messaging.config.kafka.ssl.context.KafkaReactiveMessagingSslConfigProcessor.SSL_CONTEXT_PROPERTY_SUFFIX;
 import static org.wildfly.microprofile.reactive.messaging.config.kafka.ssl.context._private.MicroProfileReactiveMessagingKafkaLogger.LOGGER;
+import static org.wildfly.microprofile.reactive.messaging.common.security.BaseReactiveMessagingSslConfigProcessor.SSL_CONTEXT_PROPERTY_SUFFIX;
 
 import java.io.IOException;
 import java.security.KeyStore;
