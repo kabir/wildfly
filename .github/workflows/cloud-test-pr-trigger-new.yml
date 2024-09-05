@@ -1,0 +1,118 @@
+name: Cloud Tests Trigger
+on:
+  pull_request_target:
+    branches:
+      - main
+    paths-ignore:
+      - ".mvn/**"
+      - "docs/**"
+      - ".github/workflows/build-manual.yml"
+      - ".github/workflows/shared-wildfly-build.yml"
+      - '.gitattributes'
+      - '.gitignore'
+      - '.gitleaks.toml'
+      - 'build.bat'
+      - 'build.sh'
+      - "CODE_OF_CONDUCT.md"
+      - "CONTRIBUTING.md"
+      - "integration-tests.bat"
+      - "integration-tests.sh"
+      - "LICENSE.txt"
+      - "mvnw"
+      - "mvnw.cmd"
+      - "README.md"
+      - "SECURITY.md"
+      - "**/README.md"
+      - "**/README.adoc"
+
+# Only run the latest job
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+env:
+  # This must be set to a PAT with 'repo' permission for the target repository
+  TOKEN: ${{ secrets.CLOUD_TESTS_REMOTE_DISPATCH_TOKEN }}
+  # Just an identifier for the event - this one triggers the cloud tests
+  EVENT_TYPE: report-cloud-tests-pr-progress
+
+permissions: {}
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Remote Dispatch
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        if: ${{ env.TOKEN }}
+        run: |
+          echo $GITHUB_REPOSITORY
+          
+          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
+          
+          
+          CLIENT_PAYLOAD=$( jq -n \
+                  --arg tr "$GITHUB_REPOSITORY" \
+                  --arg githubSha "$GITHUB_SHA" \
+                  --arg prHeadSha "$PR_HEAD_SHA" \
+                  '{triggerRepo: $tr, githubSha: $githubSha, prHeadSha: $prHeadSha}' )
+          
+          echo "CLIENT_PAYLOAD: $CLIENT_PAYLOAD"
+
+          resp=$(curl -X POST -s "https://api.github.com/repos/${REPOSITORY}/dispatches" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -d "{\"event_type\": \"${EVENT_TYPE}\", \"client_payload\": ${CLIENT_PAYLOAD} }")
+          if [ -z "$resp" ]
+          then
+            sleep 2
+          else
+            echo "Workflow failed to trigger"
+            echo "$resp"
+            exit 1
+          fi
+#      - name: Wait for remote job completion
+#        if: ${{ env.TOKEN }}
+#        run: |
+#          echo "Waiting/polling for remote test execution to complete"
+#          echo "Sleeping $RESULT_INITIAL_WAIT_SECONDS seconds before polling"
+#          sleep $RESULT_INITIAL_WAIT_SECONDS
+#          i=0
+#          while [[ "${RESULT}" != '0' ]]
+#          do
+#            echo "debug - fetching"
+#            git fetch origin
+#            echo "debug - resetting"
+#            git reset --hard origin/$STATUS_BRANCH
+#
+#            echo "debug - is $FILENAME there?"
+#            # Check file is there and break if it is
+#            if [ -f "$FILENAME" ]; then
+#              echo "debug - file is there"
+#              break
+#            fi
+#
+#
+#            echo "debug - incrementing counter"
+#            i=$((i+1))
+#            echo "debug - checking max poll attempts"
+#            if [ $i -eq $RESULT_MAX_POLL_ATTEMPTS ]; then
+#              1>&2 echo "Timeout receiving the results"
+#              exit 1
+#            fi
+#            echo "Sleeping $RESULT_POLL_WAIT_SECONDS seconds before polling again"
+#            sleep $RESULT_POLL_WAIT_SECONDS
+#          done
+#          # cat $FILENAME
+#          STATUS="$(jq -r .status $FILENAME)"
+#          MESSAGE="$(jq -r .message $FILENAME)"
+#
+#          # echo "Status: $STATUS"
+#
+#          if [[ "${STATUS}" == "failed" ]]; then
+#            echo -e "\e[31m${MESSAGE}\e[0m"
+#            exit 1
+#          fi
+#
+#          echo -e "\e[32m${MESSAGE}\e[0m"
