@@ -22,7 +22,7 @@ import org.wildfly.test.integration.microprofile.reactive.RunKafkaSetupTask;
 
 @RunWith(Arquillian.class)
 @RunAsClient
-@ServerSetup({EnableReactiveExtensionsSetupTask.class, RunKafkaSetupTask.class, OpenTelemetrySetupTask.class})
+@ServerSetup({OpenTelemetrySetupTask.class, EnableReactiveExtensionsSetupTask.class, RunKafkaSetupTask.class})
 @DockerRequired(AssumptionViolatedException.class)
 public class KafkaReactiveMessagingAndOtelTestCase extends BaseReactiveMessagingAndOtelTest {
     @Testcontainer
