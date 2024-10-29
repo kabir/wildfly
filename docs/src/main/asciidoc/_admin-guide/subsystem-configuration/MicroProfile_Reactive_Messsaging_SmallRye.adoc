@@ -358,6 +358,71 @@ Each of the new lines has the following meaning:
 
 Instead of configuring these properties on the connector level, we could also have defined them on the individual channels. E.g.: `mp.messaging.incoming.from.wildfly.elytron.ssl.context=test` would choose the `test` SSLContext for the `from` incoming channel.
 
+== Tracing messages with MicroProfile Telemetry
+
+The Kafka and AMQP connectors both allow to use MicroProfile Telemetry to trace incoming and outgoing messages. This functionality is disabled in WildFly by default.
+
+If the MicroProfile Telemetry subsystem is present, we can turn on OpenTelemetry tracing of the messages.
+
+[NOTE]
+The link:./MicroProfile_Telemetry.adoc[MicroProfile Telemetry subsystem] must be present for the settings in this section to take effect. If the MicroProfile subsystem is not present, these settings will be ignored.
+
+In order to turn it on, we need to add the `/subsystem=microprofile-reactive-messaging-smallrye/opentelemetry-tracing=config` resource. This resource has two attributes allowing you to enable tracing per connector:
+
+* `amqp-connector` - configures the AMQP connector for the tracing integration
+* `kafka-connector` - configures the AMQP connector for the tracing integration
+
+The value for these attributes may be one of the following:
+
+* `NEVER` - This is the default value, and will be used if the mentioned resource does not exist, or if the resource exists and the attribute is not set. This turns off the MicroProfile Telemetry tracing integration, and does not allow you to turn it on in deployed applications.
+* `OFF` - Turns off the MicroProfile Telemetry tracing integration by default, but allows you to turn it on in deployed applications.
+* `ON` - Turns on the MicroProfile Telemetry tracing integration by default, but allows you to turn it off in deployed applications.
+* `ALWAYS` - Turns on the MicroProfile Telemetry tracing integration, and does not allow you to turn it off in deployed applications.
+
+Here is an example of forcing the MicroProfile Telemetry tracing integration for the AMQP connector:
+----
+/subsystem=microprofile-reactive-messaging-smallrye/opentelemetry-tracing=config:add(amqp-connector=ALWAYS)
+----
+
+This is an example of having the OpenTelemetry tracing integration off by default, but allowing deployed applications to turn it on for the Kafka connector:
+----
+/subsystem=microprofile-reactive-messaging-smallrye/opentelemetry-tracing=config:add(amqp-connector=OFF)
+----
+
+=== MicroProfile Config settings for deployed applications
+
+If MicroProfile Telemetry tracing is desired, we *must* specify the `otel.sdk.disabled` property via MicroProfile Config as shown below. This example assumes it is part of an application's `META-INF/microprofile-config.properties` file:
+
+[source,properties]
+----
+otel.sdk.disabled=false
+----
+The above is mentioned in the link:./MicroProfile_Telemetry.adoc[MicroProfile Telemetry subsystem] section.
+
+Next if the attribute value for our connector in  `/subsystem=microprofile-reactive-messaging-smallrye/opentelemetry-tracing=config` is either `OFF` or `ON`, we can change the default behavior for the deployed applications via the following MicroProfile Config properties:
+
+* `mp.messaging.connector.smallrye-amqp.tracing-enabled` - Overrides the value configured by the `amqp-connector` attribute, and can be `true` or `false`
+** `true` turns on MicroProfile Telemetry tracing. This will only have an effect if the attribute is set to `OFF`
+** `false` turns off MicroProfile Telemetry tracing. This will only have an effect if the attribute is set to `ON`
+* `mp.messaging.connector.smallrye-kafka.tracing-enabled` - Overrides the value configured by the `kafka-connector` attribute, and can be `true` or `false`
+** `true` turns on MicroProfile Telemetry tracing. This will only have an effect if the attribute is set to `OFF`
+** `false` turns off MicroProfile Telemetry tracing. This will only have an effect if the attribute is set to `ON`
+
+To give an example of the above, if added the `/subsystem=microprofile-reactive-messaging-smallrye/opentelemetry-tracing=config` resource as:
+
+----
+/subsystem=microprofile-reactive-messaging-smallrye/opentelemetry-tracing=config:add(amqp-connector=OFF, kafka-connector=ON)
+----
+Now by default, tracing will be off for the AMQP connnector, and on for the Kafka connector.
+
+If we deploy an application with the following entries in its `META-INF/microprofile-config.properties` file,
+----
+otel.sdk.disabled=false
+mp.messaging.connector.smallrye-amqp.tracing-enabled=true
+mp.messaging.connector.smallrye-kafka.tracing-enabled=false
+----
+for this application we get the inverse behaviour where tracing is on for the AMQP connnector, and off for the Kafka connector.
+
 == Component Reference
 
 The MicroProfile Reactive Messaging implementation is provided by the SmallRye Reactive Messaging project.
