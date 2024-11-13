@@ -200,6 +200,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- MicroProfile Reactive Messaging In-Memory Connector Test Dependencies -->
+        <dependency>
+            <groupId>io.smallrye.reactive</groupId>
+            <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
+            <version>${version.io.smallrye.smallrye-reactive-messaging}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- MicroProfile Reactive Messaging Kafka Connector Test Dependencies -->
         <dependency>
             <groupId>io.smallrye.reactive</groupId>

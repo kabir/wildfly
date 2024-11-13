@@ -280,7 +280,6 @@
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>mutiny</artifactId>
         </dependency>
-
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>mutiny-reactive-streams-operators</artifactId>
@@ -349,6 +348,17 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-amqp-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.smallrye.reactive</groupId>
+            <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
