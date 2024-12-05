@@ -5,6 +5,7 @@
 
 package org.wildfly.test.integration.microprofile.reactive.messaging.otel;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PACKAGE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 import static org.junit.Assert.assertEquals;
 import static org.wildfly.extension.microprofile.reactive.messaging.MicroProfileReactiveMessagingExtension.SUBSYSTEM_NAME;
@@ -457,9 +458,18 @@ public abstract class BaseReactiveMessagingAndOtelTest {
             }
             Thread.sleep(1000);
         }
+        System.out.println("Current traces:");
+        current.forEach(trace -> {
+                System.out.println("TraceID: " + trace.getTraceID());
+                trace.getSpans().forEach(s -> System.out.println(s.getOperationName()));
+                System.out.println("-------------------------");
+        });
         if (errMessage != null) {
             // some checker produced false and err message
             Assert.fail(errMessage);
+        } else {
+            // should not really happen, just to be sure. If everything is good, method returns without getting here
+            Assert.fail();
         }
     }
 }
