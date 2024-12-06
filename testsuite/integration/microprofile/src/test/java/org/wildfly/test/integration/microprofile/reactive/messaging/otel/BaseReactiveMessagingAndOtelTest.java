@@ -432,18 +432,16 @@ public abstract class BaseReactiveMessagingAndOtelTest {
 
     private void checkJaegerTraces(int timeout, ReactiveMessagingOtelAssertUtils.TraceChecker... traceCheckers) throws InterruptedException {
         long end = System.currentTimeMillis() + timeout;
-        List<JaegerTrace> current = new ArrayList<>();
         String errMessage = null;
+        List<JaegerTrace> currentDebug = new ArrayList<>();
         while (System.currentTimeMillis() < end) {
+            List<JaegerTrace> current = new ArrayList<>();
             List<JaegerTrace> traces = getCollector().getTraces(deploymentName);
             for (JaegerTrace trace : traces) {
                 if (previousTestsTraceIds.contains(trace.getTraceID())) {
                     continue;
                 }
-                if (!currentTraceIds.contains(trace.getTraceID())){
-                    current.add(trace);
-                    currentTraceIds.add(trace.getTraceID());
-                }
+                currentTraceIds.add(trace.getTraceID());
             }
             boolean allGood = true;
             for (ReactiveMessagingOtelAssertUtils.TraceChecker traceChecker : traceCheckers) {
@@ -457,9 +455,10 @@ public abstract class BaseReactiveMessagingAndOtelTest {
                 return;
             }
             Thread.sleep(1000);
+            currentDebug = new ArrayList<>(current);
         }
         System.out.println("Current traces:");
-        current.forEach(trace -> {
+        currentDebug.forEach(trace -> {
                 System.out.println("TraceID: " + trace.getTraceID());
                 trace.getSpans().forEach(s -> System.out.println(s.getOperationName()));
                 System.out.println("-------------------------");
