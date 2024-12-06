@@ -442,6 +442,7 @@ public abstract class BaseReactiveMessagingAndOtelTest {
                     continue;
                 }
                 currentTraceIds.add(trace.getTraceID());
+                current.add(trace);
             }
             boolean allGood = true;
             for (ReactiveMessagingOtelAssertUtils.TraceChecker traceChecker : traceCheckers) {
