@@ -28,30 +28,8 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
         }
     }
 
-    public void registerOpenTelemetryConfigAnnotatedType(@Observes BeforeBeanDiscovery event, BeanManager beanManager) {
+    public void registerConfigProducerAnnotatedType(@Observes BeforeBeanDiscovery event, BeanManager beanManager) {
         event.addAnnotatedType(EarConfigProducer.class, null);
     }
-
-//    public void registerOpenTelemetryConfigBean(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
-//        event.addBean()
-//                .scope(Singleton.class)
-//                .addQualifier(Default.Literal.INSTANCE)
-//                .types(OpenTelemetryConfig.class)
-//                .createWith(c -> {
-//                            Config appConfig = beanManager.createInstance().select(Config.class).get();
-//                            Map<String, String> properties = new HashMap<>(serverConfig);
-//                            // MicroProfile Telemetry is disabled by default
-//                            properties.put("otel.sdk.disabled", "true");
-//                            for (String propertyName : appConfig.getPropertyNames()) {
-//                                if (propertyName.startsWith("otel.") || propertyName.startsWith("OTEL_")) {
-//                                    appConfig.getOptionalValue(propertyName, String.class).ifPresent(
-//                                            value -> properties.put(propertyName, value));
-//                                }
-//                            }
-//
-//                            return (OpenTelemetryConfig) () -> properties;
-//                        }
-//                );
-//    }
 
 }
