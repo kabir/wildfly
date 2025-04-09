@@ -19,13 +19,15 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Supplier;
 
-
+import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.AnnotatedMember;
 import jakarta.enterprise.inject.spi.AnnotatedType;
 import jakarta.enterprise.inject.spi.InjectionPoint;
+import jakarta.interceptor.Interceptor;
 
 import io.smallrye.config.ConfigValue;
 import io.smallrye.config.SmallRyeConfig;
@@ -35,10 +37,14 @@ import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.wildfly.security.manager.WildFlySecurityManager;
 
+
 @ApplicationScoped
+@Alternative
+@Priority(Interceptor.Priority.LIBRARY_BEFORE)
 public class EarConfigProducer {
     @Produces
     protected SmallRyeConfig getConfig() {
+        // TODO change the SmallRyeConfig lookup
         return ConfigProvider.getConfig(WildFlySecurityManager.getCurrentContextClassLoaderPrivileged()).unwrap(SmallRyeConfig.class);
     }
 

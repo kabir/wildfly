@@ -20,10 +20,11 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
         this.classLoader = classLoader;
     }
 
-    public void stop(@Observes ProcessAnnotatedType<?> event) {
-        // Don't install the Config
+    public void veto(@Observes ProcessAnnotatedType<?> event) {
+        // Don't install the ConfigProducer
         if (event.getAnnotatedType().getJavaClass().equals(ConfigProducer.class)) {
-//            event.veto();
+            // Disable for now since it breaks everything
+            //event.veto();
         }
     }
 
