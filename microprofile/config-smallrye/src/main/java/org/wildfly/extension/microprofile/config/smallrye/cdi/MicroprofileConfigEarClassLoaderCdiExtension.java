@@ -29,7 +29,7 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
     }
 
     public void registerConfigProducerAnnotatedType(@Observes BeforeBeanDiscovery event, BeanManager beanManager) {
-        event.addAnnotatedType(EarConfigProducer.class, null);
+        event.addAnnotatedType(EarConfigProducer.class, EarConfigProducer.class.getName() + "-override");
     }
 
 }
