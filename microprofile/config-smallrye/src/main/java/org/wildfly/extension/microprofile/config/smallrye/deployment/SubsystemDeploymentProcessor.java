@@ -44,9 +44,12 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
     }
 
     private void handleEars(DeploymentUnit deploymentUnit, ModuleClassLoader classLoader) {
-        if (!isEar(deploymentUnit)) {
+        if (true) {
             return;
         }
+//        if (!isEarOrPartOfWar(deploymentUnit)) {
+//            return;
+//        }
 
         try {
             final CapabilityServiceSupport support = deploymentUnit.getAttachment(Attachments.CAPABILITY_SERVICE_SUPPORT);
@@ -56,9 +59,10 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
                         "Skipping MicroProfile Telemetry integration.");
             } else {
 
-
-                weldCapability.registerExtensionInstance(new MicroprofileConfigEarClassLoaderCdiExtension(classLoader),
-                        deploymentUnit);
+//                if (true) {
+                    weldCapability.registerExtensionInstance(new MicroprofileConfigEarClassLoaderCdiExtension(classLoader),
+                            deploymentUnit);
+//                }
             }
         } catch (CapabilityServiceSupport.NoSuchCapabilityException e) {
             throw new IllegalStateException("No capability");
@@ -68,11 +72,15 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
 
     }
 
-    private boolean isEar(DeploymentUnit deploymentUnit) {
+    private boolean isEarOrPartOfWar(DeploymentUnit deploymentUnit) {
         try {
-            if (DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) {
-                return true;
+            while (deploymentUnit != null) {
+                if (DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) {
+                    return true;
+                }
+                deploymentUnit = deploymentUnit.getParent();
             }
+
         } catch (Exception e) {
             // The ee subsystem is not available so we don't handle ears
         }
