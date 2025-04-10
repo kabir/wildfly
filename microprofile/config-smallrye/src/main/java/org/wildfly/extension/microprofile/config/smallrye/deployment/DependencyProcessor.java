@@ -31,6 +31,7 @@ public class DependencyProcessor implements DeploymentUnitProcessor {
         final ModuleLoader moduleLoader = Module.getBootModuleLoader();
 
         moduleSpecification.addSystemDependency(ModuleDependency.Builder.of(moduleLoader, "org.eclipse.microprofile.config.api").setImportServices(true).build());
+        moduleSpecification.addSystemDependency(ModuleDependency.Builder.of(moduleLoader, "org.wildfly.extension.microprofile.config-smallrye").setImportServices(true).build());
         moduleSpecification.addSystemDependency(ModuleDependency.Builder.of(moduleLoader, "io.smallrye.config").setImportServices(true).build());
     }
 

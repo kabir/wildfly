@@ -5,13 +5,17 @@
 
 package org.wildfly.extension.microprofile.config.smallrye.cdi;
 
+import io.smallrye.config.SmallRyeConfig;
+import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.inject.spi.BeanManager;
-import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
+import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
 import jakarta.enterprise.inject.spi.Extension;
 import jakarta.enterprise.inject.spi.ProcessAnnotatedType;
 
 import io.smallrye.config.inject.ConfigProducer;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.wildfly.security.manager.WildFlySecurityManager;
 
 public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
     private ClassLoader classLoader;
@@ -28,8 +32,13 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
         }
     }
 
-    public void registerConfigProducerAnnotatedType(@Observes BeforeBeanDiscovery event, BeanManager beanManager) {
-        event.addAnnotatedType(EarConfigProducer.class, EarConfigProducer.class.getName() + "-override");
+    public void registerConfigBean(@Observes AfterBeanDiscovery abd) {
+        abd.addBean().scope(Dependent.class)
+                .alternative(true)
+                .priority(10)
+                .beanClass(SmallRyeConfig.class)
+                .addTypes(SmallRyeConfig.class, Config.class)
+                .produceWith(instance -> ConfigProvider.getConfig(WildFlySecurityManager.getCurrentContextClassLoaderPrivileged()).unwrap(SmallRyeConfig.class));
     }
 
 }
