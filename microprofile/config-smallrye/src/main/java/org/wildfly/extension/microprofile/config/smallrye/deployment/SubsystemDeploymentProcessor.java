@@ -29,6 +29,9 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
 
     public static final AttachmentKey<Config> CONFIG = AttachmentKey.create(Config.class);
 
+    private static final AttachmentKey<MicroprofileConfigEarClassLoaderCdiExtension> CDI_EXTENSION =
+            AttachmentKey.create(MicroprofileConfigEarClassLoaderCdiExtension.class);
+
     public SubsystemDeploymentProcessor() {
     }
 
@@ -44,7 +47,8 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
     }
 
     private void handleEars(DeploymentUnit deploymentUnit, ModuleClassLoader classLoader) {
-        if (!isEarOrPartOfWar(deploymentUnit)) {
+        DeploymentUnit earDeploymentUnit = getEarDeploymentUnit(deploymentUnit);
+        if (earDeploymentUnit == null) {
             return;
         }
 
@@ -55,25 +59,27 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
                 MicroProfileConfigLogger.ROOT_LOGGER.debug("The deployment does not have Jakarta Contexts and Dependency Injection enabled. " +
                         "Skipping MicroProfile Telemetry integration.");
             } else {
+                MicroprofileConfigEarClassLoaderCdiExtension extension = earDeploymentUnit.getAttachment(CDI_EXTENSION);
+                if (extension == null) {
+                    extension = new MicroprofileConfigEarClassLoaderCdiExtension();
+                    earDeploymentUnit.putAttachment(CDI_EXTENSION, extension);
+                    weldCapability.registerExtensionInstance(extension, earDeploymentUnit);
+                }
 
-//                if (true) {
-                    weldCapability.registerExtensionInstance(new MicroprofileConfigEarClassLoaderCdiExtension(classLoader),
-                            deploymentUnit);
-//                }
+                // TODO - only add this if it is a lib/ jar? We'd need to inspect the ear structure
+                extension.addClassLoader(classLoader);
             }
         } catch (CapabilityServiceSupport.NoSuchCapabilityException e) {
             throw new IllegalStateException("No capability");
-//            throw MPTEL_LOGGER.deploymentRequiresCapability(deploymentPhaseContext.getDeploymentUnit().getName(),
-//                    WELD_CAPABILITY_NAME);
         }
 
     }
 
-    private boolean isEarOrPartOfWar(DeploymentUnit deploymentUnit) {
+    private DeploymentUnit getEarDeploymentUnit(DeploymentUnit deploymentUnit) {
         try {
             while (deploymentUnit != null) {
                 if (DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) {
-                    return true;
+                    return deploymentUnit;
                 }
                 deploymentUnit = deploymentUnit.getParent();
             }
@@ -81,7 +87,7 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
         } catch (Exception e) {
             // The ee subsystem is not available so we don't handle ears
         }
-        return false;
+        return null;
     }
 
     @Override
