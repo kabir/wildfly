@@ -48,9 +48,9 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
 
     private void handleEars(DeploymentUnit deploymentUnit, ModuleClassLoader classLoader) {
         DeploymentUnit earDeploymentUnit = getEarDeploymentUnit(deploymentUnit);
-        if (earDeploymentUnit == null) {
-            return;
-        }
+//        if (earDeploymentUnit == null) {
+//            return;
+//        }
 
         try {
             final CapabilityServiceSupport support = deploymentUnit.getAttachment(Attachments.CAPABILITY_SERVICE_SUPPORT);
