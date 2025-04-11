@@ -6,11 +6,15 @@
 package org.wildfly.extension.microprofile.config.smallrye.cdi;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.event.Observes;
@@ -21,6 +25,7 @@ import jakarta.enterprise.inject.spi.Extension;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.enterprise.inject.spi.ProcessAnnotatedType;
 import jakarta.enterprise.util.AnnotationLiteral;
+import jakarta.enterprise.util.TypeLiteral;
 
 import io.smallrye.config.ConfigValue;
 import io.smallrye.config.SmallRyeConfig;
@@ -71,6 +76,8 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
         registerSimpleConfigPropertyProducer(abd, Long.class, ConfigProducerUtil::getValue);
         registerSimpleConfigPropertyProducer(abd, Integer.class, ConfigProducerUtil::getValue);
         registerSimpleConfigPropertyProducer(abd, Float.class, ConfigProducerUtil::getValue);
+        registerSimpleConfigPropertyProducer(abd, Double.class, ConfigProducerUtil::getValue);
+        registerSimpleConfigPropertyProducer(abd, Boolean.class, ConfigProducerUtil::getValue);
         registerSimpleConfigPropertyProducer(abd, Short.class, ConfigProducerUtil::getValue);
         registerSimpleConfigPropertyProducer(abd, Byte.class, ConfigProducerUtil::getValue);
         registerSimpleConfigPropertyProducer(abd, Character.class, ConfigProducerUtil::getValue);
@@ -78,9 +85,32 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
         registerSimpleConfigPropertyProducer(abd, OptionalLong.class, ConfigProducerUtil::getValue);
         registerSimpleConfigPropertyProducer(abd, OptionalDouble.class, ConfigProducerUtil::getValue);
         registerSimpleConfigPropertyProducer(abd, ConfigValue.class, ConfigProducerUtil::getValue);
+        // These have type variables, but no bounds. So hopefully type erasure will get rid of them
+        registerGenericConfigPropertyProducer(abd, Optional.class,
+                new TypeLiteral<Optional>() {
+
+                }, ConfigProducerUtil::getValue);
+        registerGenericConfigPropertyProducer(abd, Supplier.class,
+                new TypeLiteral<Supplier>() {
+                },
+                ConfigProducerUtil::getValue);
+        registerGenericConfigPropertyProducer(abd, Set.class,
+                new TypeLiteral<Set>() {
+                },
+                ConfigProducerUtil::getValue);
+        registerGenericConfigPropertyProducer(abd, List.class,
+                new TypeLiteral<List>() {
+                },
+                ConfigProducerUtil::getValue);
+        registerGenericConfigPropertyProducer(abd, Map.class,
+                new TypeLiteral<Map>() {
+                },
+                ConfigProducerUtil::getValue);
     }
 
-    private <T> void registerSimpleConfigPropertyProducer(AfterBeanDiscovery abd, Class<T> type, BiFunction<InjectionPoint, SmallRyeConfig, T> function) {
+    private <T> void registerSimpleConfigPropertyProducer(
+            AfterBeanDiscovery abd, Class<T> type, BiFunction<InjectionPoint, SmallRyeConfig, T> function) {
+
         abd.addBean().scope(Dependent.class)
                 .beanClass(type)
                 .addTypes(type)
@@ -90,6 +120,21 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
                     SmallRyeConfig config = getInjectedConfig(instance);
                     return function.apply(ip, config);
                 });
+    }
+
+    private <T> void registerGenericConfigPropertyProducer (
+            AfterBeanDiscovery abd, Class<T> type, TypeLiteral<?> typeLiteral, BiFunction<InjectionPoint, SmallRyeConfig, T> function) {
+
+        abd.addBean().scope(Dependent.class)
+                .beanClass(type)
+                .addType(typeLiteral)
+                .addQualifier(ConfigPropertyLiteral.INSTANCE)
+                .produceWith(instance -> {
+                    InjectionPoint ip = getInjectedInjectionPoint(instance);
+                    SmallRyeConfig config = getInjectedConfig(instance);
+                    return function.apply(ip, config);
+                });
+
     }
 
     private InjectionPoint getInjectedInjectionPoint(Instance<Object> instance) {

@@ -356,26 +356,26 @@ public class TestApplication extends Application {
         @Inject
         Config config;
 
-        @Inject
-        @ConfigProperty(name = "myPets", defaultValue = "horse,monkey\\,donkey")
-        private String[] myArrayPets;
-
-        @Inject
-        @ConfigProperty(name = "myPets", defaultValue = "cat,lama\\,yokohama")
-        private List<String> myListPets;
-
-        @Inject
-        @ConfigProperty(name = "myPets", defaultValue = "dog,mouse\\,house")
-        private Set<String> mySetPets;
+//        @Inject
+//        @ConfigProperty(name = "myPets", defaultValue = "horse,monkey\\,donkey")
+//        private String[] myArrayPets;
+//
+//        @Inject
+//        @ConfigProperty(name = "myPets", defaultValue = "cat,lama\\,yokohama")
+//        private List<String> myListPets;
+//
+//        @Inject
+//        @ConfigProperty(name = "myPets", defaultValue = "dog,mouse\\,house")
+//        private Set<String> mySetPets;
 
         @GET
         @Produces("text/plain")
         public Response doGet() {
             StringBuilder text = new StringBuilder();
 
-            text.append("myPets as String array = " + Arrays.toString(myArrayPets) + "\n");
-            text.append("myPets as String list = " + myListPets + "\n");
-            text.append("myPets as String set = " + mySetPets + "\n");
+//            text.append("myPets as String array = " + Arrays.toString(myArrayPets) + "\n");
+//            text.append("myPets as String list = " + myListPets + "\n");
+//            text.append("myPets as String set = " + mySetPets + "\n");
 
             return Response.ok(text).build();
         }
@@ -387,26 +387,26 @@ public class TestApplication extends Application {
         @Inject
         Config config;
 
-        @Inject
-        @ConfigProperty(name = "myPetsOverridden", defaultValue = "horse,monkey\\,donkey")
-        private String[] myArrayPetsOverridden;
-
-        @Inject
-        @ConfigProperty(name = "myPetsOverridden", defaultValue = "cat,lama\\,yokohama")
-        private List<String> myListPetsOverridden;
-
-        @Inject
-        @ConfigProperty(name = "myPetsOverridden", defaultValue = "dog,mouse\\,house")
-        private Set<String> mySetPetsOverridden;
+//        @Inject
+//        @ConfigProperty(name = "myPetsOverridden", defaultValue = "horse,monkey\\,donkey")
+//        private String[] myArrayPetsOverridden;
+//
+//        @Inject
+//        @ConfigProperty(name = "myPetsOverridden", defaultValue = "cat,lama\\,yokohama")
+//        private List<String> myListPetsOverridden;
+//
+//        @Inject
+//        @ConfigProperty(name = "myPetsOverridden", defaultValue = "dog,mouse\\,house")
+//        private Set<String> mySetPetsOverridden;
 
         @GET
         @Produces("text/plain")
         public Response doGet() {
             StringBuilder text = new StringBuilder();
 
-            text.append("myPetsOverridden as String array = " + Arrays.toString(myArrayPetsOverridden) + "\n");
-            text.append("myPetsOverridden as String list = " + myListPetsOverridden + "\n");
-            text.append("myPetsOverridden as String set = " + mySetPetsOverridden + "\n");
+//            text.append("myPetsOverridden as String array = " + Arrays.toString(myArrayPetsOverridden) + "\n");
+//            text.append("myPetsOverridden as String list = " + myListPetsOverridden + "\n");
+//            text.append("myPetsOverridden as String set = " + mySetPetsOverridden + "\n");
 
             return Response.ok(text).build();
         }

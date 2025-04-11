@@ -10,8 +10,6 @@ import static org.jboss.as.weld.Capabilities.WELD_CAPABILITY_NAME;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.jboss.as.controller.capability.CapabilityServiceSupport;
-import org.jboss.as.ee.structure.DeploymentType;
-import org.jboss.as.ee.structure.DeploymentTypeMarker;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -48,9 +46,9 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
 
     private void handleEars(DeploymentUnit deploymentUnit, ModuleClassLoader classLoader) {
         DeploymentUnit earDeploymentUnit = getEarDeploymentUnit(deploymentUnit);
-//        if (earDeploymentUnit == null) {
-//            return;
-//        }
+        if (earDeploymentUnit == null) {
+            return;
+        }
 
         try {
             final CapabilityServiceSupport support = deploymentUnit.getAttachment(Attachments.CAPABILITY_SERVICE_SUPPORT);
@@ -78,7 +76,11 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
     private DeploymentUnit getEarDeploymentUnit(DeploymentUnit deploymentUnit) {
         try {
             while (deploymentUnit != null) {
-                if (DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) {
+//                if (DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) {
+//                    return deploymentUnit;
+//                }
+                // Temporarily use this for all top/war deployments
+                if (deploymentUnit.getParent() == null) {
                     return deploymentUnit;
                 }
                 deploymentUnit = deploymentUnit.getParent();
