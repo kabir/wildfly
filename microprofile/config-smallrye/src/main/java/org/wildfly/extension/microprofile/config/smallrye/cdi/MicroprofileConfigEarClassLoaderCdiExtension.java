@@ -56,7 +56,7 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
     }
 
 
-    public void registerConfigProducerBeans(@Observes AfterBeanDiscovery abd, BeanManager beanManager) {
+    public void registerConfigProducerSimple(@Observes AfterBeanDiscovery abd, BeanManager beanManager) {
         System.out.println("Adding bean for " + beanManager);
         // If I make this ApplicationScoped it fails with
         // 10:27:46,343 ERROR [org.jboss.resteasy.core.providerfactory.DefaultExceptionMapper] (default task-3) RESTEASY002375: Error processing request GET /guide-maven-multimodules-war - io.openliberty.guides.multimodules.web.SampleResource.getAllConfig: org.jboss.weld.exceptions.IllegalArgumentException: WELD-001569: Cannot inject injection point metadata in a non @Dependent bean: Configurator Bean [class io.smallrye.config.SmallRyeConfig, types: Object, SmallRyeConfig, Config, qualifiers: @Any @Default]
@@ -107,6 +107,33 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
                 },
                 ConfigProducerUtil::getValue);
     }
+
+    public <T> void registerConfigProducerGenericBeans(@Observes AfterBeanDiscovery abd, BeanManager beanManager) {
+        registerGenericConfigPropertyProducer(abd, Optional.class,
+                new TypeLiteral<Optional<T>>() {
+
+                }, ConfigProducerUtil::getValue);
+        registerGenericConfigPropertyProducer(abd, Supplier.class,
+                new TypeLiteral<Supplier<T>>() {
+                },
+                ConfigProducerUtil::getValue);
+        registerGenericConfigPropertyProducer(abd, Set.class,
+                new TypeLiteral<Set<T>>() {
+                },
+                ConfigProducerUtil::getValue);
+        registerGenericConfigPropertyProducer(abd, List.class,
+                new TypeLiteral<List<T>>() {
+                },
+                ConfigProducerUtil::getValue);
+    }
+
+    public <K, V> void registerConfigProducerGenericMapBeans(@Observes AfterBeanDiscovery abd, BeanManager beanManager) {
+        registerGenericConfigPropertyProducer(abd, Map.class,
+                new TypeLiteral<Map<K, V>>() {
+                },
+                ConfigProducerUtil::getValue);
+    }
+
 
     private <T> void registerSimpleConfigPropertyProducer(
             AfterBeanDiscovery abd, Class<T> type, BiFunction<InjectionPoint, SmallRyeConfig, T> function) {
