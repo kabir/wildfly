@@ -26,6 +26,7 @@
 
     <modules>
         <module>config-smallrye</module>
+        <module>config-api</module>
         <module>fault-tolerance-smallrye</module>
         <module>health-smallrye</module>
         <module>jwt-smallrye</module>

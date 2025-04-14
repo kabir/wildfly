@@ -64,6 +64,12 @@
 
             <dependency>
                 <groupId>${full.maven.groupId}</groupId>
+                <artifactId>wildfly-microprofile-config-api</artifactId>
+                <version>${full.maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
                 <artifactId>wildfly-microprofile-config-smallrye</artifactId>
                 <version>${full.maven.version}</version>
             </dependency>
