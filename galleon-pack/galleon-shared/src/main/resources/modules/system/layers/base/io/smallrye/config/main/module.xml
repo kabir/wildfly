@@ -27,5 +27,6 @@
         <module name="io.smallrye.common.classloader"/>
         <module name="io.smallrye.common.expression"/>
         <module name="io.smallrye.common.function"/>
+        <module name="org.wildfly.microprofile.config-api"/>
     </dependencies>
 </module>

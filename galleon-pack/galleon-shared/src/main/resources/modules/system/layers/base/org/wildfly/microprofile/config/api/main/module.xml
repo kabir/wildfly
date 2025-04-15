@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright The WildFly Authors
+  ~ SPDX-License-Identifier: Apache-2.0
+ -->
+<module xmlns="urn:jboss:module:1.9" name="org.wildfly.microprofile.config-api">
+
+    <properties>
+        <property name="jboss.api" value="private"/>
+    </properties>
+
+    <resources>
+        <artifact name="${org.wildfly:wildfly-microprofile-config-api}"/>
+    </resources>
+
+    <dependencies>
+        <module name="io.smallrye.config" export="true"/>
+        <module name="jakarta.annotation.api"/>
+        <module name="jakarta.enterprise.api"/>
+        <module name="jakarta.interceptor.api"/>
+        <module name="org.eclipse.microprofile.config.api"/>
+        <module name="org.wildfly.security.manager"/>
+    </dependencies>
+</module>
+

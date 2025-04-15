@@ -8,7 +8,7 @@ package org.wildfly.extension.microprofile.config.smallrye.cdi;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
@@ -27,19 +27,46 @@ public class MicroprofileConfigEarClassLoaderCdiExtension implements Extension {
         classLoaders.add(classLoader);
     }
 
+//    public void veto(@Observes ProcessProducer<ConfigProducer, SmallRyeConfig> processProducer) {
+//        System.out.println("======> Got producer " + processProducer);
+//        Producer<SmallRyeConfig> configProducer = processProducer.getProducer();
+//        processProducer.setProducer(new Producer<>() {
+//            @Override
+//            public SmallRyeConfig produce(CreationalContext<SmallRyeConfig> ctx) {
+//                ClassLoader cl = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
+//                return (SmallRyeConfig) ConfigProvider.getConfig(cl);
+//            }
+//
+//            @Override
+//            public void dispose(SmallRyeConfig instance) {
+//                configProducer.dispose(instance);
+//                classLoaders.clear();
+//            }
+//
+//            @Override
+//            public Set<InjectionPoint> getInjectionPoints() {
+//                return configProducer.getInjectionPoints();
+//            }
+//        });
+//    }
+
     public void registerClassLoaderFactory(@Observes AfterBeanDiscovery abd) {
         System.out.println("======> Adding bean");
-        abd.addBean().scope(Dependent.class)
+        abd.addBean().scope(ApplicationScoped.class)
                 .beanClass(ConfigProducerClassLoaderFactory.class)
                 .addType(ConfigProducerClassLoaderFactory.class)
                 .qualifiers(Default.Literal.INSTANCE)
                 .produceWith(instance -> (ConfigProducerClassLoaderFactory) ip -> {
-                    System.out.println("======> Using bean");
+                    System.out.println("======> Using bean " + ip);
                     if (ip != null && ip.getBean() != null) {
-                        ClassLoader cl = WildFlySecurityManager.getClassLoaderPrivileged(ip.getBean().getClass());
+                        ClassLoader cl = WildFlySecurityManager.getClassLoaderPrivileged(ip.getBean().getBeanClass());
                         System.out.println("======> InjectionPoint CL " + cl);
-                        return cl;
+                        if (classLoaders.contains(cl)) {
+                            System.out.println("---> CL: " + cl);
+                            return cl;
+                        }
                     }
+                    System.out.println("======> TCCL Fallback " + WildFlySecurityManager.getCurrentContextClassLoaderPrivileged());
                     return WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
                 });
     }
