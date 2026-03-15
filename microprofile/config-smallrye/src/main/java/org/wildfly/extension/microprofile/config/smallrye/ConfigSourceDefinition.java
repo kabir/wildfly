@@ -142,6 +142,8 @@ class ConfigSourceDefinition extends PersistentResourceDefinition {
         @Override
         protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
             super.performRuntime(context, operation, model);
+            // Runtime changes to config-sources require server reload to ensure proper initialization
+            context.reloadRequired();
             String name = context.getCurrentAddressValue();
             int ordinal = ORDINAL.resolveModelAttribute(context, model).asInt();
             ModelNode classModel = CLASS.resolveModelAttribute(context, model);

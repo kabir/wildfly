@@ -83,6 +83,8 @@ class ConfigSourceProviderDefinition extends PersistentResourceDefinition {
         @Override
         protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
             super.performRuntime(context, operation, model);
+            // Runtime changes to config-source-providers require server reload to ensure proper initialization
+            context.reloadRequired();
             ModelNode classModel = CLASS.resolveModelAttribute(context, model);
             if (classModel.isDefined()) {
                 Class configSourceProviderClass = unwrapClass(classModel);
