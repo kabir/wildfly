@@ -72,6 +72,13 @@ class MicroProfileConfigSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         MicroProfileConfigLogger.ROOT_LOGGER.activatingSubsystem();
 
+        // Install the capability service so dependent subsystems can wait on config availability
+        ConfigProviderResolver resolver = ConfigProviderResolver.instance();
+        context.getServiceTarget()
+                .addService(MicroProfileSubsystemDefinition.CONFIG_CAPABILITY.getCapabilityServiceName())
+                .setInstance(new ConfigProviderResolverService(resolver))
+                .install();
+
         context.addStep(new AbstractDeploymentChainStep() {
             @Override
             public void execute(DeploymentProcessorTarget processorTarget) {
