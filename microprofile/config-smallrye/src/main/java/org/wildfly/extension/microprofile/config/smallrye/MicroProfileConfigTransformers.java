@@ -32,9 +32,28 @@ public class MicroProfileConfigTransformers implements ExtensionTransformerRegis
     public void registerTransformers(SubsystemTransformerRegistration registration) {
         ChainedTransformationDescriptionBuilder builder = TransformationDescriptionBuilder.Factory.createChainedSubystemInstance(registration.getCurrentSubsystemVersion());
 
+        // WildFly 35+ (version 3.0.0) -> WildFly 34 (version 2.0.0)
+        registerTransformers_WildFly_34(builder.createBuilder(MicroProfileConfigExtension.VERSION_3_0_0, MicroProfileConfigExtension.VERSION_2_0_0));
+
+        // WildFly 27-34 (version 2.0.0) -> WildFly 26 (version 1.1.0)
         registerTransformers_WildFly_26(builder.createBuilder(MicroProfileConfigExtension.VERSION_2_0_0, MicroProfileConfigExtension.VERSION_1_1_0));
 
-        builder.buildAndRegister(registration, new ModelVersion[] { MicroProfileConfigExtension.VERSION_1_1_0});
+        builder.buildAndRegister(registration, new ModelVersion[] {
+            MicroProfileConfigExtension.VERSION_2_0_0,
+            MicroProfileConfigExtension.VERSION_1_1_0
+        });
+    }
+
+    private void registerTransformers_WildFly_34(ResourceTransformationDescriptionBuilder builder) {
+        // Version 3.0.0 -> 2.0.0 transformation
+        // No model structure changes, only behavioral changes:
+        // - config-source and config-source-provider operations now require reload
+        // - ConfigProviderResolver capability now provides a service
+        // These are runtime-only changes, so no attribute transformations needed
+        // The operations will still work on older versions, they just won't require reload
+
+        // No-op transformer: model structure is identical, only runtime behavior differs
+        // This transformer exists to track the version change for operational semantics
     }
 
     private void registerTransformers_WildFly_26(ResourceTransformationDescriptionBuilder builder) {
