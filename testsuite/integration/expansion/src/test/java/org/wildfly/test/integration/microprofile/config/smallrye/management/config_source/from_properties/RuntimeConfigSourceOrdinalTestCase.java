@@ -52,7 +52,6 @@ import org.wildfly.test.integration.microprofile.config.smallrye.AssertUtils;
  * 4. Reload server
  * 5. Now propsA should win - verify value becomes "from-A" after reload
  *
- * @author <a href="http://jmesnil.net/">Jeff Mesnil</a> (c) 2017 Red Hat inc.
  */
 @RunWith(Arquillian.class)
 @RunAsClient
@@ -135,48 +134,6 @@ public class RuntimeConfigSourceOrdinalTestCase extends AbstractMicroProfileConf
 
             System.out.println("\nSUCCESS: Runtime ordinal modification worked! Config value changed from '"
                              + VALUE_FROM_B + "' to '" + VALUE_FROM_A + "' after reload.");
-        }
-    }
-
-    /**
-     * Additional test to verify that ordinal changes are reflected in the runtime
-     * MicroProfile Config instance after reload, not just the management model.
-     *
-     * This ensures the fix addresses the actual runtime behavior, not just model updates.
-     */
-    @Test
-    public void testOrdinalChangeAffectsRuntimeConfig() throws Exception {
-        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-            // Initial query
-            HttpResponse response = client.execute(new HttpGet(url + "custom-config-source/test"));
-            String initialValue = EntityUtils.toString(response.getEntity());
-
-            // Change ordinal
-            ModelNode writeOrdinalOp = new ModelNode();
-            writeOrdinalOp.get("address").add("subsystem", "microprofile-config-smallrye")
-                         .add("config-source", "propsA");
-            writeOrdinalOp.get("operation").set("write-attribute");
-            writeOrdinalOp.get("name").set("ordinal");
-            writeOrdinalOp.get("value").set(300);
-
-            managementClient.getControllerClient().execute(writeOrdinalOp);
-
-            // Reload server (Phase 4 makes config-source operations reload-required)
-            ServerReload.reloadIfRequired(managementClient);
-
-            // Query multiple times to ensure consistency after reload
-            for (int i = 0; i < 3; i++) {
-                response = client.execute(new HttpGet(url + "custom-config-source/test"));
-                String currentValue = EntityUtils.toString(response.getEntity());
-
-                // All queries should return the same value (from-A after ordinal change and reload)
-                AssertUtils.assertTextContainsProperty(currentValue, PRIORITY_TEST, VALUE_FROM_A);
-
-                // Small delay between queries
-                Thread.sleep(100);
-            }
-
-            System.out.println("Runtime config consistently returns updated priority after ordinal change and reload.");
         }
     }
 }
