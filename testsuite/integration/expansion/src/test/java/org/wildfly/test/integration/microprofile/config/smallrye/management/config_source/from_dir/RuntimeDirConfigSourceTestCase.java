@@ -5,7 +5,6 @@
 
 package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_dir;
 
-import java.io.File;
 import java.net.URL;
 
 import org.apache.http.HttpResponse;
@@ -59,7 +58,7 @@ import org.wildfly.test.integration.microprofile.config.smallrye.AbstractMicroPr
 public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTestCase {
 
     private static final String CONFIG_SOURCE_NAME = "runtime-test-dir";
-    private static final String RUNTIME_PROPERTY_NAME = "runtime.test.property";
+    private static final String RUNTIME_PROPERTY_NAME = "runtime-test-property";
     private static final String RUNTIME_PROPERTY_VALUE = "runtime-dir-value";
     private static final String TEST_DIR_NAME = "test-config-dir";
 
@@ -130,10 +129,17 @@ public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTe
         PathAddress configSourceAddress = PathAddress.pathAddress("subsystem", "microprofile-config-smallrye")
                 .append("config-source", CONFIG_SOURCE_NAME);
 
+        // Find the test directory created by SetupTask in target/
+        java.nio.file.Path target = java.nio.file.Paths.get("target").toAbsolutePath().normalize();
+        java.nio.file.Path[] dirs = java.nio.file.Files.list(target)
+            .filter(p -> p.getFileName().toString().startsWith(TEST_DIR_NAME))
+            .toArray(java.nio.file.Path[]::new);
+
+        Assert.assertTrue("Test directory should exist in target/", dirs.length > 0);
+        String dirPath = dirs[0].toString().replace('\\', '/'); // Escape Windows paths
+
         ModelNode addOperation = Util.createAddOperation(configSourceAddress);
-        // Use relative-to to reference server's config directory
-        addOperation.get("dir").get("relative-to").set("jboss.server.config.dir");
-        addOperation.get("dir").get("path").set(TEST_DIR_NAME);
+        addOperation.get("dir").get("path").set(dirPath);
 
         ModelNode result = managementClient.getControllerClient().execute(addOperation);
         Assert.assertEquals("Adding config-source should succeed: " + result.toString(),
