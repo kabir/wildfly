@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime_ordinal;
+package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties;
 
-import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime_ordinal.TestApplication.PRIORITY_TEST;
+import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties.OrdinalTestApplication.PRIORITY_TEST;
 
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.test.shared.CLIServerSetupTask;
@@ -17,7 +17,7 @@ import org.jboss.as.test.shared.CLIServerSetupTask;
  *
  * @author <a href="http://jmesnil.net/">Jeff Mesnil</a> (c) 2017 Red Hat inc.
  */
-public class SetupTask extends CLIServerSetupTask {
+public class RuntimeConfigSourceOrdinalSetupTask extends CLIServerSetupTask {
     static final String ADDR_A = "/subsystem=microprofile-config-smallrye/config-source=propsA";
     static final String ADDR_B = "/subsystem=microprofile-config-smallrye/config-source=propsB";
 

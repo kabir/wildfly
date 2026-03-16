@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime_ordinal;
+package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties;
 
-import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime_ordinal.SetupTask.VALUE_FROM_A;
-import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime_ordinal.SetupTask.VALUE_FROM_B;
-import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime_ordinal.TestApplication.PRIORITY_TEST;
+import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties.RuntimeConfigSourceOrdinalSetupTask.VALUE_FROM_A;
+import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties.RuntimeConfigSourceOrdinalSetupTask.VALUE_FROM_B;
+import static org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties.OrdinalTestApplication.PRIORITY_TEST;
 
 import java.net.URL;
 
@@ -22,6 +22,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.container.ManagementClient;
+import org.jboss.as.test.shared.ServerReload;
 import org.jboss.dmr.ModelNode;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -34,34 +35,34 @@ import org.wildfly.test.integration.microprofile.config.smallrye.AbstractMicroPr
 import org.wildfly.test.integration.microprofile.config.smallrye.AssertUtils;
 
 /**
- * Test runtime modification of config-source ordinal values (WFLY-21615 Phase 1).
+ * Test for WFLY-21615: Modify config-source ordinal at runtime and verify
+ * property priority changes after server reload.
  *
- * This test verifies that modifying a config-source's ordinal at RUNTIME changes
- * the priority of config values without requiring a server reload.
+ * With Phase 4, config-source operations are reload-required. This test verifies:
+ * - Ordinal modification succeeds and returns reload-required status
+ * - After reload, config refresh (Phase 2) makes priority change visible
+ * - Service dependency (Phase 3) ensures proper initialization order
  *
- * Test scenario:
+ * Test workflow:
  * 1. SetupTask creates two config-sources:
  *    - propsA: ordinal=100, priority-test=from-A
  *    - propsB: ordinal=200, priority-test=from-B
  * 2. Initially, propsB wins (higher ordinal) - verify value is "from-B"
- * 3. At runtime, modify propsA ordinal to 300 (higher than propsB)
- * 4. Now propsA should win - verify value becomes "from-A"
- *
- * EXPECTED BEHAVIOR (Phase 1):
- * This test will FAIL initially because the ordinal change requires server reload
- * to take effect. Phase 2 implementation will fix this by implementing runtime refresh.
+ * 3. At runtime, modify propsA ordinal to 300 (reload-required response)
+ * 4. Reload server
+ * 5. Now propsA should win - verify value becomes "from-A" after reload
  *
  * @author <a href="http://jmesnil.net/">Jeff Mesnil</a> (c) 2017 Red Hat inc.
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-@ServerSetup(SetupTask.class)
+@ServerSetup(RuntimeConfigSourceOrdinalSetupTask.class)
 public class RuntimeConfigSourceOrdinalTestCase extends AbstractMicroProfileConfigTestCase {
 
     @Deployment(testable = false)
     public static Archive<?> deploy() {
         return ShrinkWrap.create(WebArchive.class, "RuntimeConfigSourceOrdinalTestCase.war")
-                .addClasses(TestApplication.class)
+                .addClasses(OrdinalTestApplication.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -73,10 +74,10 @@ public class RuntimeConfigSourceOrdinalTestCase extends AbstractMicroProfileConf
 
     /**
      * Test that modifying a config-source ordinal at runtime changes the priority
-     * of configuration values without requiring a server reload.
+     * of configuration values after server reload.
      *
-     * Phase 1: This test demonstrates the CURRENT behavior (ordinal changes require reload).
-     * Phase 2: After implementation, this test should PASS (ordinal changes work at runtime).
+     * With Phase 4, ordinal modifications require reload. This test verifies the
+     * complete flow including Phase 2 (config refresh) and Phase 3 (service dependency).
      */
     @Test
     public void testRuntimeOrdinalModification() throws Exception {
@@ -92,7 +93,7 @@ public class RuntimeConfigSourceOrdinalTestCase extends AbstractMicroProfileConf
             // Initially, propsB (ordinal=200) should win over propsA (ordinal=100)
             AssertUtils.assertTextContainsProperty(text, PRIORITY_TEST, VALUE_FROM_B);
 
-            // Step 2: Modify propsA ordinal to 300 at RUNTIME (no reload)
+            // Step 2: Modify propsA ordinal to 300 at runtime
             System.out.println("\nModifying propsA ordinal from 100 to 300...");
             ModelNode writeOrdinalOp = new ModelNode();
             writeOrdinalOp.get("address").add("subsystem", "microprofile-config-smallrye")
@@ -117,27 +118,29 @@ public class RuntimeConfigSourceOrdinalTestCase extends AbstractMicroProfileConf
             Assert.assertEquals("Ordinal should be updated in management model", 300, newOrdinal);
             System.out.println("Management model updated: propsA ordinal = " + newOrdinal);
 
-            // Step 3: Query again - propsA should now win (ordinal 300 > 200)
+            // Step 3: Reload server (Phase 4 makes config-source operations reload-required)
+            ServerReload.reloadIfRequired(managementClient);
+
+            // Step 4: Query again - propsA should now win (ordinal 300 > 200) after reload
             response = client.execute(new HttpGet(url + "custom-config-source/test"));
             Assert.assertEquals(200, response.getStatusLine().getStatusCode());
             text = EntityUtils.toString(response.getEntity());
 
-            System.out.println("\nAfter runtime modification (propsA ordinal=300 > propsB ordinal=200):");
+            System.out.println("\nAfter reload (propsA ordinal=300 > propsB ordinal=200):");
             System.out.println(text);
 
-            // CRITICAL TEST: After ordinal change, propsA (ordinal=300) should win over propsB (ordinal=200)
-            // Phase 1: This assertion will FAIL - ordinal change doesn't take effect without reload
-            // Phase 2: This assertion should PASS - ordinal change takes effect immediately
+            // After ordinal change and reload, propsA (ordinal=300) should win over propsB (ordinal=200)
+            // Phase 2 (config refresh) + Phase 3 (service dependency) ensure proper initialization
             AssertUtils.assertTextContainsProperty(text, PRIORITY_TEST, VALUE_FROM_A);
 
             System.out.println("\nSUCCESS: Runtime ordinal modification worked! Config value changed from '"
-                             + VALUE_FROM_B + "' to '" + VALUE_FROM_A + "' without reload.");
+                             + VALUE_FROM_B + "' to '" + VALUE_FROM_A + "' after reload.");
         }
     }
 
     /**
      * Additional test to verify that ordinal changes are reflected in the runtime
-     * MicroProfile Config instance, not just the management model.
+     * MicroProfile Config instance after reload, not just the management model.
      *
      * This ensures the fix addresses the actual runtime behavior, not just model updates.
      */
@@ -158,19 +161,22 @@ public class RuntimeConfigSourceOrdinalTestCase extends AbstractMicroProfileConf
 
             managementClient.getControllerClient().execute(writeOrdinalOp);
 
-            // Query multiple times to ensure consistency
+            // Reload server (Phase 4 makes config-source operations reload-required)
+            ServerReload.reloadIfRequired(managementClient);
+
+            // Query multiple times to ensure consistency after reload
             for (int i = 0; i < 3; i++) {
                 response = client.execute(new HttpGet(url + "custom-config-source/test"));
                 String currentValue = EntityUtils.toString(response.getEntity());
 
-                // All queries should return the same value (from-A after ordinal change)
+                // All queries should return the same value (from-A after ordinal change and reload)
                 AssertUtils.assertTextContainsProperty(currentValue, PRIORITY_TEST, VALUE_FROM_A);
 
                 // Small delay between queries
                 Thread.sleep(100);
             }
 
-            System.out.println("Runtime config consistently returns updated priority after ordinal change.");
+            System.out.println("Runtime config consistently returns updated priority after ordinal change and reload.");
         }
     }
 }
