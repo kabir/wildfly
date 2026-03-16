@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime;
+package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime_ordinal;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ApplicationPath;
@@ -16,25 +16,26 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
- * Test application for runtime config-source removal testing.
+ * REST application to test runtime ordinal changes.
  *
- * @author WildFly Team
+ * @author <a href="http://jmesnil.net/">Jeff Mesnil</a> (c) 2017 Red Hat inc.
  */
-@ApplicationPath("/runtime-config-test")
+@ApplicationPath("/custom-config-source")
 public class TestApplication extends Application {
+    static final String PRIORITY_TEST = "priority-test";
 
     @Path("/test")
     public static class Resource {
 
         @Inject
-        @ConfigProperty(name = "runtime.test.property", defaultValue = "NOT_FOUND")
-        String testProperty;
+        @ConfigProperty(name = PRIORITY_TEST)
+        String priorityTest;
 
         @GET
         @Produces("text/plain")
         public Response doGet() {
             StringBuilder text = new StringBuilder();
-            text.append("runtime.test.property = ").append(testProperty).append("\n");
+            text.append(PRIORITY_TEST + " = " + priorityTest + "\n");
             return Response.ok(text).build();
         }
     }

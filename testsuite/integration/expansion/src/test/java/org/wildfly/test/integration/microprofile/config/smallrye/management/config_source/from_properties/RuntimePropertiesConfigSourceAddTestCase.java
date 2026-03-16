@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime;
+package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties;
 
 import java.net.URL;
 
@@ -63,7 +63,7 @@ public class RuntimePropertiesConfigSourceAddTestCase extends AbstractMicroProfi
     @Deployment(testable = false)
     public static Archive<?> deploy() {
         return ShrinkWrap.create(WebArchive.class, "RuntimePropertiesConfigSourceAddTestCase.war")
-                .addClasses(RuntimeQueryTestApplication.class)
+                .addClasses(RuntimeTestApplication.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -72,7 +72,7 @@ public class RuntimePropertiesConfigSourceAddTestCase extends AbstractMicroProfi
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
 
             // Step 1: Verify property does NOT exist before adding config-source
-            HttpResponse initialResponse = client.execute(new HttpGet(url + "runtime-query-test/test?property=" + RUNTIME_PROPERTY_NAME));
+            HttpResponse initialResponse = client.execute(new HttpGet(url + "custom-config-source/query?property=" + RUNTIME_PROPERTY_NAME));
             String initialText = EntityUtils.toString(initialResponse.getEntity());
 
             // Property should not be found initially (404 or empty/null value)
@@ -87,7 +87,7 @@ public class RuntimePropertiesConfigSourceAddTestCase extends AbstractMicroProfi
 
             // Step 3: Query again - property SHOULD be visible now
             // THIS WILL FAIL with WFLY-21615 bug because Config instances don't refresh
-            HttpResponse runtimeResponse = client.execute(new HttpGet(url + "runtime-query-test/test?property=" + RUNTIME_PROPERTY_NAME));
+            HttpResponse runtimeResponse = client.execute(new HttpGet(url + "custom-config-source/query?property=" + RUNTIME_PROPERTY_NAME));
             Assert.assertEquals("Request after adding config-source should succeed",
                     200, runtimeResponse.getStatusLine().getStatusCode());
 

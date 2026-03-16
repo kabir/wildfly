@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.runtime;
+package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties;
 
 import java.util.Optional;
 
@@ -19,15 +19,19 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 /**
- * JAX-RS application for runtime config-source add testing (WFLY-21615).
- *
- * @author WildFly Team
+ * JAX-RS application for runtime config-source testing.
+ * This application has no injected properties, so it can deploy before
+ * config-sources are added at runtime.
  */
-@ApplicationPath("/runtime-query-test")
-public class RuntimeQueryTestApplication extends Application {
+@ApplicationPath("/custom-config-source")
+public class RuntimeTestApplication extends Application {
 
-    @Path("/test")
-    public static class Resource {
+    /**
+     * Dynamic query resource for runtime config testing.
+     * Uses ConfigProvider.getConfig() to query properties dynamically.
+     */
+    @Path("/query")
+    public static class DynamicQueryResource {
 
         @GET
         @Produces("text/plain")
@@ -36,7 +40,6 @@ public class RuntimeQueryTestApplication extends Application {
                 return Response.status(400).entity("Missing 'property' query parameter\n").build();
             }
 
-            // Get Config instance fresh each time to test if it picks up runtime changes
             Config config = ConfigProvider.getConfig();
             Optional<String> value = config.getOptionalValue(propertyName, String.class);
 
