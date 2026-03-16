@@ -130,10 +130,10 @@ public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTe
         PathAddress configSourceAddress = PathAddress.pathAddress("subsystem", "microprofile-config-smallrye")
                 .append("config-source", CONFIG_SOURCE_NAME);
 
-        String dirPath = System.getProperty("jboss.server.config.dir") + File.separator + TEST_DIR_NAME;
-
         ModelNode addOperation = Util.createAddOperation(configSourceAddress);
-        addOperation.get("dir").get("path").set(dirPath);
+        // Use relative-to to reference server's config directory
+        addOperation.get("dir").get("relative-to").set("jboss.server.config.dir");
+        addOperation.get("dir").get("path").set(TEST_DIR_NAME);
 
         ModelNode result = managementClient.getControllerClient().execute(addOperation);
         Assert.assertEquals("Adding config-source should succeed: " + result.toString(),
