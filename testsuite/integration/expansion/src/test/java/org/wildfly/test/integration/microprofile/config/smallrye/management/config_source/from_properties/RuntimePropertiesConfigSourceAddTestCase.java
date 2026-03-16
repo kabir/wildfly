@@ -19,6 +19,7 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.test.shared.ServerReload;
 import org.jboss.dmr.ModelNode;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -31,18 +32,21 @@ import org.junit.runner.RunWith;
 import org.wildfly.test.integration.microprofile.config.smallrye.AbstractMicroProfileConfigTestCase;
 
 /**
- * Test for WFLY-21615: Add a properties config-source at RUNTIME (not during setup) and verify
- * the property becomes visible without server reload.
+ * Test for WFLY-21615: Add a properties config-source at runtime and verify
+ * the property becomes visible after server reload.
  *
- * This test is expected to FAIL initially because config instances don't see runtime changes.
- * Once WFLY-21615 is fixed (Phase 2), this test should pass.
+ * With Phase 4, config-source operations are reload-required. This test verifies:
+ * - Add operation succeeds and returns reload-required status
+ * - After reload, config refresh (Phase 2) makes property visible
+ * - Service dependency (Phase 3) ensures proper initialization order
  *
  * Test workflow:
- * 1. Deploy the application FIRST
- * 2. Query for a property that doesn't exist (should get 404 or empty response)
- * 3. Add config-source via management operation at RUNTIME (not in SetupTask)
- * 4. Query again - property should be visible (will FAIL until Phase 2 fixes it)
- * 5. Clean up - remove the config-source
+ * 1. Deploy the application
+ * 2. Verify property doesn't exist yet
+ * 3. Add config-source via management operation (reload-required response)
+ * 4. Reload server
+ * 5. Query property - should be visible after reload
+ * 6. Clean up
  *
  * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
  */
@@ -82,24 +86,25 @@ public class RuntimePropertiesConfigSourceAddTestCase extends AbstractMicroProfi
                     initialText.contains("not found") ||
                     initialText.isEmpty());
 
-            // Step 2: Add config-source with the property at RUNTIME
+            // Step 2: Add config-source with the property at runtime
             addConfigSource();
 
-            // Step 3: Query again - property SHOULD be visible now
-            // THIS WILL FAIL with WFLY-21615 bug because Config instances don't refresh
-            HttpResponse runtimeResponse = client.execute(new HttpGet(url + "custom-config-source/query?property=" + RUNTIME_PROPERTY_NAME));
-            Assert.assertEquals("Request after adding config-source should succeed",
-                    200, runtimeResponse.getStatusLine().getStatusCode());
+            // Step 3: Reload server (Phase 4 makes config-source operations reload-required)
+            ServerReload.reloadIfRequired(managementClient);
 
-            String runtimeText = EntityUtils.toString(runtimeResponse.getEntity());
+            // Step 4: Query property - should be visible after reload
+            // Phase 2 (config refresh) + Phase 3 (service dependency) ensure proper initialization
+            HttpResponse reloadedResponse = client.execute(new HttpGet(url + "custom-config-source/query?property=" + RUNTIME_PROPERTY_NAME));
+            Assert.assertEquals("Request after reload should succeed",
+                    200, reloadedResponse.getStatusLine().getStatusCode());
 
-            // This assertion will FAIL until WFLY-21615 is fixed (Phase 2 implementation)
+            String reloadedText = EntityUtils.toString(reloadedResponse.getEntity());
+
             Assert.assertTrue(
-                    "Property should be visible after config-source is added at runtime. " +
+                    "Property should be visible after config-source is added and server reloaded. " +
                     "Expected: '" + RUNTIME_PROPERTY_NAME + " = " + RUNTIME_PROPERTY_VALUE + "' " +
-                    "Actual response: " + runtimeText + ". " +
-                    "THIS IS EXPECTED TO FAIL - demonstrates WFLY-21615 bug where config instances don't see runtime changes.",
-                    runtimeText.contains(RUNTIME_PROPERTY_NAME + " = " + RUNTIME_PROPERTY_VALUE));
+                    "Actual response: " + reloadedText,
+                    reloadedText.contains(RUNTIME_PROPERTY_NAME + " = " + RUNTIME_PROPERTY_VALUE));
         }
     }
 
@@ -107,6 +112,8 @@ public class RuntimePropertiesConfigSourceAddTestCase extends AbstractMicroProfi
     public void cleanup() throws Exception {
         // Always try to remove the config-source in cleanup
         removeConfigSource();
+        // Reload after removal (also reload-required)
+        ServerReload.reloadIfRequired(managementClient);
     }
 
     /**
