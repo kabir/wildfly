@@ -19,14 +19,7 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 /**
- * Test application for runtime config-source add testing (WFLY-21615).
- *
- * This application queries for config properties dynamically via query parameters,
- * allowing tests to verify if properties added at runtime are visible.
- *
- * Unlike the injection-based TestApplication, this uses ConfigProvider.getConfig()
- * to dynamically query properties, which is necessary to test if runtime changes
- * are visible to the Config instance.
+ * JAX-RS application for runtime config-source add testing (WFLY-21615).
  *
  * @author WildFly Team
  */
