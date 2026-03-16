@@ -6,6 +6,7 @@
 package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_properties;
 
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.GET;
@@ -25,6 +26,11 @@ import org.eclipse.microprofile.config.ConfigProvider;
  */
 @ApplicationPath("/custom-config-source")
 public class RuntimeTestApplication extends Application {
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        return Set.of(DynamicQueryResource.class);
+    }
 
     /**
      * Dynamic query resource for runtime config testing.
