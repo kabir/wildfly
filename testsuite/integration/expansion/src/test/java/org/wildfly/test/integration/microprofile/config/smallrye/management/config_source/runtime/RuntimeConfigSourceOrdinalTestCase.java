@@ -117,7 +117,8 @@ public class RuntimeConfigSourceOrdinalTestCase extends AbstractMicroProfileConf
         PathAddress configSourceAddress = PathAddress.pathAddress("subsystem", "microprofile-config-smallrye")
                 .append("config-source", name);
 
-        String properties = String.format("{%s=%s}", PROPERTY_NAME, value);
+        ModelNode properties = new ModelNode();
+        properties.get(PROPERTY_NAME).set(value);
 
         ModelNode addOperation = Util.createAddOperation(configSourceAddress);
         addOperation.get("properties").set(properties);

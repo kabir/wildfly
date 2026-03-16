@@ -116,8 +116,9 @@ public class RuntimePropertiesConfigSourceAddTestCase extends AbstractMicroProfi
         PathAddress configSourceAddress = PathAddress.pathAddress("subsystem", "microprofile-config-smallrye")
                 .append("config-source", CONFIG_SOURCE_NAME);
 
-        // Create the properties map: {runtime.test.property=runtime-value}
-        String properties = String.format("{%s=%s}", RUNTIME_PROPERTY_NAME, RUNTIME_PROPERTY_VALUE);
+        // Create the properties ModelNode object
+        ModelNode properties = new ModelNode();
+        properties.get(RUNTIME_PROPERTY_NAME).set(RUNTIME_PROPERTY_VALUE);
 
         ModelNode addOperation = Util.createAddOperation(configSourceAddress);
         addOperation.get("properties").set(properties);
