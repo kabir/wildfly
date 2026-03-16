@@ -22,7 +22,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  */
 @ApplicationPath("/custom-config-source")
 public class OrdinalTestApplication extends Application {
-    static final String PRIORITY_TEST = "priority-test";
+    static final String PRIORITY_TEST = "wfly21615.ordinal.test.property";
 
     @Path("/test")
     public static class Resource {
