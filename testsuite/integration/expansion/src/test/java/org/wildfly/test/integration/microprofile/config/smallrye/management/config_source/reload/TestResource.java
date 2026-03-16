@@ -5,10 +5,14 @@
 
 package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.reload;
 
+import java.util.Optional;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.Config;
 
@@ -21,12 +25,18 @@ public class TestResource {
     @GET
     @Path("/test")
     @Produces("text/plain")
-    public String test() {
-        StringBuilder builder = new StringBuilder();
-        config.getPropertyNames().forEach(propertyName -> {
-            String propertyValue = config.getConfigValue(propertyName).getValue();
-            builder.append(propertyName).append("=").append(propertyValue).append("\n");
-        });
-        return builder.toString();
+    public Response test(@QueryParam("property") String propertyName) {
+        if (propertyName == null || propertyName.isEmpty()) {
+            return Response.status(400).entity("Missing 'property' query parameter\n").build();
+        }
+
+        Optional<String> value = config.getOptionalValue(propertyName, String.class);
+
+        if (value.isPresent()) {
+            String text = propertyName + " = " + value.get() + "\n";
+            return Response.ok(text).build();
+        } else {
+            return Response.status(404).entity("Property not found: " + propertyName + "\n").build();
+        }
     }
 }

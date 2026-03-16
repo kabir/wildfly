@@ -6,9 +6,7 @@
 package org.wildfly.test.integration.microprofile.config.smallrye.management.config_source.from_dir;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.net.URL;
-import java.nio.file.Files;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -19,6 +17,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
@@ -56,6 +55,7 @@ import org.wildfly.test.integration.microprofile.config.smallrye.AbstractMicroPr
  */
 @RunWith(Arquillian.class)
 @RunAsClient
+@ServerSetup(RuntimeDirConfigSourceSetupTask.class)
 public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTestCase {
 
     private static final String CONFIG_SOURCE_NAME = "runtime-test-dir";
@@ -69,8 +69,6 @@ public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTe
     @ArquillianResource
     private URL url;
 
-    private File testConfigDir;
-
     @Deployment(testable = false)
     public static Archive<?> deploy() {
         return ShrinkWrap.create(WebArchive.class, "RuntimeDirConfigSourceTestCase.war")
@@ -82,10 +80,8 @@ public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTe
     public void testRuntimeDirConfigSourceAdd() throws Exception {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
 
-            // Step 1: Create test directory and property file
-            setupTestDirectory();
-
-            // Step 2: Verify property does NOT exist before adding config-source
+            // Step 1: Verify property does NOT exist before adding config-source
+            // (SetupTask already created the directory and file server-side)
             HttpResponse initialResponse = client.execute(new HttpGet(url + "custom-config-source/query?property=" + RUNTIME_PROPERTY_NAME));
             String initialText = EntityUtils.toString(initialResponse.getEntity());
 
@@ -96,13 +92,13 @@ public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTe
                     initialText.contains("not found") ||
                     initialText.isEmpty());
 
-            // Step 3: Add config-source with directory path at runtime
+            // Step 2: Add config-source with directory path at runtime
             addConfigSource();
 
-            // Step 4: Reload server (Phase 4 makes config-source operations reload-required)
+            // Step 3: Reload server (Phase 4 makes config-source operations reload-required)
             ServerReload.reloadIfRequired(managementClient);
 
-            // Step 5: Query property - should be visible after reload
+            // Step 4: Query property - should be visible after reload
             // Phase 2 (config refresh) + Phase 3 (service dependency) ensure proper initialization
             HttpResponse reloadedResponse = client.execute(new HttpGet(url + "custom-config-source/query?property=" + RUNTIME_PROPERTY_NAME));
             Assert.assertEquals("Request after reload should succeed",
@@ -124,45 +120,7 @@ public class RuntimeDirConfigSourceTestCase extends AbstractMicroProfileConfigTe
         removeConfigSource();
         // Reload after removal (also reload-required)
         ServerReload.reloadIfRequired(managementClient);
-        // Clean up test directory
-        cleanupTestDirectory();
-    }
-
-    /**
-     * Create test directory and property file.
-     */
-    private void setupTestDirectory() throws Exception {
-        String configDir = System.getProperty("jboss.server.config.dir");
-        testConfigDir = new File(configDir, TEST_DIR_NAME);
-
-        // Create directory if it doesn't exist
-        if (!testConfigDir.exists()) {
-            Assert.assertTrue("Failed to create test directory: " + testConfigDir.getAbsolutePath(),
-                    testConfigDir.mkdirs());
-        }
-
-        // Create property file in the directory
-        File propertyFile = new File(testConfigDir, RUNTIME_PROPERTY_NAME);
-        try (FileWriter writer = new FileWriter(propertyFile)) {
-            writer.write(RUNTIME_PROPERTY_VALUE);
-        }
-    }
-
-    /**
-     * Clean up test directory and its contents.
-     */
-    private void cleanupTestDirectory() throws Exception {
-        if (testConfigDir != null && testConfigDir.exists()) {
-            // Delete all files in directory
-            File[] files = testConfigDir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    Files.deleteIfExists(file.toPath());
-                }
-            }
-            // Delete directory itself
-            Files.deleteIfExists(testConfigDir.toPath());
-        }
+        // SetupTask will clean up the directory in tearDown
     }
 
     /**

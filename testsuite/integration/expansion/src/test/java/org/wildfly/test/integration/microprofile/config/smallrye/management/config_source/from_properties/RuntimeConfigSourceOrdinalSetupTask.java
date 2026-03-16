@@ -28,14 +28,14 @@ public class RuntimeConfigSourceOrdinalSetupTask extends CLIServerSetupTask {
     public void setup(ManagementClient managementClient, String containerId) throws Exception {
         NodeBuilder nb = builder.node(containerId);
 
-        // propsA: ordinal=100, priority-test=from-A
+        // propsA: default ordinal (100), priority-test=from-A
         String propsA = String.format("{%s=%s}", PRIORITY_TEST, VALUE_FROM_A);
 
         // propsB: ordinal=200, priority-test=from-B
         String propsB = String.format("{%s=%s}", PRIORITY_TEST, VALUE_FROM_B);
 
-        // Add propsA with ordinal=100
-        nb.setup(String.format("%s:add(properties=%s, ordinal=100)", ADDR_A, propsA));
+        // Add propsA without explicit ordinal (gets default 100)
+        nb.setup(String.format("%s:add(properties=%s)", ADDR_A, propsA));
 
         // Add propsB with ordinal=200 (higher priority initially)
         nb.setup(String.format("%s:add(properties=%s, ordinal=200)", ADDR_B, propsB));

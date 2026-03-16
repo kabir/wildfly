@@ -52,7 +52,7 @@ public class ConfigSourceReloadRaceConditionTestCase extends AbstractMicroProfil
     @Test
     public void testConfigAvailableAfterReload() throws Exception {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-            HttpResponse response = client.execute(new HttpGet(url + "custom-config/test"));
+            HttpResponse response = client.execute(new HttpGet(url + "custom-config/test?property=my.reload.test.property"));
             Assert.assertEquals(200, response.getStatusLine().getStatusCode());
             String text = EntityUtils.toString(response.getEntity());
             // Verify the property from our config-source is accessible
