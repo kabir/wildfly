@@ -142,10 +142,14 @@ public class UndertowSubsystemTransformerTestCase extends AbstractSubsystemTest 
         PathAddress subsystemAddress = PathAddress.pathAddress(UndertowRootDefinition.PATH_ELEMENT);
 
         if (UndertowSubsystemModel.VERSION_15_0_0.requiresTransformation(this.modelVersion)) {
-            PathAddress ajpListenerAddress = subsystemAddress.append(PathElement.pathElement(ServerDefinition.PATH_ELEMENT.getKey(), "default-server"))
-                    .append(PathElement.pathElement(AjpListenerResourceDefinition.PATH_ELEMENT.getKey(), "ajp"));
+            PathAddress serverAddress = subsystemAddress.append(PathElement.pathElement(ServerDefinition.PATH_ELEMENT.getKey(), "default-server"));
 
+            PathAddress ajpListenerAddress = serverAddress.append(PathElement.pathElement(AjpListenerResourceDefinition.PATH_ELEMENT.getKey(), "ajp"));
             config.addFailedAttribute(ajpListenerAddress, new FailedOperationTransformationConfig.NewAttributesConfig(AjpListenerResourceDefinition.ALLOWED_REQUEST_ATTRIBUTES_PATTERN));
+
+            PathAddress consoleAccessLogAddress = serverAddress.append(PathElement.pathElement(HostDefinition.PATH_ELEMENT.getKey(), "default-host"))
+                .append(PathElement.pathElement(ConsoleAccessLogDefinition.PATH_ELEMENT.getKey(), "console-access-log"));
+            config.addFailedAttribute(consoleAccessLogAddress, new FailedOperationTransformationConfig.NewAttributesConfig(ExchangeAttributeDefinitions.ATTRIBUTES));
         }
         if (UndertowSubsystemModel.VERSION_13_0_0.requiresTransformation(this.modelVersion)) {
             PathAddress servletContainerAddress = subsystemAddress.append(PathElement.pathElement(ServletContainerDefinition.PATH_ELEMENT.getKey(), "rejected-container"));
