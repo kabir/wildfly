@@ -10,6 +10,7 @@
         <host name="default-host">
             <console-access-log>
                 <attributes>
+                    <bytes-sent/>
                     <secure-protocol/>
                 </attributes>
             </console-access-log>

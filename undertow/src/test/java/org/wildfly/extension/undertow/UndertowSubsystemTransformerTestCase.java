@@ -149,7 +149,23 @@ public class UndertowSubsystemTransformerTestCase extends AbstractSubsystemTest 
 
             PathAddress consoleAccessLogAddress = serverAddress.append(PathElement.pathElement(HostDefinition.PATH_ELEMENT.getKey(), "default-host"))
                 .append(PathElement.pathElement(ConsoleAccessLogDefinition.PATH_ELEMENT.getKey(), "console-access-log"));
-            config.addFailedAttribute(consoleAccessLogAddress, new FailedOperationTransformationConfig.NewAttributesConfig(ExchangeAttributeDefinitions.ATTRIBUTES));
+            //config.addFailedAttribute(consoleAccessLogAddress, new FailedOperationTransformationConfig.NewAttributesConfig(ExchangeAttributeDefinitions.ATTRIBUTES));
+            config.addFailedAttribute(consoleAccessLogAddress, new FailedOperationTransformationConfig.AttributesPathAddressConfig(ExchangeAttributeDefinitions.ATTRIBUTES.getName()) {
+                @Override
+                protected boolean isAttributeWritable(String attributeName) {
+                    return true;
+                }
+
+                @Override
+                protected boolean checkValue(String attrName, ModelNode attribute, boolean isGeneratedWriteAttribute) {
+                    return attribute.hasDefined(ExchangeAttributeDefinitions.SECURE_PROTOCOL.getName());
+                }
+
+                @Override
+                protected ModelNode correctValue(ModelNode toResolve, boolean isGeneratedWriteAttribute) {
+                    return toResolve.remove(ExchangeAttributeDefinitions.SECURE_PROTOCOL.getName());
+                }
+            });
         }
         if (UndertowSubsystemModel.VERSION_13_0_0.requiresTransformation(this.modelVersion)) {
             PathAddress servletContainerAddress = subsystemAddress.append(PathElement.pathElement(ServletContainerDefinition.PATH_ELEMENT.getKey(), "rejected-container"));
