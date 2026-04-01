@@ -163,7 +163,8 @@ public class UndertowSubsystemTransformerTestCase extends AbstractSubsystemTest 
 
                 @Override
                 protected ModelNode correctValue(ModelNode toResolve, boolean isGeneratedWriteAttribute) {
-                    return toResolve.remove(ExchangeAttributeDefinitions.SECURE_PROTOCOL.getName());
+                    toResolve.remove(ExchangeAttributeDefinitions.SECURE_PROTOCOL.getName());
+                    return toResolve;
                 }
             });
         }
