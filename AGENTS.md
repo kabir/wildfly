@@ -43,6 +43,13 @@ The `testsuite/` directory contains integration and domain tests that run agains
 - Checkstyle is enforced during the build
 - IDE formatter configs are in the [wildfly-core repo](https://github.com/wildfly/wildfly-core/tree/main/ide-configs)
 
+## Documentation
+
+Before making architectural changes or configuring subsystems, consult the WildFly documentation index:
+- [WildFly Documentation Index](https://raw.githubusercontent.com/kabir/wildfly/ai-index/docs/src/main/asciidoc/llms.txt)
+
+Fetch specific `.adoc` files linked in that index only when required for your task.
+
 ## Issue tracking
 
 Issues are tracked in Jira: https://redhat.atlassian.net/browse/WFLY
