@@ -9,6 +9,9 @@
 - [WildFly Maven Plugin Guide](WildFly_Maven_Plugin_Guide.adoc): Packaging a WildFly server with your application using Maven
 - [Bootable JAR Guide](Bootable_Guide.adoc): Packaging your application and WildFly into a single bootable JAR
 - [Galleon Provisioning Guide](Galleon_Guide.adoc): Provisioning a customized WildFly server using the Galleon CLI
+- [Galleon Provisioning Details](_galleon/Galleon_provisioning.adoc): Detailed guide to provisioning WildFly with Galleon
+- [Galleon Feature Packs](_galleon/Galleon_feature_packs.adoc): WildFly Galleon feature-pack artifacts and their contents
+- [Galleon Layers](_galleon/Galleon_layers.adoc): WildFly Galleon layers for fine-grained server provisioning
 - [Getting Started on OpenShift](Getting_Started_on_OpenShift.adoc): Running WildFly on OpenShift/Kubernetes
 
 ## Administrator Guides
@@ -42,5 +45,6 @@
 
 ## Other
 
+- [Developing Jakarta Faces with Maven and IntelliJ](_extras/Developing_Jakarta_Faces_Project_Using_Maven_and_IntelliJ.adoc): Tutorial for developing a Jakarta Faces project using Maven and IntelliJ
 - [Cloud References](Cloud_References.adoc): References for running WildFly in cloud environments
 - [Glossary](Glossary.adoc): Terminology used in WildFly documentation
