@@ -45,16 +45,13 @@ The `testsuite/` directory contains integration and domain tests that run agains
 - Checkstyle is enforced during the build
 - IDE formatter configs are in the [wildfly-core repo](https://github.com/wildfly/wildfly-core/tree/main/ide-configs)
 
-## Documentation
+## Ecosystem Context & Cross-Repo Routing
 
-Before making architectural changes or configuring subsystems, consult the WildFly documentation index:
-- [WildFly Documentation Index](https://raw.githubusercontent.com/kabir/wildfly/ai-index/docs/src/main/asciidoc/llms.txt)
-
-Fetch specific `.adoc` files linked in that index only when required for your task.
-
-When modifying subsystem code (resources, attributes, operations, XML parsers, transformers), consult the WildFly Core subsystem development guides:
-- [WildFly Core Subsystem Development](https://raw.githubusercontent.com/kabir/wildfly-core/ai-index/llms.txt)
-
+- **Local Tasks:** For features fully contained within this repository, consult the local [WildFly Documentation Index](https://raw.githubusercontent.com/.../docs/src/main/asciidoc/llms.txt).
+- **Cross-Repository Tasks:** For changes involving upstream/downstream components, consult the [WildFly Central AI Hub](https://raw.githubusercontent.com/kabir/wildfly-ai-context/main/llms.txt) and look up the target project:
+    - *Core controller, management model, CLI, or subsystem parsers* $\rightarrow$ Navigate to **WildFly Core**.
+    - *Provisioning rules, feature-pack selection, or deployment scanning* $\rightarrow$ Navigate to **WildFly Glow**.
+    - *Plugin goals, server provisioning, or remote deployment execution* $\rightarrow$ Navigate to **WildFly Maven Plugin**.
 ## Issue tracking
 
 Issues are tracked in Jira: https://redhat.atlassian.net/browse/WFLY
