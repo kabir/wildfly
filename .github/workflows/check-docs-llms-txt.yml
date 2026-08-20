@@ -1,0 +1,32 @@
+name: Check docs llms.txt references
+
+on:
+  pull_request:
+    branches:
+      - main
+      - '*.x'
+    paths:
+      - 'docs/**'
+  push:
+    branches:
+      - main
+      - '*.x'
+    paths:
+      - 'docs/**'
+
+jobs:
+  check-llms-txt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check llms.txt references
+        env:
+          GITHUB_EVENT_NAME: '${{ github.event_name }}'
+          GITHUB_BASE_REF: '${{ github.base_ref }}'
+          GITHUB_SHA: '${{ github.sha }}'
+        shell: bash
+        run: bash .github/check-docs-llms-txt.sh
