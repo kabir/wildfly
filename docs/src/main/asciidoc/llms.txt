@@ -1,0 +1,46 @@
+# WildFly Documentation
+
+> WildFly is a Jakarta EE application server. This documentation covers server installation, administration, application development, security, clustering, and extensibility.
+
+## Installation Guides
+
+- [Different Flavors of WildFly](Different_Flavors_of_WildFly.adoc): Overview of WildFly variants — standard, WildFly Preview, and WildFly EE
+- [Installation Guide](Installation_Guide.adoc): Choosing an installation method — zip, Galleon-provisioned server, or bootable JAR
+- [WildFly Maven Plugin Guide](WildFly_Maven_Plugin_Guide.adoc): Packaging a WildFly server with your application using Maven
+- [Bootable JAR Guide](Bootable_Guide.adoc): Packaging your application and WildFly into a single bootable JAR
+- [Galleon Provisioning Guide](Galleon_Guide.adoc): Provisioning a customized WildFly server using the Galleon CLI
+- [Getting Started on OpenShift](Getting_Started_on_OpenShift.adoc): Running WildFly on OpenShift/Kubernetes
+
+## Administrator Guides
+
+- [Getting Started Guide](Getting_Started_Guide.adoc): Installing and starting the server, basic configuration, deploying an application
+- [Admin Guide — Table of Contents](_admin-guide/llms.txt): Server administration, CLI, management interfaces, subsystem configuration, managed domains (87 files)
+
+## Developer Guides
+
+- [Developer Guide — Table of Contents](_developer-guide/llms.txt): Application development, deployment descriptors, Jakarta EE APIs, EJB, JPA, REST, web services (59 files)
+- [Extending WildFly](_extending-wildfly/llms.txt): Creating new WildFly subsystem extensions
+- [Testsuite](_testsuite/llms.txt): WildFly testsuite structure and how to add tests
+- [Hacking on WildFly](_hacking/llms.txt): Contributing to WildFly — development environment, GitHub setup, pull request standards
+
+## Security Guide
+
+- [WildFly Elytron Security — Table of Contents](_elytron/llms.txt): Elytron security layer — authentication, authorization, SSL/TLS, credential stores, migration from legacy security (41 files)
+
+## High Availability Guide
+
+- [High Availability Guide — Table of Contents](_high-availability/llms.txt): Clustering, JGroups, Infinispan, load balancing, failover, HA singletons (28 files)
+
+## Migration Guide
+
+- [Migration Guide — Introduction](_migration-guide/Introduction.adoc): Overview of features removed from WildFly and their replacements
+- [PicketBox Vault Migration](_migration-guide/Vault.adoc): Migrating from PicketBox Vault to Elytron credential stores
+
+## Client Guide
+
+- [WildFly Client Configuration](_client-guide/llms.txt): Client-side configuration for EJB, remoting, web services, and Elytron
+
+## Other
+
+- [Cloud References](Cloud_References.adoc): References for running WildFly in cloud environments
+- [Glossary](Glossary.adoc): Terminology used in WildFly documentation

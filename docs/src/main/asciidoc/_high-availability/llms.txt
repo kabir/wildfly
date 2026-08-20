@@ -1,0 +1,57 @@
+# WildFly High Availability Guide
+
+> Clustering, session replication, load balancing, and failover for WildFly — JGroups, Infinispan, mod_cluster, and HA singleton services.
+
+## Overview
+
+- [Introduction to High Availability Services](Introduction_To_High_Availability_Services.adoc): Overview of HA concepts in WildFly
+- [Clustering and Domain Setup Walkthrough](Clustering_and_Domain_Setup_Walkthrough.adoc): Step-by-step guide to setting up a WildFly cluster
+- [Clustering API](Clustering_API.adoc): Programmatic access to clustering services
+
+## Distributable Applications
+
+- [Distributable Web Applications](Distributable_Web_Applications.adoc): HTTP session replication and passivation for web apps
+- [Distributable Jakarta Enterprise Beans](Distributable_Jakarta_Enterprise_Beans_Applications.adoc): Stateful session bean replication
+
+## JGroups
+
+- [JGroups](JGroups.adoc): JGroups overview — group communication for clustering
+- [JGroups Subsystem](jgroups/JGroups_Subsystem.adoc): JGroups subsystem configuration — stacks, protocols, transport
+- [Discovery for Kubernetes](jgroups/Kubernetes.adoc): Kubernetes-based JGroups discovery (KUBE_PING)
+- [Discovery for AWS EC2](jgroups/AWS-Discovery.adoc): AWS-based JGroups discovery (S3_PING)
+- [SSL/TLS Secured Transport](jgroups/SSL-TLS-Secured-Transport.adoc): Encrypting JGroups TCP transport with SSL/TLS
+- [Adding External Protocols](jgroups/External_Protocols.adoc): Adding custom JGroups protocols from external modules
+
+## Infinispan
+
+- [Infinispan](Infinispan.adoc): Infinispan overview — distributed caching and data grids
+- [Infinispan Subsystem](infinispan/Infinispan_Subsystem.adoc): Infinispan subsystem configuration — cache containers, caches, stores
+
+## Load Balancing
+
+- [Load Balancing](Load_Balancing.adoc): Overview of load balancing options
+- [mod_cluster Subsystem](load-balancing/mod_cluster_Subsystem.adoc): Dynamic load balancing with mod_cluster
+- [Affinity Cookie](load-balancing/Affinity_Cookie.adoc): Load balancer affinity via cookies
+- [Ranked Affinity](load-balancing/Ranked_Affinity.adoc): Ranked session affinity for load balancers
+- [SSL Configuration using Elytron](load-balancing/SSL_Configuration_using_Elytron_Subsystem.adoc): SSL/TLS configuration for mod_cluster with Elytron
+
+## HA Singleton Features
+
+- [HA Singleton Features](HA_Singleton_Features.adoc): Overview of HA singleton capabilities
+- [Singleton Deployments](ha-singleton-features/Singleton_deployments.adoc): Deploying an application as a cluster-wide singleton
+- [Singleton MSC Services](ha-singleton-features/Singleton_MSC_services.adoc): Creating singleton MSC services
+- [Singleton Subsystem](ha-singleton-features/Singleton_subsystem.adoc): Singleton subsystem configuration
+
+## Messaging
+
+- [Messaging](Messaging.adoc): ActiveMQ Artemis clustering and HA for messaging
+
+## Advanced Topics
+
+- [Advanced Topics](Advanced_Topics.adoc): Advanced clustering topics
+- [Marshalling](advanced-topics/Marshalling.adoc): Custom marshalling for session and cache data
+
+## Cloud
+
+- [Clustering in the Cloud](Cloud.adoc): Running WildFly clusters in cloud environments
+- [Kubernetes](cloud/Kubernetes.adoc): Kubernetes-specific clustering configuration

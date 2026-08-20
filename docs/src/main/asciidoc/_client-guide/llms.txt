@@ -1,0 +1,12 @@
+# WildFly Client Guide
+
+> Client-side configuration for WildFly — EJB client, remoting, web services, XNIO, and Elytron authentication.
+
+## Contents
+
+- [Elytron Authentication Client](authentication-client.adoc): Client-side authentication configuration using WildFly Elytron
+- [jboss-ejb-client](jboss-ejb-client.adoc): Legacy jboss-ejb-client.properties configuration
+- [jboss-ejb-client via wildfly-config](wildfly-config-jboss-ejb-client.adoc): EJB client configuration using wildfly-config.xml
+- [Remoting Client Configuration](Remoting_Client_Configuration.adoc): JBoss Remoting client-side configuration
+- [Web Services Client Configuration](Webservices_Client_Configuration.adoc): Web services client configuration
+- [XNIO Client Configuration](XNIO_Client_Configuration.adoc): XNIO (NIO framework) client configuration

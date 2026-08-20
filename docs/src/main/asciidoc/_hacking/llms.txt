@@ -1,0 +1,9 @@
+# Hacking on WildFly
+
+> Contributing to WildFly — development environment setup, GitHub workflow, and pull request standards.
+
+## Contents
+
+- [Development Environment](contributing.adoc): Setting up a development environment for WildFly contributions
+- [GitHub Setup](github_setup.adoc): Forking, cloning, and configuring your GitHub repository
+- [Pull Request Standards](pullrequest_standards.adoc): WildFly pull request standards and guidelines

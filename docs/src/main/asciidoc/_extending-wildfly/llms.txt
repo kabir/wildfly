@@ -1,0 +1,12 @@
+# Extending WildFly
+
+> Creating new WildFly subsystem extensions — the extension API, example subsystem, capabilities, JNDI, domain mode transformers, and CLI extensibility.
+
+## Contents
+
+- [Example Subsystem](Example_subsystem.adoc): Step-by-step walkthrough of creating a new WildFly subsystem extension
+- [Key Interfaces and Classes](Key_Interfaces_and_Classes_Relevant_to_Extension_Developers.adoc): Extension, SubsystemDefinition, ResourceDefinition, OperationStepHandler, and other key APIs
+- [Working with WildFly Capabilities](Working_with_WildFly_Capabilities.adoc): The capability/requirement model for inter-subsystem dependencies
+- [WildFly JNDI Implementation](WildFly_JNDI_Implementation.adoc): How WildFly implements JNDI and how extensions interact with it
+- [Domain Mode Subsystem Transformers](Domain_Mode_Subsystem_Transformers.adoc): Transforming subsystem resources for mixed-version managed domains
+- [CLI Extensibility for Layered Products](CLI_extensibility_for_layered_products.adoc): Adding custom CLI commands for product layers

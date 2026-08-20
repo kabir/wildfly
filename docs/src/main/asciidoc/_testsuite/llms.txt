@@ -1,0 +1,13 @@
+# WildFly Testsuite
+
+> WildFly testsuite structure, test quality standards, and guides for writing and running tests.
+
+## Contents
+
+- [Testsuite Overview](WildFly_Testsuite_Overview.adoc): High-level structure of the WildFly testsuite
+- [Integration Testsuite User Guide](WildFly_Integration_Testsuite_User_Guide.adoc): Running the integration testsuite — profiles, modules, and configuration
+- [Testsuite Harness Developer Guide](WildFly_Testsuite_Harness_Developer_Guide.adoc): Developing and extending the test harness
+- [Test Developer Guide](WildFly_Testsuite_Test_Developer_Guide.adoc): Writing tests — Arquillian, ManagementClient, deployment archives
+- [How to Add a Test Case](How_to_Add_a_Test_Case.adoc): Step-by-step guide to adding a new test
+- [Test Quality Standards](Pre-requisites_-_test_quality_standards.adoc): Requirements for test submissions
+- [Shared Test Classes and Resources](Shared_Test_Classes_and_Resources.adoc): Reusable test utilities and shared resources

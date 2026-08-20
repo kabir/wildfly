@@ -1,0 +1,140 @@
+# WildFly Admin Guide
+
+> Server administration for WildFly — management interfaces, operating modes, subsystem configuration, domain setup, and operational tasks.
+
+## Core Concepts
+
+- [Target Audience](Target_Audience.adoc): Who this guide is for
+- [Core Management Concepts](Core_management_concepts.adoc): Overview of the WildFly management layer, management model, and management interfaces
+- [Operating Modes](Operating_modes.adoc): Standalone server vs. managed domain
+- [General Configuration Concepts](General_configuration_concepts.adoc): Profiles, socket bindings, paths, system properties
+- [Feature Stability Levels](Feature_stability_levels.adoc): Feature maturity classification — default, preview, community, experimental
+- [Interfaces and Ports](Interfaces_and_ports.adoc): Network interface and socket binding configuration
+
+## Management Clients
+
+- [Management Clients](Management_Clients.adoc): Overview of CLI, web console, and programmatic management
+- [Command Line Interface](Command_Line_Interface.adoc): Using the CLI (jboss-cli) for server management
+- [CLI Recipes](CLI_Recipes.adoc): Common CLI commands and usage patterns
+
+## Administrative Security
+
+- [add-user Utility](add-user-utility.adoc): Creating management and application users
+- [Role Based Access Control](RBAC.adoc): Configuring RBAC for management operations
+- [Default HTTP Interface Security](Default_HTTP_Interface_Security.adoc): HTTP management interface security defaults
+- [Default Native Interface Security](Default_Native_Interface_Security.adoc): Native management interface security defaults
+
+## Deployment
+
+- [Application Deployment](Application_deployment.adoc): Deploying applications via CLI, web console, filesystem scanner, and Maven plugin
+- [Deployment Overlays](Deployment_Overlays.adoc): Overlaying content on existing deployments without repackaging
+- [Management Resources](Management_resources.adoc): Management model resources for deployments
+
+## Domain Setup
+
+- [Domain Setup](Domain_Setup.adoc): Setting up and managing a WildFly managed domain
+
+## Management API
+
+- [Management API Reference](Management_API_reference.adoc): Overview of the management API
+- [Description of the Management Model](management-api/Description_of_the_Management_Model.adoc): Structure and description of the management model tree
+- [Detyped Management and jboss-dmr](management-api/Detyped_management_and_the_jboss-dmr_library.adoc): Using the detyped management model with the jboss-dmr library
+- [Global Operations](management-api/Global_operations.adoc): Operations available on all management resources (read-resource, read-attribute, etc.)
+- [The HTTP Management API](management-api/The_HTTP_management_API.adoc): RESTful HTTP management interface
+- [The Native Management API](management-api/The_native_management_API.adoc): Native remoting-based management interface
+
+## Management Tasks
+
+- [Command Line Parameters](management-tasks/Command_line_parameters.adoc): Server startup arguments and system properties
+- [JVM Settings](management-tasks/JVM_settings.adoc): Configuring JVM options for servers
+- [Configuration File History](management-tasks/Configuration_file_history.adoc): Automatic snapshots and rollback of server configuration
+- [Git Configuration File History](management-tasks/Configuration_file_git_history.adoc): Using Git to track configuration changes
+- [YAML Configuration File](management-tasks/YAML_Configuration_file.adoc): YAML-based configuration overrides
+- [Audit Logging](management-tasks/Audit_logging.adoc): Logging management operations for auditing
+- [Suspend, Resume and Graceful Shutdown](management-tasks/Suspend,_Resume_and_Graceful_shutdown.adoc): Graceful request handling during shutdown
+- [Canceling Management Operations](management-tasks/Canceling_Management_Operations.adoc): Canceling long-running management operations
+- [Starting and Stopping Servers in a Managed Domain](management-tasks/Starting_and_Stopping_Servers_in_a_Managed_Domain.adoc): Managing server lifecycle in domain mode
+
+## Subsystem Configuration
+
+- [Subsystem Configuration Overview](Subsystem_configuration.adoc): Introduction to subsystem configuration
+
+### Core and EE
+
+- [Core Management Subsystem](subsystem-configuration/Core_Management.adoc): Core management subsystem configuration
+- [EE Subsystem](subsystem-configuration/EE.adoc): Jakarta EE platform subsystem
+- [EE Application Deployment](subsystem-configuration/EE_Application_Deployment_Configuration.adoc): Deployment-related EE configuration
+- [EE Concurrency Utilities](subsystem-configuration/EE_Concurrency_Utilities_Configuration.adoc): Managed executor services and scheduled executors
+- [Default EE Bindings](subsystem-configuration/EE_Default_Bindings_Configuration.adoc): Default JNDI bindings for EE resources
+- [Simple Configuration Subsystems](subsystem-configuration/Simple_configuration_subsystems.adoc): Subsystems with minimal configuration
+
+### Data
+
+- [DataSource Subsystem](subsystem-configuration/DataSource.adoc): JDBC datasource and connection pool configuration
+- [Agroal Subsystem](subsystem-configuration/Datasources_Agroal.adoc): Agroal datasource subsystem (alternative to legacy datasources)
+- [Jakarta Batch Subsystem](subsystem-configuration/Jakarta_Batch.adoc): Batch processing (JSR-352 / Jakarta Batch) configuration
+- [Jakarta Data Subsystem](subsystem-configuration/Jakarta_Data.adoc): Jakarta Data subsystem configuration
+- [Jakarta Persistence (JPA)](subsystem-configuration/Jakarta_Enterprise_Beans_3.adoc): Jakarta Enterprise Beans subsystem configuration
+- [Resource Adapters Subsystem](subsystem-configuration/Resource_adapters.adoc): JCA resource adapter configuration
+- [Transactions Subsystem](subsystem-configuration/Transactions.adoc): Transaction manager configuration
+
+### Web and REST
+
+- [Undertow Subsystem](subsystem-configuration/Undertow.adoc): HTTP server, virtual hosts, servlets, websockets
+- [AJP Listeners](subsystem-configuration/Undertow_AJP_listeners.adoc): Configuring AJP listeners in Undertow
+- [Using WildFly as a Load Balancer](subsystem-configuration/Undertow_using_as_a_Load_Balancer.adoc): Using Undertow's reverse proxy for load balancing
+- [Jakarta RESTful Web Services Subsystem](subsystem-configuration/Jakarta_RESTful_Web_Services.adoc): RESTEasy / Jakarta REST configuration
+- [Jakarta Faces Subsystem](subsystem-configuration/Jakarta_Faces.adoc): JSF/Faces configuration
+- [Jakarta MVC Subsystem](subsystem-configuration/Jakarta_MVC.adoc): Jakarta MVC configuration
+- [Web Services Subsystem](subsystem-configuration/Web_services.adoc): SOAP/WSDL web services (Apache CXF) configuration
+
+### Messaging
+
+- [Messaging Subsystem](subsystem-configuration/Messaging.adoc): Apache ActiveMQ Artemis messaging configuration
+- [AIO/NIO for Messaging Journal](subsystem-configuration/Mesaging_AIO_-_NIO_for_messaging_journal.adoc): Choosing AIO vs NIO for the messaging journal
+- [Messaging Backward and Forward Compatibility](subsystem-configuration/Messaging_Backward_and_Forward_Compatibility.adoc): Protocol compatibility across versions
+- [Pooled Connection Factory to Remote Artemis](subsystem-configuration/Messaging_Connect_a_pooled-connection-factory_to_a_Remote_Artemis_Server.adoc): Connecting to a remote ActiveMQ Artemis server
+- [Messaging Discovery Configuration](subsystem-configuration/Messaging_Discovery_Configuration.adoc): Broadcast and discovery group configuration
+- [JDBC Store for Messaging Journal](subsystem-configuration/Messaging_JDBC_Store_for_Messaging_Journal.adoc): Using JDBC as the messaging journal store
+
+### Naming and JNDI
+
+- [Naming Subsystem](subsystem-configuration/Naming.adoc): JNDI naming subsystem overview
+- [Global Bindings Configuration](subsystem-configuration/Naming_Global_Bindings_Configuration.adoc): Configuring global JNDI bindings
+- [Remote JNDI Configuration](subsystem-configuration/Naming_Remote_JNDI_Configuration.adoc): Configuring remote JNDI access
+
+### Logging
+
+- [Logging Subsystem](subsystem-configuration/Logging.adoc): Logging subsystem overview and configuration
+- [Loggers](subsystem-configuration/Logging_Loggers.adoc): Configuring loggers and log categories
+- [Handlers](subsystem-configuration/Logging_Handlers.adoc): Log handlers — console, file, periodic, size rotating, async, custom
+- [Formatters](subsystem-configuration/Logging_Formatters.adoc): Log output formatters — pattern, JSON, XML
+- [Filters](subsystem-configuration/Logging_Filters.adoc): Log filters
+- [Logging How-To](subsystem-configuration/Logging_How_To.adoc): Common logging tasks and recipes
+
+### Monitoring and Observability
+
+- [Health Subsystem](subsystem-configuration/Health.adoc): Server health check endpoints
+- [Metrics Subsystem](subsystem-configuration/Metrics.adoc): WildFly Metrics (base and vendor metrics)
+- [Micrometer Subsystem](subsystem-configuration/Micrometer.adoc): Micrometer metrics integration
+- [OpenTelemetry Subsystem](subsystem-configuration/OpenTelemetry.adoc): OpenTelemetry tracing and metrics
+- [MicroProfile Telemetry Subsystem](subsystem-configuration/MicroProfile_Telemetry.adoc): MicroProfile Telemetry integration
+- [MicroProfile Health Subsystem](subsystem-configuration/MicroProfile_Health.adoc): MicroProfile Health checks
+- [JMX Subsystem](subsystem-configuration/JMX.adoc): JMX remoting configuration
+
+### MicroProfile
+
+- [MicroProfile Config Subsystem](subsystem-configuration/MicroProfile_Config_SmallRye.adoc): MicroProfile Config (SmallRye) configuration
+- [MicroProfile Fault Tolerance Subsystem](subsystem-configuration/MicroProfile_Fault_Tolerance_SmallRye.adoc): Circuit breaker, retry, bulkhead, timeout, fallback
+- [MicroProfile JWT Subsystem](subsystem-configuration/MicroProfile_JWT.adoc): MicroProfile JWT authentication
+- [MicroProfile LRA Subsystems](subsystem-configuration/MicroProfile_LRA.adoc): Long Running Actions (saga pattern)
+- [MicroProfile OpenAPI Subsystem](subsystem-configuration/MicroProfile_OpenAPI.adoc): OpenAPI documentation generation
+- [MicroProfile Reactive Messaging Subsystem](subsystem-configuration/MicroProfile_Reactive_Messsaging_SmallRye.adoc): Reactive messaging with Kafka, AMQP
+- [MicroProfile Reactive Streams Operators Subsystem](subsystem-configuration/MicroProfile_Reactive_Streams_Operators_SmallRye.adoc): Reactive Streams Operators
+
+### Security
+
+- [Elytron OIDC Client Subsystem](subsystem-configuration/Elytron_OIDC_Client.adoc): OpenID Connect client configuration
+- [Identity Propagation](subsystem-configuration/Identity_Propagation.adoc): Propagating security identity across invocations
+- [Authentication Modules](subsystem-configuration/Security_Authentication_Modules.adoc): Legacy security authentication module reference
+- [Deployment Scanner Subsystem](subsystem-configuration/Deployment_Scanner.adoc): Automatic deployment scanning configuration

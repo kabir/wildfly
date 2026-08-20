@@ -1,0 +1,65 @@
+# WildFly Elytron Security
+
+> WildFly's security layer — authentication, authorization, SSL/TLS, credential stores, OIDC/SAML, and migration from legacy PicketBox security.
+
+## Architecture and Overview
+
+- [General Elytron Architecture](General_Elytron_Architecture.adoc): Security domains, security realms, decoders, mappers, and the overall Elytron model
+- [Elytron Subsystem](Elytron_Subsystem.adoc): Elytron subsystem configuration reference
+- [Using the Elytron Subsystem](Using_the_Elytron_Subsystem.adoc): Practical guide to configuring Elytron
+- [Using Elytron within WildFly](Using_WildFly_Elytron_with_WildFly.adoc): Integrating Elytron with WildFly subsystems (Undertow, EJB, remoting)
+- [Component Documentation](Subsystem_Component_Documentation.adoc): Index of Elytron component types
+
+## Authentication and Authorization
+
+- [Passwords](Passwords.adoc): Password types and encoding — clear, bcrypt, digest, PBKDF2, salted, OTP
+- [Bearer Token Authorization](Bearer_Token_Authorization.adoc): OAuth2 bearer token authentication
+- [Elytron and Jakarta Authorization (JACC)](Elytron_and_Jakarta_Authorization.adoc): Java Authorization Contract for Containers
+- [Elytron and JASPI](Elytron_and_Java_Authentication_SPI_for_Containers-JASPI.adoc): Java Authentication SPI for Containers
+- [Elytron and EE Security](Elytron_and_Java_EE_Security.adoc): Jakarta Security API integration
+- [Custom Components](Custom_Components.adoc): Writing custom Elytron components (realms, decoders, etc.)
+
+## Security Realms
+
+- [Filesystem Security Realm](components/Filesystem_Security_Realm.adoc): File-based identity store
+- [JDBC Security Realm](components/JDBC_Security_Realm.adoc): Database-backed identity store
+- [JAAS Security Realm](components/JAAS_Security_Realm.adoc): JAAS LoginModule-based realm
+- [Aggregate Security Realm](components/Aggregate_Security_Realm.adoc): Combining multiple realms
+- [Distributed Security Realm](components/Distributed_Security_Realm.adoc): Searching across multiple realms
+- [Failover Security Realm](components/Failover_Security_Realm.adoc): Realm failover configuration
+- [Brute Force Detection](components/Brute_Force_Detection.adoc): Protecting against brute force authentication attacks
+
+## SSL/TLS and Credentials
+
+- [OpenSSL](OpenSSL.adoc): Using OpenSSL as the TLS provider
+- [Credential Store](Credential_Store.adoc): Storing sensitive strings (passwords, keys) outside of configuration files
+- [Encrypted Expressions](Encrypted_Expressions.adoc): Using encrypted expressions in server configuration
+- [HashiCorp Vault Integration](HashiCorp_Vault_Integration.adoc): Retrieving credentials from HashiCorp Vault
+- [Elytron WildFly Java Security Manager](Elytron_WildFly_Java_Security_Manager.adoc): Security Manager integration
+
+## SSO and Identity Providers
+
+- [Web Single Sign-On](Web_Single_Sign_On.adoc): Configuring SSO across web applications
+- [Keycloak Integration](Keycloak_Integration.adoc): Using Keycloak as an OpenID Connect provider
+- [Keycloak SAML Integration](Keycloak_SAML_Integration.adoc): Using Keycloak as a SAML identity provider
+- [Audit](Audit.adoc): Security event audit logging
+
+## Client Configuration
+
+- [Client Authentication with Elytron](Client_Authentication_with_Elytron_Client.adoc): Configuring authentication for WildFly clients
+- [Client Configuration using wildfly-config.xml](Configuring_other_clients_using_wildfly-config.adoc): Configuring non-EJB clients via wildfly-config.xml
+
+## Migrating from Legacy Security
+
+- [Migration Overview](Migrate_Legacy_Security_to_Elytron_Security.adoc): Overview of migrating from PicketBox to Elytron
+- [Properties Based Authentication Migration](migrate/Properties_File_Based_Authentication_Migration.adoc): Migrating properties-file-based authentication
+- [Database Authentication Migration](migrate/Database_Authentication_Migration.adoc): Migrating database-backed authentication
+- [LDAP Authentication Migration](migrate/LDAP_Based_Authentication_Migration.adoc): Migrating LDAP authentication
+- [Kerberos Authentication Migration](migrate/Kerberos_Based_Authentication_Migration.adoc): Migrating Kerberos/SPNEGO authentication
+- [Simple SSL Migration](migrate/Simple_SSL_Migration.adoc): Migrating one-way SSL configuration
+- [SSL with Client Cert Migration](migrate/SSL_with_Client_Cert_Migration.adoc): Migrating mutual/two-way SSL
+- [Composite Stores Migration](migrate/Composite_Stores_Migration.adoc): Migrating composite security stores
+- [Caching Migration](migrate/Caching_Migration.adoc): Migrating security realm caching
+- [Security Vault Migration](migrate/Security_Vault_Migration.adoc): Migrating from PicketBox Vault to credential stores
+- [Security Properties Migration](migrate/Security_Property_Migration.adoc): Migrating security properties
+- [Application Client Migration](migrate/Application_Client_Migration.adoc): Migrating application client security

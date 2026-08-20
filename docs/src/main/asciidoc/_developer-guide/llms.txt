@@ -1,0 +1,83 @@
+# WildFly Developer Guide
+
+> Application development guide for WildFly — Jakarta EE APIs, deployment descriptors, class loading, EJB, JPA, REST, CDI, web services, and migration.
+
+## Core Concepts
+
+- [Class Loading in WildFly](Class_Loading_in_WildFly.adoc): JBoss Modules class loading, module dependencies, and isolation
+- [Implicit Module Dependencies](Implicit_module_dependencies_for_deployments.adoc): Modules automatically added to deployments based on content
+- [Deployment Descriptors](Deployment_Descriptors_used_In_WildFly.adoc): All deployment descriptors recognized by WildFly
+- [JNDI Reference](JNDI_Reference.adoc): JNDI naming overview and lookup rules
+- [Local JNDI](JNDI_Local_Reference.adoc): Local JNDI namespace and bindings
+- [Remote JNDI Access](JNDI_Remote_Reference.adoc): Accessing JNDI from remote clients
+
+## Jakarta EE APIs
+
+- [Jakarta CDI Reference](Jakarta_Contexts_and_Dependency_Injection_Reference.adoc): Contexts and Dependency Injection (CDI) — Weld integration, bean discovery, decorators, interceptors
+- [Jakarta Concurrency Reference](EE_Concurrency_Utilities.adoc): Managed executor services, managed thread factory, context propagation
+- [Jakarta Data Reference](Jakarta_Data_Reference.adoc): Jakarta Data repositories and queries
+- [Jakarta Persistence Reference](Jakarta_Persistence_Reference_Guide.adoc): JPA / Hibernate — persistence units, entity managers, second-level cache
+- [Jakarta REST Reference](Jakarta_RESTful_Web_Services_Reference_Guide.adoc): RESTEasy / Jakarta RESTful Web Services — resources, providers, client API
+- [Jakarta Transactions Reference](Jakarta_Transactions_Reference.adoc): Transaction management — JTA, CMT, BMT
+- [Jakarta Application Client Reference](Application_Client_Reference.adoc): Application client container reference
+
+## Web
+
+- [Web (Undertow) Reference](Web_(Undertow)_Reference_Guide.adoc): Servlet, JSP, websockets — Undertow-specific configuration and features
+
+## Jakarta Enterprise Beans (EJB)
+
+- [Jakarta Enterprise Beans Reference](Jakarta_Enterprise_Beans_3_Reference_Guide.adoc): EJB overview — session beans, MDBs, timers, security, pools
+- [jboss-ejb3.xml Reference](ejb3/jboss-ejb3.xml_Reference.adoc): WildFly-specific EJB deployment descriptor
+- [Securing Jakarta Enterprise Beans](ejb3/Securing_Jakarta_Enterprise_Beans.adoc): EJB security annotations and configuration
+- [Container Interceptors](ejb3/Container_interceptors.adoc): Server-side EJB interceptors
+- [EJB Client Interceptors](ejb3/Jakarta_Enterprise_Beans_Client_Interceptors.adoc): Client-side EJB interceptors
+- [EJB Database Persistent Timers](ejb3/Jakarta_Enterprise_Beans_Database_Persistent_Timers.adoc): Storing EJB timers in a database
+- [EJB Distributed Timers](ejb3/Jakarta_Enterprise_Beans_Distributed_Timers.adoc): EJB timers in a clustered environment
+- [EJB Deployment Runtime Resources](ejb3/Jakarta_Enterprise_Beans_Deployment_Runtime_Resources.adoc): Runtime management resources for deployed EJBs
+- [EJB IIOP Guide](ejb3/Jakarta_Enterprise_Beans_IIOP_Guide.adoc): CORBA/IIOP interoperability for EJBs
+- [EJB Remote Invocation via JNDI](ejb3/Jakarta_Enterprise_Beans_invocations_from_a_remote_client_using_JNDI.adoc): Invoking EJBs from a remote client using JNDI lookups
+- [EJB Invocation from Remote Server](ejb3/Jakarta_Enterprise_Beans_invocations_from_a_remote_server_instance.adoc): Server-to-server EJB invocations
+- [EJB on Kubernetes](ejb3/Jakarta_Enterprise_Beans_on_Kubernetes.adoc): Running EJBs in Kubernetes environments
+- [EJB over HTTP](ejb3/Jakarta_Enterprise_Beans_over_HTTP.adoc): Invoking EJBs over HTTP transport
+- [Scoped EJB Client Contexts](ejb3/Scoped_Jakarta_Enterprise_Beans_client_contexts.adoc): Isolating EJB client connections per scope
+- [Remote EJB via JNDI vs EJB Client API](ejb3/Remote_Jakarta_Enterprise_Beans_invocations_via_JNDI_-_Jakarta_Enterprise_Beans_client_API_or_wildfly-naming-client_project.adoc): Choosing between JNDI lookup and the EJB client API
+- [MDB Controlled Delivery](ejb3/Message_Driven_Beans_Controlled_Delivery.adoc): Controlling when MDBs start receiving messages
+- [MDB Single Connection](ejb3/Message_Driven_Beans_Single_Connection.adoc): Using a single connection for MDB activation
+
+## Jakarta XML Web Services (SOAP)
+
+- [Jakarta XML Web Services Reference](Jakarta_XML_Web_Services_Reference_Guide.adoc): SOAP/WSDL web services overview
+- [Jakarta XML Web Services User Guide](Jakarta_XML_Web_Services_User_Guide.adoc): Getting started with SOAP web services in WildFly
+- [Jakarta XML Web Services Advanced Guide](Jakarta_XML_Web_Services_Advanced_User_Guide.adoc): Advanced SOAP/WSDL topics
+- [JBoss Modules and WS Applications](Jakarta_XML_Web_Services_JBoss_Modules_and_WS_applications.adoc): Module dependencies for web service applications
+- [Jakarta XML Web Services Tools](Jakarta_XML_Web_Services_Tools.adoc): Overview of wsconsume and wsprovide tools
+- [wsconsume](wsconsume.adoc): Generating Java classes from WSDL
+- [wsprovide](wsprovide.adoc): Generating WSDL and wrapper classes from Java
+- [Apache CXF Integration](Jakarta_XML_Web_Services/Apache_CXF_integration.adoc): CXF bus, interceptors, and features
+- [WS Authentication](Jakarta_XML_Web_Services/Authentication.adoc): SOAP web service authentication
+- [WS-Addressing](Jakarta_XML_Web_Services/WS-Addressing.adoc): WS-Addressing support
+- [WS-Discovery](Jakarta_XML_Web_Services/WS-Discovery.adoc): Web service discovery
+- [WS-Policy](Jakarta_XML_Web_Services/WS-Policy.adoc): WS-Policy configuration
+- [WS-Reliable Messaging](Jakarta_XML_Web_Services/WS-Reliable_Messaging.adoc): Reliable SOAP messaging
+- [WS-Security](Jakarta_XML_Web_Services/WS-Security.adoc): SOAP message-level security
+- [WS-Trust and STS](Jakarta_XML_Web_Services/WS-Trust_and_STS.adoc): Security Token Service integration
+- [SAML Bearer Assertion Scenario](Jakarta_XML_Web_Services/SAML_Bearer_Assertion_Scenario.adoc): SAML bearer token authentication
+- [SAML Holder-Of-Key Assertion Scenario](Jakarta_XML_Web_Services/SAML_Holder-Of-Key_Assertion_Scenario.adoc): SAML holder-of-key authentication
+- [ActAs WS-Trust Scenario](Jakarta_XML_Web_Services/ActAs_WS-Trust_Scenario.adoc): WS-Trust ActAs delegation
+- [OnBehalfOf WS-Trust Scenario](Jakarta_XML_Web_Services/OnBehalfOf_WS-Trust_Scenario.adoc): WS-Trust OnBehalfOf delegation
+- [Predefined Client and Endpoint Configurations](Jakarta_XML_Web_Services/Predefined_client_and_endpoint_configurations.adoc): Reusable WS client/endpoint configuration
+- [Published WSDL Customization](Jakarta_XML_Web_Services/Published_WSDL_customization.adoc): Customizing the published WSDL address
+- [SOAP over Jakarta Messaging](Jakarta_XML_Web_Services/SOAP_over_Jakarta_Messaging.adoc): SOAP messages over JMS transport
+- [HTTP Proxy](Jakarta_XML_Web_Services/HTTP_Proxy.adoc): Configuring HTTP proxy for WS clients
+
+## Embedded and Programmatic
+
+- [Embedded API](Embedded_API.adoc): Running WildFly embedded within your application
+- [H2 Web Console](H2_Web_Console_Integration.adoc): Enabling the H2 database web console
+
+## Migration
+
+- [Spring Migration Guide](Spring_applications_development_and_migration_guide.adoc): Developing and migrating Spring applications on WildFly
+- [Migrating from EAP 5.1](Migrate_Order_Application_from_EAP5.adoc): Porting an application from JBoss EAP 5.1 to WildFly
+- [Example Migrated Applications](Migrated_to_WildFly_Example_Applications.adoc): Example applications migrated to WildFly
