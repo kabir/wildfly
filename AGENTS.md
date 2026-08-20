@@ -1,5 +1,7 @@
 # WildFly
 
+> Note: `CLAUDE.md` is a symlink to this file. Do not create or edit them independently.
+
 WildFly is a Jakarta EE application server. This is a large multi-module Maven project (60+ modules) written in Java.
 
 ## Build
@@ -49,6 +51,9 @@ Before making architectural changes or configuring subsystems, consult the WildF
 - [WildFly Documentation Index](https://raw.githubusercontent.com/kabir/wildfly/ai-index/docs/src/main/asciidoc/llms.txt)
 
 Fetch specific `.adoc` files linked in that index only when required for your task.
+
+When modifying subsystem code (resources, attributes, operations, XML parsers, transformers), consult the WildFly Core subsystem development guides:
+- [WildFly Core Subsystem Development](https://raw.githubusercontent.com/kabir/wildfly-core/ai-index/llms.txt)
 
 ## Issue tracking
 
