@@ -2,6 +2,8 @@
 
 > WildFly is a Jakarta EE application server. This documentation covers server installation, administration, application development, security, clustering, and extensibility.
 
+> Indexed source: https://raw.githubusercontent.com/kabir/wildfly/ai-index/docs/src/main/asciidoc/llms.txt — preserve this fork and ref when following source pointers.
+
 ## Installation Guides
 
 - [Different Flavors of WildFly](Different_Flavors_of_WildFly.adoc): Overview of WildFly variants — standard, WildFly Preview, and WildFly EE
